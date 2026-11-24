@@ -4,7 +4,7 @@ import * as THREE from 'three'
 // ---------- разрез
 // Глобальная плоскость отсечения + подкраска внутренних стенок (обратных граней),
 // чтобы срез читался как на чертеже: внутри детали — «штриховка» цветом.
-export const SECTION_COLOR = new THREE.Color('#e0533d')
+export const SECTION_COLOR = new THREE.Color('#a85a44')
 
 export function createSection(renderer, materials) {
   const plane = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0)
@@ -78,7 +78,7 @@ function dotTexture() {
 export function createFlows(parent) {
   const tex = dotTexture()
   const systems = {}
-  let active = null
+  let active = []
 
   // paths: [{ pts: Vector3[], w?: вес (доля частиц), speed?: множитель }]
   function define(id, color, paths, { density = 8, size = 0.26, speed = 1.6 } = {}) {
@@ -145,19 +145,17 @@ export function createFlows(parent) {
 
   return {
     define,
-    show(id) {
-      active = systems[id] ? id : null
+    // можно показать сразу несколько систем: show(['air', 'fuel'])
+    show(ids) {
+      active = [].concat(ids || []).filter((k) => systems[k])
       for (const [k, s] of Object.entries(systems)) {
-        s.pts.visible = k === active
-        s.lines.visible = k === active
+        s.pts.visible = active.includes(k)
+        s.lines.visible = active.includes(k)
       }
     },
-    get active() {
-      return active
-    },
     tick(dt) {
-      if (!active) return false
-      place(systems[active], dt)
+      if (!active.length) return false
+      for (const k of active) place(systems[k], dt)
       return true
     },
     dispose() {

@@ -139,6 +139,9 @@ function headingPlugin(md) {
     const level = Number(tok.tag.slice(1))
     env.toc = env.toc || []
     const id = `sec-${env.toc.length + 1}`
+    // строгий стиль: эмодзи в начале заголовка на сайте не показываем (в Obsidian они остаются)
+    const first = tokens[i + 1].children.find((c) => c.type === 'text')
+    if (first) first.content = first.content.replace(/^[^\p{L}\p{N}«"(]+/u, '')
     const text = tokens[i + 1].children.filter((c) => c.type === 'text' || c.type === 'code_inline').map((c) => c.content).join('')
     if (level === 2 || level === 3) env.toc.push({ id, level, text: text.replace(/^[^\p{L}\p{N}]+/u, '').trim() })
     else env.toc.push({ id, level, text })

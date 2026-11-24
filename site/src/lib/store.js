@@ -42,35 +42,18 @@ export function resetProgress() {
 }
 
 // ---------- оформление
-const mq = typeof matchMedia !== 'undefined' ? matchMedia('(prefers-color-scheme: dark)') : null
-let themeRaw = 'system'
+// у reactable одна тема — тёмная (графит и молочный); светлой нет
 let fontRaw = '1'
 try {
-  themeRaw = localStorage.getItem(KEY + 'theme') || 'system'
   fontRaw = localStorage.getItem(KEY + 'font') || '1'
 } catch {}
 
 export const settings = reactive({
-  theme: themeRaw, // 'light' | 'dark' | 'system'
   font: Number(fontRaw), // множитель размера текста урока
-  systemDark: mq ? mq.matches : false,
 })
-mq?.addEventListener?.('change', (e) => (settings.systemDark = e.matches))
+export const isDark = computed(() => true)
+if (typeof document !== 'undefined') document.documentElement.dataset.theme = 'dark'
 
-export const isDark = computed(() => settings.theme === 'dark' || (settings.theme === 'system' && settings.systemDark))
-
-watch(
-  isDark,
-  (d) => {
-    document.documentElement.dataset.theme = d ? 'dark' : 'light'
-  },
-  { immediate: true },
-)
-watch(() => settings.theme, (t) => {
-  try {
-    localStorage.setItem(KEY + 'theme', t)
-  } catch {}
-})
 watch(
   () => settings.font,
   (f) => {
@@ -81,10 +64,6 @@ watch(
   },
   { immediate: true },
 )
-
-export function cycleTheme() {
-  settings.theme = isDark.value ? 'light' : 'dark'
-}
 
 // ---------- глобальный UI
 export const ui = reactive({

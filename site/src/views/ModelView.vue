@@ -6,6 +6,7 @@ import { PARTS, PART, GROUPS, SYSTEMS, STROKES } from '../model3d/partsInfo.js'
 import { DETAILS, QUIZ } from '../model3d/partsDetails.js'
 import { ASSEMBLY, TIGHTEN } from '../model3d/assemblySteps.js'
 import { ROUTES } from '../model3d/systemRoutes.js'
+import { cylState, EPS } from '../model3d/operation.js'
 import { getLesson, getTerm } from '../lib/content.js'
 import { ui } from '../lib/store.js'
 
@@ -56,6 +57,7 @@ const views = [
 const tabs = [
   { id: 'parts', t: 'Детали' },
   { id: 'assembly', t: 'Сборка' },
+  { id: 'work', t: 'Работа' },
   { id: 'practice', t: 'Тренажёр' },
 ]
 
@@ -114,6 +116,12 @@ onMounted(async () => {
   if (q && PART[q]) setTimeout(() => select(q, true), 300)
 })
 onBeforeUnmount(() => eng?.dispose())
+
+// страховка для старых браузеров без overflow: clip — контейнер страницы модели не должен прокручиваться
+function unscroll(e) {
+  const el = e.currentTarget
+  if (el.scrollTop || el.scrollLeft) el.scrollTop = el.scrollLeft = 0
+}
 
 // переход по ссылке «Посмотреть в 3D», когда страница модели уже открыта
 watch(
@@ -286,11 +294,110 @@ function turnCrank(deg) {
   eng?.setTheta(theta.value + deg)
 }
 
+// ================================================================
+// работа двигателя
+const work = reactive({
+  follow: 1,
+  allForces: false,
+  cut: false,
+  fx: { gas: true, air: true, fuel: true, fire: true, exhaust: true, forces: true, glass: true },
+})
+const FX = [
+  { id: 'air', t: 'Воздух: впуск и наддув', c: '#a2c08f' },
+  { id: 'fuel', t: 'Топливо: подача и впрыск', c: '#c47a45' },
+  { id: 'fire', t: 'Вспышка и сгорание', c: '#e3874a' },
+  { id: 'exhaust', t: 'Выхлоп и турбина', c: '#958e84' },
+  { id: 'gas', t: 'Газ в цилиндре (цвет — температура)', c: '#86a8c6' },
+  { id: 'forces', t: 'Силы: кто толкает поршень', c: '#d0644f' },
+  { id: 'glass', t: 'Прозрачные стенки', c: '#8c8880' },
+]
+const PHASES = {
+  intake: { t: 'Впуск', c: '#8aa37b', text: 'Поршень идёт вниз, впускной клапан открыт. Турбокомпрессор нагнетает в цилиндр свежий воздух под давлением. Топлива в нём нет: дизель набирает чистый воздух.' },
+  compression: { t: 'Сжатие', c: '#6f8fa8', text: `Оба клапана закрыты. Поршень идёт вверх и сжимает воздух примерно в ${EPS} раз. От сжатия воздух сильно нагревается.` },
+  injection: { t: 'Впрыск', c: '#c47a45', text: 'Незадолго до ВМТ форсунка распыляет топливо через несколько отверстий распылителя. Капли попадают в раскалённый воздух и воспламеняются сами: свечи зажигания у дизеля нет.' },
+  combustion: { t: 'Сгорание', c: '#b0584a', text: 'Топливо горит, давление газов резко растёт и с огромной силой давит на днище поршня. Это единственный такт, когда поршень толкает вал, а не вал поршень.' },
+  expansion: { t: 'Рабочий ход', c: '#b0584a', text: 'Газы расширяются и толкают поршень вниз, через шатун он крутит коленвал. Давление и температура падают.' },
+  blowdown: { t: 'Начало выпуска', c: '#d0734f', text: 'Выпускной клапан открылся ещё до НМТ: газы под остаточным давлением вырываются в коллектор и раскручивают турбину.' },
+  exhaust: { t: 'Выпуск', c: '#8c8880', text: 'Поршень идёт вверх и выталкивает отработавшие газы через выпускной клапан в коллектор и дальше на турбину.' },
+}
+const wPsi = computed(() => mod(theta.value - FIRE_AT[work.follow], 720))
+const wState = computed(() => cylState(wPsi.value))
+const valveOpen = (psi, [a, b]) => psi > a && psi < b
+const wValves = computed(() => ({ in: valveOpen(wPsi.value, IN_WIN), ex: valveOpen(wPsi.value, EX_WIN) }))
+const wPhase = computed(() => {
+  if (wValves.value.in && wValves.value.ex) return { t: 'Перекрытие клапанов', c: '#7fa39a', text: 'Открыты оба клапана: свежий воздух продувает цилиндр и выдувает остатки газов в выпуск.' }
+  return PHASES[wState.value.phase]
+})
+const wPiston = computed(() => {
+  const a = wState.value.a
+  const down = a > 0 ? a < 180 : a < -180
+  const gas = wState.value.phase === 'combustion' || wState.value.phase === 'expansion'
+  return { dir: down ? 'вниз' : 'вверх', arrow: down ? '↓' : '↑', who: gas ? 'давление газов' : 'коленвал: его крутят маховик и рабочие ходы других цилиндров' }
+})
+const powerNow = computed(() => FIRING.filter((c) => cycle.value[c] === 0))
+
+// график давления в цилиндре по углу поворота вала
+const CH = { w: 320, h: 150, l: 30, r: 8, t: 10, b: 22, pMax: 170 }
+const cx = (a) => CH.l + ((a + 360) / 720) * (CH.w - CH.l - CH.r)
+const cy_ = (p) => CH.h - CH.b - (Math.min(p, CH.pMax) / CH.pMax) * (CH.h - CH.t - CH.b)
+const chartPath = (() => {
+  let d = ''
+  for (let a = -360; a <= 360; a += 3) d += (d ? 'L' : 'M') + cx(a).toFixed(1) + ' ' + cy_(cylState(mod(a, 720)).p).toFixed(1)
+  return d
+})()
+const chartBands = [
+  { a0: -360, a1: -180, c: '#8aa37b', t: 'Впуск' },
+  { a0: -180, a1: 0, c: '#6f8fa8', t: 'Сжатие' },
+  { a0: 0, a1: 180, c: '#b0584a', t: 'Рабочий' },
+  { a0: 180, a1: 360, c: '#8c8880', t: 'Выпуск' },
+]
+const chartMark = computed(() => ({ x: cx(wState.value.a), y: cy_(wState.value.p) }))
+
+function workFollow(c) {
+  work.follow = c
+  s.cylinder = c
+  eng?.setCylinder(c, { focus: false })
+  eng?.opFollow(c, { fly: !work.cut, all: work.allForces })
+  if (work.cut) setSection('x', ((c - 1) % 6) + 1)
+}
+function workFx(id) {
+  work.fx[id] = !work.fx[id]
+  eng?.setOpFx(id, work.fx[id])
+}
+function workCut() {
+  work.cut = !work.cut
+  if (work.cut) setSection('x', ((work.follow - 1) % 6) + 1)
+  else setSection('none')
+}
+watch(() => work.allForces, (v) => eng?.opFollow(work.follow, { all: v }))
+function enterWork() {
+  s.explode = 0
+  s.layer = 'all'
+  setSection('none')
+  work.cut = false
+  select(null)
+  s.speed = 0.25
+  s.playing = true
+  eng?.setOperation(true)
+  workFollow(work.follow)
+}
+function leaveWork() {
+  eng?.setOperation(false)
+  if (work.cut) setSection('none')
+  work.cut = false
+  s.speed = 1
+  s.cylinder = null
+  eng?.setCylinder(null)
+}
+const speeds = computed(() => (tab.value === 'work' ? [0.1, 0.25, 0.5, 1] : [0.25, 0.5, 1, 2]))
+
 // переключение вкладок
 watch(tab, (t, prev) => {
   if (prev === 'assembly') leaveAssembly()
   if (prev === 'practice' && quiz.running) stopQuiz()
+  if (prev === 'work') leaveWork()
   if (t === 'assembly') enterAssembly()
+  if (t === 'work') enterWork()
 })
 
 function onKey(e) {
@@ -316,13 +423,14 @@ const titleName = computed(() => {
 const sheetTitle = computed(() => {
   if (tab.value === 'assembly' && step.value) return `Шаг ${asm.i + 1}: ${step.value.title}`
   if (tab.value === 'practice' && question.value) return 'Найдите деталь'
+  if (tab.value === 'work') return `${wPhase.value.t} · цилиндр ${work.follow}`
   return info.value ? titleName.value : 'Детали и настройки'
 })
 </script>
 
 <template>
-  <div class="model-page">
-    <div class="stage">
+  <div class="model-page" @scroll="unscroll">
+    <div class="stage" @scroll="unscroll">
       <div ref="host" class="stage-canvas" />
 
       <div v-if="failed" class="stage-error">
@@ -381,9 +489,9 @@ const sheetTitle = computed(() => {
           <button class="dock-btn" type="button" title="Повернуть вал вперёд на 10°" @click="eng?.step(10)">+10°</button>
         </template>
         <div v-else class="seg">
-          <button v-for="v in [0.25, 0.5, 1, 2]" :key="v" type="button" :class="{ on: s.speed === v }" @click="s.speed = v">{{ v }}×</button>
+          <button v-for="v in speeds" :key="v" type="button" :class="{ on: s.speed === v }" @click="s.speed = v">{{ v }}×</button>
         </div>
-        <label class="dock-range">
+        <label v-if="tab !== 'work'" class="dock-range">
           <span>Разборка</span>
           <input v-model.number="s.explode" type="range" min="0" max="1" step="0.01" />
         </label>
@@ -617,6 +725,86 @@ const sheetTitle = computed(() => {
           </section>
         </template>
 
+        <!-- ================= РАБОТА ================= -->
+        <template v-else-if="tab === 'work'">
+          <section class="part-card work-live" :style="{ '--c': wPhase.c }">
+            <div class="pc-top">
+              <span class="pc-sys">{{ wPhase.t }}</span>
+              <span class="pc-count">цилиндр {{ work.follow }} · {{ Math.round(wState.a) }}° от ВМТ</span>
+            </div>
+            <p class="work-text">{{ wPhase.text }}</p>
+            <div class="work-stats">
+              <div><small>Поршень</small><b>{{ wPiston.arrow }} {{ wPiston.dir }}</b></div>
+              <div><small>Давление</small><b>≈ {{ Math.round(wState.p) }} бар</b></div>
+              <div><small>Температура</small><b>≈ {{ Math.round(wState.T - 273) }} °C</b></div>
+            </div>
+            <div class="work-valves">
+              <span :class="{ open: wValves.in }" class="vin">Впускной: {{ wValves.in ? 'открыт' : 'закрыт' }}</span>
+              <span :class="{ open: wValves.ex }" class="vex">Выпускной: {{ wValves.ex ? 'открыт' : 'закрыт' }}</span>
+            </div>
+            <p class="mp-note"><b>Поршень двигает:</b> {{ wPiston.who }}.</p>
+
+            <svg class="pchart" :viewBox="`0 0 ${CH.w} ${CH.h}`" role="img" aria-label="Давление в цилиндре по углу поворота вала">
+              <g v-for="b in chartBands" :key="b.a0">
+                <rect :x="cx(b.a0)" :y="CH.t" :width="cx(b.a1) - cx(b.a0)" :height="CH.h - CH.t - CH.b" :fill="b.c" opacity="0.09" />
+                <text :x="(cx(b.a0) + cx(b.a1)) / 2" :y="CH.t + 11" text-anchor="middle" class="pc-band">{{ b.t }}</text>
+              </g>
+              <g class="pc-axis">
+                <line :x1="CH.l" :x2="CH.w - CH.r" :y1="CH.h - CH.b" :y2="CH.h - CH.b" />
+                <text v-for="p in [0, 50, 100, 150]" :key="p" :x="CH.l - 4" :y="cy_(p) + 3" text-anchor="end">{{ p }}</text>
+                <text v-for="a in [-360, -180, 0, 180, 360]" :key="a" :x="cx(a)" :y="CH.h - 7" text-anchor="middle">{{ Math.abs(a) === 180 ? 'НМТ' : 'ВМТ' }}</text>
+              </g>
+              <rect :x="cx(-14)" :y="CH.t" :width="cx(0) - cx(-14)" :height="CH.h - CH.t - CH.b" fill="#c47a45" opacity="0.25" />
+              <path :d="chartPath" fill="none" stroke="var(--text)" stroke-width="1.6" />
+              <line :x1="chartMark.x" :x2="chartMark.x" :y1="CH.t" :y2="CH.h - CH.b" stroke="var(--accent)" stroke-width="1" stroke-dasharray="3 3" />
+              <circle :cx="chartMark.x" :cy="chartMark.y" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="1.5" />
+            </svg>
+            <div class="pchart-cap">Давление в цилиндре, бар (учебная модель). Оранжевая полоса — впрыск.</div>
+          </section>
+
+          <section class="mp-block">
+            <div class="mp-title">Следить за цилиндром</div>
+            <div class="pairs tdc">
+              <button v-for="c in FIRING" :key="c" type="button" :class="{ on: work.follow === c }" @click="workFollow(c)">{{ c }}</button>
+            </div>
+            <div class="quiz-btns">
+              <button class="btn-ghost" :class="{ active: work.cut }" type="button" @click="workCut">{{ work.cut ? 'Убрать разрез' : 'Разрез через цилиндр' }}</button>
+              <button class="btn-ghost" type="button" @click="workFollow(work.follow)">Камера к цилиндру</button>
+            </div>
+          </section>
+
+          <section class="mp-block">
+            <div class="mp-title">Эффекты</div>
+            <div class="fx-list">
+              <label v-for="f in FX" :key="f.id" class="switch fx">
+                <input type="checkbox" :checked="work.fx[f.id]" @change="workFx(f.id)" />
+                <span class="track" :style="{ '--sw': f.c }"><span class="thumb" /></span>
+                {{ f.t }}
+              </label>
+              <label v-if="work.fx.forces" class="switch fx sub">
+                <input v-model="work.allForces" type="checkbox" />
+                <span class="track"><span class="thumb" /></span>
+                Стрелки у всех цилиндров
+              </label>
+            </div>
+          </section>
+
+          <section class="part-card">
+            <div class="pc-sub">Почему вал крутится без остановки</div>
+            <p class="mp-note">У V12 рабочий ход начинается каждые 60° поворота вала, по порядку работы {{ FIRING.join('–') }}. Поэтому в любой момент 2–3 цилиндра толкают вал, а маховик сглаживает толчки. Поршни остальных цилиндров в это время двигает сам вал: на впуске, сжатии и выпуске.</p>
+            <p class="mp-note"><b>Сейчас рабочий ход:</b> {{ powerNow.length ? powerNow.join(', ') : '—' }}</p>
+          </section>
+
+          <section class="part-card">
+            <div class="pc-sub">Откуда что берётся</div>
+            <ul class="work-src">
+              <li><i style="background: #8aa37b" /><span><b>Воздух</b> — снаружи через воздушный фильтр (на модели нет) в колёса компрессоров, затем через охладитель во впускной коллектор и к впускным клапанам.</span></li>
+              <li><i style="background: #c47a45" /><span><b>Топливо</b> — из бака через фильтр в ТНВД. Насос по очереди посылает порцию по трубке высокого давления к форсунке нужного цилиндра.</span></li>
+              <li><i style="background: #958e84" /><span><b>Газы</b> — через выпускные клапаны в коллектор ряда, на турбину и в выпускную трубу. Турбина крутит компрессор: энергия выхлопа идёт на наддув.</span></li>
+            </ul>
+          </section>
+        </template>
+
         <!-- ================= ТРЕНАЖЁР ================= -->
         <template v-else-if="tab === 'practice'">
           <section class="part-card quiz">
@@ -684,6 +872,11 @@ const sheetTitle = computed(() => {
 
 <style>
 .model-page { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 380px; height: calc(100dvh - var(--topbar-h)); overflow: hidden; }
+/* clip, а не только hidden: hidden-контейнер браузер сам прокручивает при фокусе на кнопке внутри,
+   и вся сцена уезжает вверх. clip такую прокрутку запрещает */
+.model-page, .stage { overflow: clip; }
+/* страница модели появляется без сдвига: сдвиг на время анимации делал документ выше окна */
+.model-page.page-enter-from, .model-page.page-leave-to { transform: none; }
 .stage { position: relative; min-width: 0; container-type: size; background: radial-gradient(ellipse at 50% 40%, var(--surface) 0%, var(--bg) 70%); }
 .stage-canvas { position: absolute; inset: 0; }
 .stage-canvas canvas { display: block; cursor: grab; }
@@ -692,33 +885,33 @@ const sheetTitle = computed(() => {
 
 .m-label {
   position: absolute; transform: translate(-50%, calc(-100% - 14px)); pointer-events: none; white-space: nowrap;
-  padding: 6px 12px; border-radius: 10px; background: var(--text); color: var(--bg); font-size: 13.5px; font-weight: 650;
+  padding: 6px 12px; border-radius: var(--radius); background: var(--text); color: var(--bg); font-size: 13.5px; font-weight: 650;
   box-shadow: var(--shadow); display: flex; gap: 8px; align-items: baseline; animation: fadein 0.25s var(--ease);
 }
 .m-label small { font-weight: 500; opacity: 0.7; }
-.m-label::after { content: ''; position: absolute; left: 50%; bottom: -6px; width: 10px; height: 10px; background: var(--text); transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
-.m-hover { position: absolute; transform: translate(14px, 14px); pointer-events: none; padding: 4px 9px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); font-size: 12.5px; font-weight: 600; box-shadow: var(--shadow); white-space: nowrap; }
+.m-label::after { content: ''; position: absolute; left: 50%; bottom: -6px; width: 10px; height: 10px; background: var(--text); transform: translateX(-50%) rotate(45deg); border-radius: 1px; }
+.m-hover { position: absolute; transform: translate(14px, 14px); pointer-events: none; padding: 4px 9px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); font-size: 12.5px; font-weight: 600; box-shadow: var(--shadow); white-space: nowrap; }
 
-.hud { position: absolute; left: 16px; top: 16px; padding: 10px 12px; border-radius: 14px; background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(10px); border: 1px solid var(--border); box-shadow: var(--shadow-sm); max-width: calc(100% - 32px); }
+.hud { position: absolute; left: 16px; top: 16px; padding: 10px 12px; border-radius: var(--radius); background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(10px); border: 1px solid var(--border); box-shadow: var(--shadow-sm); max-width: calc(100% - 32px); }
 .hud-title { font-size: 12px; font-weight: 650; color: var(--text-2); display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
 .hud-angle { color: var(--text-3); font-weight: 500; font-variant-numeric: tabular-nums; }
 .hud-strip { display: flex; gap: 4px; }
 .hud-cyl {
-  width: 30px; height: 30px; border-radius: 8px; border: 1.5px solid color-mix(in srgb, var(--sc) 55%, transparent);
+  width: 30px; height: 30px; border-radius: var(--radius-sm); border: 1.5px solid color-mix(in srgb, var(--sc) 55%, transparent);
   background: color-mix(in srgb, var(--sc) 16%, var(--surface)); color: var(--text); font-weight: 700; font-size: 12.5px;
   transition: background 0.2s, transform 0.2s var(--ease), box-shadow 0.2s; font-variant-numeric: tabular-nums;
 }
 .hud-cyl.power { background: var(--sc); color: #fff; border-color: var(--sc); transform: translateY(-2px); box-shadow: 0 4px 12px color-mix(in srgb, var(--sc) 45%, transparent); }
 .hud-cyl.active { outline: 2px solid var(--accent); outline-offset: 2px; }
 .hud-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 8px; font-size: 11.5px; color: var(--text-3); }
-.hud-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 5px; vertical-align: -0.5px; }
+.hud-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 1px; margin-right: 5px; vertical-align: -0.5px; }
 
 .dock {
   position: absolute; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); transform: translateX(-50%);
-  display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 16px; max-width: calc(100% - 24px);
+  display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: var(--radius); max-width: calc(100% - 24px);
   background: color-mix(in srgb, var(--surface) 90%, transparent); backdrop-filter: blur(12px); border: 1px solid var(--border); box-shadow: var(--shadow);
 }
-.dock-btn { height: 38px; min-width: 38px; padding: 0 10px; border: 0; border-radius: 10px; background: var(--surface-2); font-weight: 650; font-size: 13px; display: grid; place-items: center; transition: background 0.15s, transform 0.15s; }
+.dock-btn { height: 38px; min-width: 38px; padding: 0 10px; border: 0; border-radius: var(--radius); background: var(--surface-2); font-weight: 650; font-size: 13px; display: grid; place-items: center; transition: background 0.15s, transform 0.15s; }
 .dock-btn:hover { background: var(--surface-3); }
 .dock-btn:active { transform: scale(0.95); }
 .dock-btn:disabled { opacity: 0.4; pointer-events: none; }
@@ -729,8 +922,8 @@ const sheetTitle = computed(() => {
 .dock-step { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 0 6px; line-height: 1.25; }
 .dock-step small { font-size: 11.5px; color: var(--text-3); font-weight: 600; }
 .dock-step b { font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 10px; background: var(--surface-2); }
-.seg button { border: 0; background: none; padding: 6px 9px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: var(--text-2); white-space: nowrap; transition: background 0.15s, color 0.15s; }
+.seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: var(--radius); background: var(--surface-2); }
+.seg button { border: 0; background: none; padding: 6px 9px; border-radius: var(--radius-sm); font-size: 12.5px; font-weight: 600; color: var(--text-2); white-space: nowrap; transition: background 0.15s, color 0.15s; }
 .seg button:hover { color: var(--text); }
 .seg button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
 .seg.wide { display: flex; flex-wrap: wrap; }
@@ -743,17 +936,17 @@ const sheetTitle = computed(() => {
 .mpanel-scroll { flex: 1; overflow-y: auto; padding: 18px 18px 28px; overscroll-behavior: contain; scrollbar-width: thin; }
 .mp-head h1 { margin: 0 0 4px; font-size: 20px; letter-spacing: -0.02em; }
 .mp-head p { margin: 0 0 14px; font-size: 13.5px; color: var(--text-2); line-height: 1.5; }
-.mp-tabs { display: flex; gap: 2px; padding: 3px; margin-bottom: 14px; border-radius: 12px; background: var(--surface-2); position: sticky; top: -18px; z-index: 2; box-shadow: 0 6px 10px -8px rgba(0, 0, 0, 0.2); }
-.mp-tabs button { flex: 1; border: 0; background: none; padding: 8px 6px; border-radius: 9px; font-size: 13.5px; font-weight: 650; color: var(--text-2); transition: background 0.15s, color 0.15s; }
+.mp-tabs { display: flex; gap: 2px; padding: 3px; margin-bottom: 14px; border-radius: var(--radius); background: var(--surface-2); position: sticky; top: -18px; z-index: 2; box-shadow: 0 6px 10px -8px rgba(0, 0, 0, 0.2); }
+.mp-tabs button { flex: 1; border: 0; background: none; padding: 8px 6px; border-radius: var(--radius); font-size: 13.5px; font-weight: 650; color: var(--text-2); transition: background 0.15s, color 0.15s; }
 .mp-tabs button:hover { color: var(--text); }
 .mp-tabs button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
-.part-card, .hint-card, .mini-card { padding: 14px 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.part-card, .hint-card, .mini-card { padding: 14px 16px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
 .part-card + .part-card { margin-top: 12px; }
 .part-card { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
 .hint-card { display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--text-2); line-height: 1.45; }
 .pc-top { display: flex; align-items: center; gap: 8px; }
 .pc-top .icon-btn { margin-left: auto; margin-right: -6px; }
-.pc-sys { font-size: 11.5px; font-weight: 650; padding: 2px 8px; border-radius: 99px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
+.pc-sys { font-size: 11.5px; font-weight: 650; padding: 2px 8px; border-radius: 2px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
 .pc-count { font-size: 12px; color: var(--text-3); font-weight: 600; }
 .part-card h2 { margin: 6px 0 6px; font-size: 18px; letter-spacing: -0.01em; line-height: 1.3; }
 .part-card h2 small { font-size: 13px; color: var(--text-3); font-weight: 500; }
@@ -769,13 +962,12 @@ const sheetTitle = computed(() => {
 .pc-more ul, .pc-more ol { margin: 0 0 10px; padding-left: 20px; font-size: 13.5px; line-height: 1.5; color: var(--text-2); }
 .pc-more li { margin: 3px 0; }
 .pc-more p { font-size: 13.5px; }
-.pc-more.warn summary { color: #dc2626; }
-:root[data-theme='dark'] .pc-more.warn summary { color: #f87171; }
+.pc-more.warn summary { color: var(--c-danger); }
 .pc-tools { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
-.tool { font-size: 12.5px; padding: 3px 9px; border-radius: 7px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2); }
+.tool { font-size: 12.5px; padding: 3px 9px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2); }
 .pc-measure { font-size: 13.5px !important; }
 .pc-links { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 10px; }
-.pc-lesson { display: flex; flex-direction: column; padding: 9px 12px; border-radius: 10px; background: var(--accent-soft); font-size: 13.5px; font-weight: 600; line-height: 1.35; transition: transform 0.2s var(--ease); }
+.pc-lesson { display: flex; flex-direction: column; padding: 9px 12px; border-radius: var(--radius); background: var(--accent-soft); font-size: 13.5px; font-weight: 600; line-height: 1.35; transition: transform 0.2s var(--ease); }
 .pc-lesson span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-strong); }
 .pc-lesson:hover { transform: translateX(2px); }
 .pc-terms { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -783,30 +975,30 @@ const sheetTitle = computed(() => {
 .mp-title { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); font-weight: 650; margin-bottom: 8px; }
 .mp-note { font-size: 13px !important; color: var(--text-2); line-height: 1.5; margin: 8px 0; }
 .layer-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.layer-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); background: var(--surface); border-radius: 99px; padding: 5px 11px; font-size: 13px; font-weight: 600; color: var(--text-2); transition: all 0.15s; }
-.layer-chip i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+.layer-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); background: var(--surface); border-radius: 2px; padding: 5px 11px; font-size: 13px; font-weight: 600; color: var(--text-2); transition: all 0.15s; }
+.layer-chip i { width: 9px; height: 9px; border-radius: 2px; background: var(--c); }
 .layer-chip.on { border-color: var(--c, var(--text)); color: var(--text); background: color-mix(in srgb, var(--c, var(--text)) 12%, var(--surface)); }
-.route-card { margin-top: 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--c) 40%, var(--border)); background: color-mix(in srgb, var(--c) 6%, var(--surface)); }
+.route-card { margin-top: 10px; padding: 12px 14px; border-radius: var(--radius); border: 1px solid color-mix(in srgb, var(--c) 40%, var(--border)); background: color-mix(in srgb, var(--c) 6%, var(--surface)); }
 .route-card p { margin: 8px 0 0; font-size: 13px; line-height: 1.5; color: var(--text-2); }
 .route { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 2px; font-size: 12.5px; font-weight: 600; }
 .route li { display: inline-flex; align-items: center; }
 .route li:not(:last-child)::after { content: '→'; margin: 0 4px; color: var(--c); }
 .pair-row { margin-top: 10px; font-size: 12.5px; color: var(--text-2); font-weight: 600; }
 .pairs { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
-.pairs button { border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 5px 9px; font-size: 12.5px; font-weight: 650; color: var(--text-2); font-variant-numeric: tabular-nums; transition: all 0.15s; }
+.pairs button { border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); padding: 5px 9px; font-size: 12.5px; font-weight: 650; color: var(--text-2); font-variant-numeric: tabular-nums; transition: all 0.15s; }
 .pairs button:hover { border-color: var(--accent); color: var(--text); }
 .pairs button.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .pairs.tdc button { min-width: 34px; }
 .switch { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 13.5px; cursor: pointer; user-select: none; }
 .switch input { position: absolute; opacity: 0; pointer-events: none; }
-.switch .track { width: 36px; height: 20px; border-radius: 99px; background: var(--surface-3); position: relative; transition: background 0.2s; }
-.switch .thumb { position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); transition: transform 0.2s var(--ease); }
+.switch .track { width: 36px; height: 20px; border-radius: 2px; background: var(--surface-3); position: relative; transition: background 0.2s; }
+.switch .thumb { position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; border-radius: 2px; background: var(--text-2); box-shadow: none; transition: transform 0.2s var(--ease); }
 .switch input:checked + .track { background: var(--accent); }
-.switch input:checked + .track .thumb { transform: translateX(16px); }
+.switch input:checked + .track .thumb { transform: translateX(16px); background: var(--bg); box-shadow: none; }
 .switch input:focus-visible + .track { outline: 2px solid var(--accent); outline-offset: 2px; }
 .part-list { display: flex; flex-direction: column; gap: 2px; }
-.part-row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border: 0; background: none; border-radius: 9px; text-align: left; font-size: 13.5px; color: var(--text-2); transition: background 0.15s, color 0.15s; }
-.part-row i { width: 12px; height: 12px; border-radius: 4px; flex: none; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15); }
+.part-row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border: 0; background: none; border-radius: var(--radius); text-align: left; font-size: 13.5px; color: var(--text-2); transition: background 0.15s, color 0.15s; }
+.part-row i { width: 12px; height: 12px; border-radius: 1px; flex: none; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15); }
 .part-row small { margin-left: auto; color: var(--text-3); font-size: 12px; }
 .part-row:hover { background: var(--surface-2); color: var(--text); }
 .part-row.on { background: var(--accent-soft); color: var(--text); font-weight: 600; }
@@ -814,23 +1006,23 @@ const sheetTitle = computed(() => {
 
 /* сборка */
 .asm-progress { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 12.5px; font-weight: 650; color: var(--text-3); font-variant-numeric: tabular-nums; }
-.asm-progress .bar { flex: 1; height: 6px; border-radius: 6px; background: var(--surface-3); overflow: hidden; }
+.asm-progress .bar { flex: 1; height: 6px; border-radius: var(--radius-sm); background: var(--surface-3); overflow: hidden; }
 .asm-parts { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
 .asm-parts .chip { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 12.5px; padding: 4px 10px; }
-.asm-parts .chip i { width: 9px; height: 9px; border-radius: 3px; }
+.asm-parts .chip i { width: 9px; height: 9px; border-radius: 1px; }
 .asm-parts .chip.on { border-color: var(--accent); color: var(--text); background: var(--accent-soft); }
 .asm-sec { margin-top: 8px; }
 .asm-sec ol, .asm-sec ul { margin: 0 0 6px; padding-left: 20px; font-size: 13.5px; line-height: 1.5; color: var(--text-2); }
 .asm-sec li { margin: 3px 0; }
 .asm-sec.check li::marker { color: var(--ok); }
-.asm-sec.tighten { padding: 10px 12px; border-radius: 10px; background: var(--surface-2); }
+.asm-sec.tighten { padding: 10px 12px; border-radius: var(--radius); background: var(--surface-2); }
 .asm-sec.tighten p { margin: 0; font-size: 13px; }
-.asm-doc { margin-top: 10px; font-size: 13px; line-height: 1.45; color: var(--text-2); padding: 8px 10px; border-radius: 9px; border: 1px dashed var(--border-strong); }
-.asm-warn { margin: 10px 0; font-size: 13px; line-height: 1.45; padding: 9px 12px; border-radius: 10px; background: color-mix(in srgb, #ef4444 10%, var(--surface)); border-left: 3px solid #ef4444; color: var(--text); }
+.asm-doc { margin-top: 10px; font-size: 13px; line-height: 1.45; color: var(--text-2); padding: 8px 10px; border-radius: var(--radius); border: 1px dashed var(--border-strong); }
+.asm-warn { margin: 10px 0; font-size: 13px; line-height: 1.45; padding: 9px 12px; border-radius: var(--radius); background: var(--c-danger-bg); border-left: 2px solid var(--c-danger); color: var(--text); }
 .asm-card .pc-lesson { margin-top: 10px; }
 .asm-nav { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; }
 .asm-nav button { flex: 1; }
-.btn-ghost, .quiz .btn-primary, .asm-nav .btn-primary, .part-card .btn-primary { border: 1px solid var(--border); background: var(--surface); border-radius: 10px; padding: 8px 14px; font-weight: 650; font-size: 13.5px; transition: background 0.15s, transform 0.15s; }
+.btn-ghost, .quiz .btn-primary, .asm-nav .btn-primary, .part-card .btn-primary { border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius); padding: 8px 14px; font-weight: 650; font-size: 13.5px; transition: background 0.15s, transform 0.15s; }
 .asm-nav .btn-primary, .part-card .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); box-shadow: none; }
 .btn-ghost:hover { background: var(--surface-2); }
 .btn-ghost:disabled, .btn-primary:disabled { opacity: 0.4; pointer-events: none; }
@@ -838,9 +1030,9 @@ const sheetTitle = computed(() => {
 .mini-card b { font-size: 14px; }
 .mini-card p { margin: 4px 0 6px; font-size: 13px; color: var(--text-2); line-height: 1.5; }
 .asm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-.asm-list button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 6px 8px; border: 0; background: none; border-radius: 9px; text-align: left; font-size: 13px; color: var(--text-2); transition: background 0.15s; }
+.asm-list button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 6px 8px; border: 0; background: none; border-radius: var(--radius); text-align: left; font-size: 13px; color: var(--text-2); transition: background 0.15s; }
 .asm-list button:hover { background: var(--surface-2); color: var(--text); }
-.asm-list .n { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 11.5px; font-weight: 700; background: var(--surface-2); border: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+.asm-list .n { flex: none; width: 22px; height: 22px; border-radius: 2px; display: grid; place-items: center; font-size: 11.5px; font-weight: 700; background: var(--surface-2); border: 1px solid var(--border); font-variant-numeric: tabular-nums; }
 .asm-list button.done .n { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
 .asm-list button.on { background: var(--accent-soft); color: var(--text); font-weight: 650; }
 .asm-list button.on .n { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
@@ -849,24 +1041,68 @@ const sheetTitle = computed(() => {
 .quiz-top { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-3); font-weight: 600; }
 .quiz-q { font-size: 16px !important; }
 .quiz-ok { color: var(--ok) !important; font-weight: 650; }
-.quiz-bad { color: #dc2626 !important; font-weight: 600; }
-:root[data-theme='dark'] .quiz-bad { color: #f87171 !important; }
+.quiz-bad { color: var(--c-danger) !important; font-weight: 600; }
 .quiz-btns { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; }
 .free { margin-top: 10px; }
 .free-head { font-size: 12.5px; font-weight: 650; margin-bottom: 6px; font-variant-numeric: tabular-nums; }
 .free-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 4px; }
-.free-grid span { display: flex; align-items: center; gap: 4px; padding: 4px 7px; border-radius: 8px; background: var(--surface-2); font-size: 12px; }
+.free-grid span { display: flex; align-items: center; gap: 4px; padding: 4px 7px; border-radius: var(--radius-sm); background: var(--surface-2); font-size: 12px; }
 .free-grid span.both { background: var(--ok-soft); }
 .free-grid b { min-width: 16px; font-variant-numeric: tabular-nums; }
-.free-grid i { font-style: normal; font-size: 11px; font-weight: 650; padding: 0 5px; border-radius: 5px; }
-.free-grid .vin { background: color-mix(in srgb, #22c55e 22%, transparent); }
-.free-grid .vex { background: color-mix(in srgb, #ef4444 20%, transparent); }
+.free-grid i { font-style: normal; font-size: 11px; font-weight: 650; padding: 0 5px; border-radius: var(--radius-sm); }
+.free-grid .vin { background: color-mix(in srgb, var(--c-tip) 22%, transparent); }
+.free-grid .vex { background: color-mix(in srgb, var(--c-danger) 22%, transparent); }
+
+/* работа двигателя */
+.work-live { border-color: color-mix(in srgb, var(--c) 55%, var(--border)) !important; }
+.work-live .pc-sys { color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); font-size: 13px; padding: 3px 10px; }
+.work-live .pc-count { margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; text-transform: none; letter-spacing: 0.02em; }
+.work-live .pc-sys { white-space: nowrap; }
+.work-text { margin: 8px 0 10px !important; min-height: 4.6em; }
+.work-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.work-stats div { display: flex; flex-direction: column; padding: 6px 8px; border-radius: var(--radius); background: var(--surface-2); min-width: 0; }
+.work-stats small { font-size: 11px; color: var(--text-3); font-weight: 600; }
+.work-stats b { font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.work-valves { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.work-valves span { font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--text-3); }
+.work-valves .vin.open { background: color-mix(in srgb, var(--c-tip) 22%, transparent); color: var(--text); }
+.work-valves .vex.open { background: color-mix(in srgb, var(--c-danger) 22%, transparent); color: var(--text); }
+.pchart { width: 100%; height: auto; display: block; margin-top: 6px; }
+.pchart text { font-size: 9px; fill: var(--text-3); font-family: inherit; }
+.pchart .pc-band { font-size: 9px; font-weight: 600; }
+.pc-axis line { stroke: var(--border-strong); }
+.pchart-cap { font-size: 11.5px; color: var(--text-3); margin-top: 2px; }
+.fx-list { display: flex; flex-direction: column; }
+.switch.fx { margin-top: 9px; font-size: 13px; }
+.switch.fx .track { flex: none; }
+.switch.fx input:checked + .track { background: var(--sw, var(--accent)); }
+.switch.fx.sub { margin-left: 46px; font-size: 12.5px; color: var(--text-2); }
+.btn-ghost.active { background: var(--accent-soft); border-color: var(--accent); }
+.work-src { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.5; color: var(--text-2); }
+.work-src li { display: flex; gap: 8px; }
+.work-src i { flex: none; width: 10px; height: 10px; border-radius: 2px; margin-top: 5px; }
+
+/* reactable: строгая типографика панели модели */
+.mp-head h1 { font-family: var(--font-head); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 22px; }
+.part-card h2, .asm-card h2, .quiz-q { font-family: var(--font-head); font-weight: 500; letter-spacing: 0.015em; }
+.mp-title, .pc-sub, .hud-title, .quiz-top, .free-head, .pchart-cap, .dock-step small, .asm-progress, .pc-count, .work-stats small {
+  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500;
+}
+.hud-title { font-size: 10.5px; }
+.mp-tabs button { font-family: var(--font-head); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; }
+.mp-tabs button.on { background: var(--text); color: var(--bg); }
+.seg button.on { background: var(--text); color: var(--bg); }
+.dock-btn.primary { background: var(--text); color: var(--bg); }
+.pc-sys { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500 !important; }
+.hud-cyl, .pairs button, .work-stats b, .hud-angle { font-family: var(--font-mono); }
+.part-card { border-color: var(--border-strong); }
+.m-label { font-family: var(--font-head); font-weight: 500; letter-spacing: 0.03em; }
 
 /* адаптация к ширине самой сцены */
 @container (max-width: 640px) {
   .hud { left: 8px; right: 8px; top: 8px; max-width: none; padding: 8px; }
   .hud-strip { justify-content: space-between; gap: 2px; }
-  .hud-cyl { width: auto; flex: 1; height: 28px; font-size: 11.5px; border-radius: 7px; }
+  .hud-cyl { width: auto; flex: 1; height: 28px; font-size: 11.5px; border-radius: var(--radius-sm); }
   .hud-legend { display: none; }
   .dock { left: 8px; right: 8px; transform: none; max-width: none; min-width: 0; overflow-x: auto; scrollbar-width: none; justify-content: space-between; }
   .dock::-webkit-scrollbar { display: none; }
@@ -883,13 +1119,13 @@ const sheetTitle = computed(() => {
   .stage { position: absolute; inset: 0; }
   .mpanel {
     position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; height: min(72vh, 620px); border: 0;
-    border-radius: 18px 18px 0 0; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.18);
+    border-radius: var(--radius) var(--radius) 0 0; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.18);
     transform: translateY(calc(100% - 56px - env(safe-area-inset-bottom))); transition: transform 0.35s var(--ease);
   }
   .mpanel.open { transform: none; }
   .sheet-handle { position: relative; display: flex; align-items: center; gap: 10px; height: 56px; padding: 12px 18px 0; border: 0; background: none; font-weight: 650; font-size: 14.5px; text-align: left; }
   .sheet-handle > span:not(.grip) { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .grip { position: absolute; left: 50%; top: 7px; width: 38px; height: 4px; border-radius: 4px; background: var(--border-strong); transform: translateX(-50%); }
+  .grip { position: absolute; left: 50%; top: 7px; width: 38px; height: 4px; border-radius: 1px; background: var(--border-strong); transform: translateX(-50%); }
   .sheet-handle .chev { width: 18px; height: 18px; color: var(--text-3); transition: transform 0.3s var(--ease); }
   .mpanel.open .sheet-handle .chev { transform: rotate(180deg); }
   .mpanel-scroll { padding-top: 6px; }
@@ -900,7 +1136,7 @@ const sheetTitle = computed(() => {
 @media (max-width: 720px) {
   .hud { left: 8px; right: 8px; top: 8px; max-width: none; padding: 8px; }
   .hud-strip { justify-content: space-between; gap: 2px; }
-  .hud-cyl { width: auto; flex: 1; height: 28px; font-size: 11.5px; border-radius: 7px; }
+  .hud-cyl { width: auto; flex: 1; height: 28px; font-size: 11.5px; border-radius: var(--radius-sm); }
   .dock { left: 8px; right: 8px; transform: none; max-width: none; min-width: 0; overflow-x: auto; scrollbar-width: none; justify-content: space-between; }
   .dock::-webkit-scrollbar { display: none; }
   .dock-range input { width: 90px; }

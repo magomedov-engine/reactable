@@ -8,6 +8,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import { PARTS, PART, SYSTEMS, STROKES } from './partsInfo.js'
 import { createSection, createFlows } from './features.js'
+import { createOperation } from './operation.js'
 
 const DEG = Math.PI / 180
 
@@ -185,21 +186,40 @@ class Helix extends THREE.Curve {
   }
 }
 
-function numberTexture(n) {
-  const c = document.createElement('canvas')
-  c.width = c.height = 128
+// палитра сцены (графит / молоко)
+const INK = '#141517' // графит
+const MILK = '#ece6da' // молочный акцент
+const BADGE_FONT = "600 66px 'Oswald Variable', 'Oswald', 'Arial Narrow', sans-serif"
+
+// номер цилиндра: строгий квадратный значок.
+// обычный — графит с молочной рамкой и цифрой; active — сплошной молочный с графитовой цифрой
+function drawBadge(c, n, active) {
   const g = c.getContext('2d')
-  g.fillStyle = 'rgba(17,22,30,0.82)'
-  g.beginPath()
-  g.arc(64, 64, 58, 0, Math.PI * 2)
-  g.fill()
-  g.fillStyle = '#ffffff'
-  g.font = 'bold 64px Inter, system-ui, sans-serif'
+  g.clearRect(0, 0, 128, 128)
+  g.fillStyle = active ? MILK : 'rgba(20,21,23,0.9)'
+  g.fillRect(10, 10, 108, 108)
+  if (!active) {
+    g.strokeStyle = MILK
+    g.lineWidth = 5
+    g.strokeRect(12.5, 12.5, 103, 103)
+  }
+  g.fillStyle = active ? INK : MILK
+  g.font = BADGE_FONT
   g.textAlign = 'center'
   g.textBaseline = 'middle'
   g.fillText(String(n), 64, 68)
+}
+function numberTexture(n, active = false) {
+  const c = document.createElement('canvas')
+  c.width = c.height = 128
+  drawBadge(c, n, active)
   const t = new THREE.CanvasTexture(c)
   t.colorSpace = THREE.SRGBColorSpace
+  // перерисовка после загрузки шрифта Oswald
+  t.userData.redraw = () => {
+    drawBadge(c, n, active)
+    t.needsUpdate = true
+  }
   return t
 }
 function shadowTexture() {
@@ -207,9 +227,10 @@ function shadowTexture() {
   c.width = c.height = 256
   const g = c.getContext('2d')
   // градиент до самого края квадрата: на краях плоскости тень полностью прозрачна
+  // (на тёмной сцене тень чуть плотнее, но остаётся едва заметной)
   const grd = g.createRadialGradient(128, 128, 4, 128, 128, 127)
-  grd.addColorStop(0, 'rgba(0,0,0,0.34)')
-  grd.addColorStop(0.6, 'rgba(0,0,0,0.12)')
+  grd.addColorStop(0, 'rgba(0,0,0,0.42)')
+  grd.addColorStop(0.6, 'rgba(0,0,0,0.16)')
   grd.addColorStop(1, 'rgba(0,0,0,0)')
   g.fillStyle = grd
   g.fillRect(0, 0, 256, 256)
@@ -221,7 +242,7 @@ export function createEngine(host, cb = {}) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
   renderer.toneMapping = THREE.ACESFilmicToneMapping
-  renderer.toneMappingExposure = 1.05
+  renderer.toneMappingExposure = 1.0
   host.appendChild(renderer.domElement)
   renderer.domElement.style.touchAction = 'none'
 
@@ -229,9 +250,14 @@ export function createEngine(host, cb = {}) {
   const pmrem = new THREE.PMREMGenerator(renderer)
   const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
   scene.environment = envTex
-  const sun = new THREE.DirectionalLight(0xffffff, 1.4)
+  // тёмная графитовая сцена: тёплый ключевой свет, холодноватый контровой
+  // (отделяет силуэт от фона) и мягкое заполнение «молоко сверху / графит снизу»
+  const sun = new THREE.DirectionalLight('#fff4e4', 1.45)
   sun.position.set(-6, 14, 9)
-  scene.add(sun, new THREE.AmbientLight(0xffffff, 0.25))
+  const rim = new THREE.DirectionalLight('#dde2e8', 0.85)
+  rim.position.set(9, 6, -12)
+  const hemi = new THREE.HemisphereLight('#efe8dc', '#1a1b1e', 0.22)
+  scene.add(sun, rim, hemi, new THREE.AmbientLight('#ece6da', 0.08))
 
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 200)
   camera.position.set(-15, 9, 15)
@@ -251,7 +277,7 @@ export function createEngine(host, cb = {}) {
       metalness: p.metal ?? 0.5,
       roughness: p.rough ?? 0.45,
       side: p.double ? THREE.DoubleSide : THREE.FrontSide,
-      envMapIntensity: 0.9,
+      envMapIntensity: 1.0,
     })
   }
   const root = new THREE.Group()
@@ -492,7 +518,7 @@ export function createEngine(host, cb = {}) {
   const gearK = gear(NK, gK, 'Шестерня распредвала')
   const markGeo = new THREE.SphereGeometry(0.06, 16, 12)
   geos.add(markGeo)
-  const blueMat = new THREE.MeshStandardMaterial({ color: '#3b82f6', roughness: 0.4 })
+  const blueMat = new THREE.MeshStandardMaterial({ color: '#5f86a8', roughness: 0.45, metalness: 0.2 })
   function mark(g, localAngle, rp, blue) {
     const m = mk(markGeo, 'gearmark')
     if (blue) m.material = blueMat
@@ -662,6 +688,14 @@ export function createEngine(host, cb = {}) {
   const cyls = []
   const flashMats = []
   const sprites = []
+  const badgeTex = []
+  let alive = true
+  // шрифт значков (Oswald) мог ещё не загрузиться: перерисуем, когда загрузится
+  document.fonts?.load?.(BADGE_FONT).then(() => {
+    if (!alive) return
+    badgeTex.forEach((t) => t.userData.redraw())
+    dirty = true
+  }).catch(() => {})
   for (let c = 1; c <= 12; c++) {
     const side = c <= 6 ? 'L' : 'R'
     const out = side === 'R' ? 1 : -1
@@ -719,7 +753,7 @@ export function createEngine(host, cb = {}) {
     hb.position.set(x, 3.9, 0)
     add(hb, 'headbolt')
 
-    const fm = new THREE.MeshBasicMaterial({ color: '#ff7a1a', transparent: true, opacity: 0, depthWrite: false })
+    const fm = new THREE.MeshBasicMaterial({ color: '#e3874a', transparent: true, opacity: 0, depthWrite: false })
     flashMats.push(fm)
     const flash = new THREE.Mesh(G.flash, fm)
     flash.userData.noPick = true
@@ -766,7 +800,11 @@ export function createEngine(host, cb = {}) {
       valves.push({ type, v, rk, pr, tp, spr, lobe, delta, xv })
     }
 
-    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: numberTexture(c), depthTest: false, transparent: true }))
+    const badge = numberTexture(c)
+    const badgeOn = numberTexture(c, true)
+    badgeTex.push(badge, badgeOn)
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: badge, depthTest: false, transparent: true, toneMapped: false }))
+    sp.userData.tex = { off: badge, on: badgeOn }
     sp.scale.set(0.62, 0.62, 1)
     sp.position.set(x, 5.05, -out * 0.2)
     sp.renderOrder = 10
@@ -860,7 +898,7 @@ export function createEngine(host, cb = {}) {
       oil.push({ pts: [V3(x, 0.2, 1.35), V3(x, 0, 0).addScaledVector(dir, 0.38)], speed: 0.6 })
       oil.push({ pts: [V3(x, -0.35, 0.1), V3(x + 0.2, -1.2, 0.2), V3(x + 0.3, -2.05, 0.1)], speed: 0.45 })
     }
-    flows.define('oil', '#d97706', oil)
+    flows.define('oil', '#d8b35c', oil)
     // охлаждающая жидкость: насос → рубашки рядов → головки → термостат → к радиатору
     const water = []
     for (const side of ['L', 'R']) {
@@ -869,11 +907,11 @@ export function createEngine(host, cb = {}) {
       for (const cy of bankCyls(side)) water.push({ pts: [W(side, cy.x, 1.4, o * 0.8), W(side, cy.x, 2.4, o * 0.78), W(side, cy.x + 0.25, 3.3, o * 0.55)], speed: 0.6 })
       water.push(path(W(side, 5.0, 3.3, o * 0.55), W(side, -4.9, 3.3, o * 0.55), W(side, -5.3, 3.3, 0), V3(-5.55, 2.95, 0), V3(-5.55, 3.47, 0), V3(-6.45, 3.47, 0)))
     }
-    flows.define('water', '#1d4ed8', water)
+    flows.define('water', '#86a8c6', water)
     // воздух: компрессоры → охладитель → коллектор → впускные клапаны
     const air = [...tubePts('intercooler'), path(V3(4.6, 3.08, 0), V3(-5.0, 3.08, 0))]
     for (const cy of cyls) air.push({ pts: [V3(cy.x - 0.3, 3.08, 0), W(cy.side, cy.x - 0.3, 3.35, 0), W(cy.side, cy.x - 0.3, 2.85, 0)], speed: 0.5 })
-    flows.define('air', '#15803d', air)
+    flows.define('air', '#a2c08f', air)
     // выхлоп: выпускные клапаны → коллектор ряда → турбина → наружу
     const ex = []
     for (const cy of cyls) {
@@ -884,11 +922,36 @@ export function createEngine(host, cb = {}) {
       const o = side === 'R' ? 1 : -1
       ex.push(path(W(side, sh(side) - 4.9, 3.5, o * 1.35), W(side, sh(side) + 5.75, 3.5, o * 1.35), W(side, sh(side) + 5.95, 4.3, o * 1.45), W(side, sh(side) + 5.95, 5.2, o * 1.6)))
     }
-    flows.define('exhaust', '#b91c1c', ex)
+    flows.define('exhaust', '#cc6e5a', ex)
     // топливо: от бака → фильтр → ТНВД → трубки высокого давления → форсунки
     const fuel = [path(V3(1.2, -0.9, -2.6), V3(3.0, -0.7, -2.3), V3(3.0, -0.6, -1.95), V3(3.25, 0.0, -1.95), V3(4.6, 1.6, -1.3), V3(5.6, 2.7, -0.45), V3(5.85, 3.0, 0)), ...tubePts('hpline').map((p) => ({ ...p, speed: 1.6 }))]
-    flows.define('fuel', '#c2410c', fuel)
+    flows.define('fuel', '#de8d55', fuel)
+
+    // режим «Работа»: общие потоки (по цилиндрам частицы рисует operation.js)
+    const opAir = [...tubePts('intercooler'), path(V3(4.6, 3.08, 0), V3(-5.0, 3.08, 0))]
+    const opExh = []
+    for (const side of ['L', 'R']) {
+      const o = side === 'R' ? 1 : -1
+      // наружный воздух через воздушный фильтр (на модели нет) в колесо компрессора
+      opAir.push(path(W(side, sh(side) + 9.2, 3.9, o * 1.9), W(side, sh(side) + 8.2, 3.55, o * 1.45), W(side, sh(side) + 7.15, 3.5, o * 1.35)))
+      opExh.push(path(W(side, sh(side) - 4.9, 3.5, o * 1.35), W(side, sh(side) + 5.75, 3.5, o * 1.35)))
+      // за турбиной газы уходят вверх, в выпускную трубу
+      opExh.push({ pts: [W(side, sh(side) + 5.75, 3.5, o * 1.35), W(side, sh(side) + 5.95, 4.3, o * 1.45), W(side, sh(side) + 6.1, 5.4, o * 1.7), W(side, sh(side) + 6.4, 6.6, o * 2.0)], speed: 1.4 })
+    }
+    flows.define('op_air', '#a2c08f', opAir, { density: 6, size: 0.24 })
+    flows.define('op_exh', '#958e84', opExh, { density: 6, size: 0.3 })
+    flows.define('op_fuel', '#de8d55', [fuel[0]], { density: 7, size: 0.22, speed: 1.0 })
   }
+  // режим «Работа двигателя»
+  const hpCurves = {}
+  const work = createOperation({
+    root, banks, cyls, DECK, IN_WIN, EX_WIN, FIRE_AT, lift,
+    hpCurve: (c) =>
+      (hpCurves[c] ||= (() => {
+        const t = tubes.find((q) => q.mesh.userData.part === 'hpline' && q.mesh.userData.cyl === c)
+        return t ? new THREE.CatmullRomCurve3(t.pointsFn(), false, 'centripetal') : null
+      })()),
+  })
 
   // тень под двигателем
   const shadowTex = shadowTexture()
@@ -918,6 +981,7 @@ export function createEngine(host, cb = {}) {
       const sp = R * Math.cos(d)
       const np = R * Math.sin(d)
       const sPin = sp + Math.sqrt(ROD * ROD - np * np)
+      cy.sPin = sPin
       setPos(cy.piston, cy.x, sPin + 0.025, 0)
       setPos(cy.rings, cy.x, sPin, 0)
       setPos(cy.ppin, cy.x, sPin, 0)
@@ -942,13 +1006,17 @@ export function createEngine(host, cb = {}) {
         va.lobe.rotation.x = th / 2 + va.delta
       }
     }
+    if (work.enabled) work.update(theta, 0, speed)
   }
 
   // ================================================================
   // внешний вид: подсветка, слои, прозрачность корпуса
-  const state = { selected: null, hover: null, layer: 'all', casing: 0.3, cylinder: null, only: null, fresh: null }
+  const state = { selected: null, hover: null, layer: 'all', casing: 0.3, cylinder: null, only: null, fresh: null, op: false, glass: true }
+  // «стеклянный» двигатель в режиме работы: стенки почти прозрачные, внутренности видно
+  const GLASS = { block: 0.1, liner: 0.13, jacket: 0.05, head: 0.16, cover: 0.12, oilpan: 0.15, oil: 0.25, manifold_in: 0.35, manifold_ex: 0.4, intercooler: 0.55, headbolt: 0.5, maincap: 0.4 }
   let flashScale = 1
-  const accent = new THREE.Color('#f59e0b')
+  // подсветка выбранной / наведённой детали: молочный тёплый белый
+  const accent = new THREE.Color(MILK)
   function applyLook() {
     for (const p of PARTS) {
       const m = mats[p.id]
@@ -973,6 +1041,7 @@ export function createEngine(host, cb = {}) {
         emis = accent
         emisI = 0.18
       }
+      if (state.op && state.glass && GLASS[p.id] != null && !state.selected) op = Math.min(op, GLASS[p.id])
       // режим сборки: показываем только поставленные детали, новые подсвечены
       if (state.only) {
         if (!state.only.has(p.id) && !(p.id === 'gearmark' && state.only.has('gear'))) op = 0
@@ -992,12 +1061,14 @@ export function createEngine(host, cb = {}) {
     }
     blueMat.opacity = mats.gearmark.opacity
     blueMat.transparent = mats.gearmark.transparent
-    flashScale = state.only && !state.only.has('piston') ? 0 : state.selected || state.layer !== 'all' ? 0.35 : 1
+    flashScale = state.op || (state.only && !state.only.has('piston')) ? 0 : state.selected || state.layer !== 'all' ? 0.35 : 1
     for (const cy of cyls) {
-      cy.sprite.material.color.set(state.cylinder === cy.c ? '#f59e0b' : '#ffffff')
+      // выбранный цилиндр — инверсный (сплошной молочный) значок
+      cy.sprite.material.map = state.cylinder === cy.c ? cy.sprite.userData.tex.on : cy.sprite.userData.tex.off
       cy.sprite.visible = numbersOn && (!state.only || state.only.has('liner'))
     }
-    flows.show(state.layer !== 'all' && !state.only && explodeF < 0.05 ? state.layer : null)
+    if (state.op) flows.show([work.fx.air && 'op_air', work.fx.exhaust && 'op_exh', work.fx.fuel && 'op_fuel'].filter(Boolean))
+    else flows.show(state.layer !== 'all' && !state.only && explodeF < 0.05 ? state.layer : null)
     dirty = true
   }
 
@@ -1155,7 +1226,11 @@ export function createEngine(host, cb = {}) {
       dirty = true
     }
     if (controls.update()) dirty = true
-    if (flows.tick(dt * (playing ? Math.max(0.5, speed) : 0.6))) dirty = true
+    if (flows.tick(dt * (state.op ? (playing ? Math.max(0.3, speed * 1.6) : 0.25) : playing ? Math.max(0.5, speed) : 0.6))) dirty = true
+    if (work.enabled) {
+      work.update(theta, dt, playing ? speed : 0.15)
+      dirty = true
+    }
     if (dirty) {
       renderer.render(scene, camera)
       dirty = false
@@ -1223,6 +1298,34 @@ export function createEngine(host, cb = {}) {
     setSpeed(s) {
       speed = s
     },
+    // режим «Работа двигателя»
+    setOperation(on) {
+      state.op = on
+      work.setEnabled(on)
+      if (on) work.update(theta, 0, speed)
+      applyLook()
+    },
+    setOpFx(key, v) {
+      if (key === 'glass') state.glass = v
+      else work.setFx(key, v)
+      if (work.enabled) work.setEnabled(true)
+      applyLook()
+    },
+    // c — цилиндр, за которым следим; all — стрелки сил у всех; fly — подлететь камерой
+    opFollow(c, { fly = false, all = false } = {}) {
+      work.setFollow(c, all)
+      const cy = cyls.find((q) => q.c === c)
+      if (fly && cy) {
+        // смотрим на цилиндр снаружи ряда и немного сверху
+        root.updateMatrixWorld(true)
+        const center = banks[cy.side].localToWorld(V3(cy.x, 2.7, 0))
+        const outDir = V3(0, 0, cy.out).applyQuaternion(banks[cy.side].quaternion)
+        // сбоку, перпендикулярно оси цилиндра: видно, как ходит поршень
+        const dir = outDir.add(V3(-0.45, 0.8, 0)).normalize()
+        flyTo(center.clone().addScaledVector(dir, 10 * Math.max(1, fitScale() * 0.9)), center)
+      }
+      dirty = true
+    },
     setNumbers(v) {
       numbersOn = v
       applyLook()
@@ -1245,11 +1348,11 @@ export function createEngine(host, cb = {}) {
       } else section.set(null)
       dirty = true
     },
-    setCylinder(c) {
+    setCylinder(c, { focus = true } = {}) {
       state.cylinder = c
       applyLook()
       const cy = cyls.find((x) => x.c === c)
-      if (cy) focusObject(cy.piston)
+      if (cy && focus) focusObject(cy.piston)
     },
     step(deg) {
       theta = mod(theta + deg, 720)
@@ -1278,6 +1381,7 @@ export function createEngine(host, cb = {}) {
     },
     partIds: () => Object.keys(meshesByPart),
     dispose() {
+      alive = false
       cancelAnimationFrame(raf)
       ro.disconnect()
       controls.dispose()
@@ -1286,10 +1390,9 @@ export function createEngine(host, cb = {}) {
       blueMat.dispose()
       flashMats.forEach((m) => m.dispose())
       flows.dispose()
-      sprites.forEach((s) => {
-        s.material.map.dispose()
-        s.material.dispose()
-      })
+      work.dispose()
+      sprites.forEach((s) => s.material.dispose())
+      badgeTex.forEach((t) => t.dispose())
       shadow.geometry.dispose()
       shadow.material.dispose()
       shadowTex.dispose()

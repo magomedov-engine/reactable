@@ -37,10 +37,9 @@ export function contentClick(e, router, figures) {
 let mermaidPromise = null
 let seq = 0
 
-function themeVars(dark) {
-  return dark
-    ? { background: 'transparent', primaryColor: '#1d2430', primaryBorderColor: '#3b4757', primaryTextColor: '#e6e9ee', lineColor: '#8b97a8', secondaryColor: '#232b38', tertiaryColor: '#1a2029', edgeLabelBackground: '#151a21', clusterBkg: '#1a2029', fontSize: '15px' }
-    : { background: 'transparent', primaryColor: '#f3f5f8', primaryBorderColor: '#cfd6df', primaryTextColor: '#1b2330', lineColor: '#7a8696', secondaryColor: '#eef1f5', tertiaryColor: '#ffffff', edgeLabelBackground: '#ffffff', clusterBkg: '#f7f8fa', fontSize: '15px' }
+// схемы в цветах reactable: графит и молочный
+function themeVars() {
+  return { background: 'transparent', primaryColor: '#212226', primaryBorderColor: '#5a5a5e', primaryTextColor: '#ece6da', lineColor: '#9a958c', secondaryColor: '#2a2b30', tertiaryColor: '#1a1b1e', edgeLabelBackground: '#1a1b1e', clusterBkg: '#1a1b1e', clusterBorder: '#44454b', fontSize: '15px' }
 }
 
 export async function renderMermaid(root, dark) {
@@ -52,7 +51,7 @@ export async function renderMermaid(root, dark) {
     startOnLoad: false,
     securityLevel: 'strict',
     theme: 'base',
-    themeVariables: { fontFamily: '"Inter Variable", system-ui, sans-serif', ...themeVars(dark) },
+    themeVariables: { fontFamily: '"IBM Plex Sans", system-ui, sans-serif', ...themeVars() },
     flowchart: { curve: 'basis', padding: 12, nodeSpacing: 34, rankSpacing: 40 },
   })
   for (const b of blocks) {

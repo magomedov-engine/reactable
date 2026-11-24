@@ -33,5 +33,5 @@ router.afterEach((to) => {
   ui.sidebarOpen = false
   ui.term = null
   const l = to.name === 'lesson' ? getLesson(to.params.id) : null
-  document.title = `${l ? l.title : to.meta.title || 'Курс'} · Слесарь-сборщик V12`
+  document.title = `${l ? l.title : to.meta.title || 'Курс'} · reactable`
 })
