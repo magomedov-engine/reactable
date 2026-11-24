@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 420" font-family="Arial, sans-serif">
+<defs><marker id="b" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#1565c0"/></marker><marker id="r" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#d84315"/></marker></defs>
+<rect width="860" height="420" fill="#ffffff" rx="10"/>
+<text x="430" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Термостат: малый и большой круг охлаждения</text>
+<text x="210" y="62" text-anchor="middle" font-size="15" font-weight="bold" fill="#1565c0">Двигатель холодный: МАЛЫЙ круг</text>
+<rect x="40" y="150" width="130" height="110" rx="8" fill="#cfd6dc" stroke="#333" stroke-width="2"/><text x="105" y="200" text-anchor="middle" font-size="13">двигатель</text><text x="105" y="216" text-anchor="middle" font-size="11" fill="#555">(рубашка)</text>
+<circle cx="105" cy="330" r="26" fill="#bbdefb" stroke="#1565c0" stroke-width="2"/><text x="105" y="334" text-anchor="middle" font-size="11">насос</text>
+<rect x="190" y="95" width="60" height="40" rx="6" fill="#e3f0fb" stroke="#333" stroke-width="2"/><text x="220" y="120" text-anchor="middle" font-size="11">термостат</text>
+<rect x="310" y="110" width="70" height="230" fill="#e3f0fb" stroke="#1565c0" stroke-width="2"/>
+<line x1="310" y1="125" x2="380" y2="125" stroke="#90caf9"/>
+<line x1="310" y1="146" x2="380" y2="146" stroke="#90caf9"/>
+<line x1="310" y1="167" x2="380" y2="167" stroke="#90caf9"/>
+<line x1="310" y1="188" x2="380" y2="188" stroke="#90caf9"/>
+<line x1="310" y1="209" x2="380" y2="209" stroke="#90caf9"/>
+<line x1="310" y1="230" x2="380" y2="230" stroke="#90caf9"/>
+<line x1="310" y1="251" x2="380" y2="251" stroke="#90caf9"/>
+<line x1="310" y1="272" x2="380" y2="272" stroke="#90caf9"/>
+<line x1="310" y1="293" x2="380" y2="293" stroke="#90caf9"/>
+<line x1="310" y1="314" x2="380" y2="314" stroke="#90caf9"/>
+<text x="345" y="358" text-anchor="middle" font-size="12">радиатор</text>
+<path d="M 105 150 L 105 115 L 190 115" fill="none" stroke="#1565c0" stroke-width="5" marker-end="url(#b)"/>
+<path d="M 250 115 L 308 115" fill="none" stroke="#bbb" stroke-width="3" stroke-dasharray="6 4"/>
+<text x="256" y="100" font-size="11" fill="#888">закрыто</text>
+<path d="M 220 135 L 220 310 L 138 325" fill="none" stroke="#1565c0" stroke-width="5" marker-end="url(#b)"/>
+<path d="M 105 304 L 105 268" fill="none" stroke="#1565c0" stroke-width="5" marker-end="url(#b)"/>
+<text x="630" y="62" text-anchor="middle" font-size="15" font-weight="bold" fill="#d84315">Двигатель горячий: БОЛЬШОЙ круг</text>
+<rect x="460" y="150" width="130" height="110" rx="8" fill="#cfd6dc" stroke="#333" stroke-width="2"/><text x="525" y="200" text-anchor="middle" font-size="13">двигатель</text><text x="525" y="216" text-anchor="middle" font-size="11" fill="#555">(рубашка)</text>
+<circle cx="525" cy="330" r="26" fill="#bbdefb" stroke="#1565c0" stroke-width="2"/><text x="525" y="334" text-anchor="middle" font-size="11">насос</text>
+<rect x="610" y="95" width="60" height="40" rx="6" fill="#ffccbc" stroke="#333" stroke-width="2"/><text x="640" y="120" text-anchor="middle" font-size="11">термостат</text>
+<rect x="730" y="110" width="70" height="230" fill="#e3f0fb" stroke="#1565c0" stroke-width="2"/>
+<line x1="730" y1="125" x2="800" y2="125" stroke="#90caf9"/>
+<line x1="730" y1="146" x2="800" y2="146" stroke="#90caf9"/>
+<line x1="730" y1="167" x2="800" y2="167" stroke="#90caf9"/>
+<line x1="730" y1="188" x2="800" y2="188" stroke="#90caf9"/>
+<line x1="730" y1="209" x2="800" y2="209" stroke="#90caf9"/>
+<line x1="730" y1="230" x2="800" y2="230" stroke="#90caf9"/>
+<line x1="730" y1="251" x2="800" y2="251" stroke="#90caf9"/>
+<line x1="730" y1="272" x2="800" y2="272" stroke="#90caf9"/>
+<line x1="730" y1="293" x2="800" y2="293" stroke="#90caf9"/>
+<line x1="730" y1="314" x2="800" y2="314" stroke="#90caf9"/>
+<text x="765" y="358" text-anchor="middle" font-size="12">радиатор</text>
+<path d="M 525 150 L 525 115 L 610 115" fill="none" stroke="#d84315" stroke-width="5" marker-end="url(#r)"/>
+<path d="M 670 115 L 728 115" fill="none" stroke="#d84315" stroke-width="5" marker-end="url(#r)"/>
+<path d="M 765 342 L 765 380 L 560 380 L 552 345" fill="none" stroke="#1565c0" stroke-width="5" marker-end="url(#b)"/>
+<path d="M 640 135 L 640 310 L 555 325" fill="none" stroke="#bbb" stroke-width="3" stroke-dasharray="6 4"/>
+<text x="650" y="230" font-size="11" fill="#888">малый круг</text><text x="650" y="244" font-size="11" fill="#888">закрыт</text>
+<path d="M 525 304 L 525 268" fill="none" stroke="#d84315" stroke-width="5" marker-end="url(#r)"/>
+<line x1="430" y1="50" x2="430" y2="390" stroke="#ccc" stroke-dasharray="6 4"/>
+<text x="430" y="408" text-anchor="middle" font-size="12" fill="#555">Термостат открывается сам при нагреве (~80–90 °C, ~пример). Ставят его правильной стороной (датчиком к двигателю) и с новой прокладкой.</text>
+</svg>

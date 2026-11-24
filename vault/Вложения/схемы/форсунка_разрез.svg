@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 620" font-family="Arial, sans-serif">
+  <rect width="820" height="620" fill="#ffffff" rx="10"/>
+  <text x="410" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Механическая форсунка в разрезе (упрощённо)</text>
+
+  <!-- корпус -->
+  <path d="M 250 60 L 350 60 L 350 330 L 330 330 L 330 470 L 270 470 L 270 330 L 250 330 Z" fill="#cfd6dc" stroke="#333" stroke-width="2.5"/>
+  <!-- полость пружины -->
+  <rect x="280" y="90" width="40" height="150" fill="#ffffff" stroke="#333"/>
+  <!-- регулировочные шайбы -->
+  <rect x="282" y="92" width="36" height="6" fill="#2f6db5"/><rect x="282" y="99" width="36" height="6" fill="#2f6db5"/>
+  <!-- пружина -->
+  <polyline points="300,106 286,116 314,126 286,136 314,146 286,156 314,166 286,176 314,186 286,196 314,206 286,216 300,224" fill="none" stroke="#2f6db5" stroke-width="3"/>
+  <!-- штанга -->
+  <rect x="294" y="224" width="12" height="16" fill="#6c7a89" stroke="#222"/>
+  <rect x="294" y="240" width="12" height="100" fill="#6c7a89" stroke="#222"/>
+  <!-- распылитель (носик) -->
+  <rect x="285" y="340" width="30" height="130" fill="#b7c2cc" stroke="#222" stroke-width="1.5"/>
+  <!-- игла -->
+  <rect x="296" y="340" width="8" height="118" fill="#444"/>
+  <path d="M 296 458 L 304 458 L 300 468 Z" fill="#444"/>
+  <!-- носик -->
+  <path d="M 285 470 L 315 470 L 308 492 L 292 492 Z" fill="#b7c2cc" stroke="#222" stroke-width="1.5"/>
+  <!-- топливный канал -->
+  <path d="M 350 120 L 336 120 L 336 300 L 312 330 L 312 450" fill="none" stroke="#e65100" stroke-width="5"/>
+  <!-- полость под иглой -->
+  <rect x="304" y="440" width="10" height="20" fill="#ffcc80"/>
+  <!-- штуцер подвода -->
+  <rect x="350" y="108" width="70" height="24" fill="#b7c2cc" stroke="#333" stroke-width="2"/>
+  <path d="M 420 120 L 470 120" stroke="#e65100" stroke-width="8"/>
+  <!-- штуцер слива -->
+  <rect x="210" y="70" width="40" height="18" fill="#b7c2cc" stroke="#333" stroke-width="2"/>
+  <path d="M 210 79 L 170 79" stroke="#ffb74d" stroke-width="6"/>
+  <!-- струи -->
+  <g stroke="#e65100" stroke-width="2" stroke-dasharray="4 3">
+    <line x1="294" y1="490" x2="240" y2="545"/><line x1="300" y1="492" x2="300" y2="560"/><line x1="306" y1="490" x2="360" y2="545"/>
+  </g>
+  <path d="M 240 545 Q 300 590 360 545" fill="#ffccbc" opacity="0.5"/>
+  <!-- уплотнительная шайба -->
+  <rect x="265" y="420" width="70" height="7" fill="#d4874a" stroke="#7a4a00"/>
+
+  <g font-size="12" fill="#222" stroke="#555">
+    <text x="480" y="114" stroke="none" font-weight="bold" fill="#e65100">Подвод топлива высокого давления</text>
+    <text x="480" y="130" stroke="none" fill="#555">трубка от ТНВД, гайка по моменту ТК</text>
+    <text x="30" y="60" stroke="none">Слив (обратка): лишнее топливо</text>
+    <text x="30" y="75" stroke="none">обратно в бак</text>
+    <line x1="120" y1="80" x2="170" y2="80"/>
+    <text x="480" y="170" stroke="none">Регулировочные шайбы (синие): задают</text>
+    <text x="480" y="185" stroke="none">давление, при котором откроется игла</text>
+    <line x1="478" y1="175" x2="320" y2="100"/>
+    <text x="480" y="225" stroke="none">Пружина прижимает иглу вниз</text>
+    <line x1="478" y1="221" x2="316" y2="186"/>
+    <text x="480" y="285" stroke="none">Штанга передаёт усилие пружины игле</text>
+    <line x1="478" y1="281" x2="306" y2="290"/>
+    <text x="480" y="345" stroke="none" font-weight="bold">Распылитель с иглой: прецизионная пара</text>
+    <text x="480" y="361" stroke="none" fill="#555">подобраны друг к другу, не разукомплектовывать</text>
+    <line x1="478" y1="351" x2="316" y2="400"/>
+    <text x="480" y="425" stroke="none" fill="#7a4a00">Уплотнительная шайба: всегда новая</text>
+    <line x1="478" y1="421" x2="336" y2="423"/>
+    <text x="480" y="485" stroke="none">Сопловые отверстия: доли мм.</text>
+    <text x="480" y="501" stroke="none" fill="#d33">Не прочищать иглой и проволокой!</text>
+    <line x1="478" y1="489" x2="310" y2="486"/>
+  </g>
+  <rect x="30" y="140" width="190" height="180" rx="8" fill="#fff8e1" stroke="#e59a14"/>
+  <g font-size="12" fill="#222">
+    <text x="40" y="160" font-weight="bold">Как работает:</text>
+    <text x="40" y="180">1. ТНВД давит топливо</text>
+    <text x="40" y="196">   по каналу вниз.</text>
+    <text x="40" y="216">2. Давление под иглой</text>
+    <text x="40" y="232">   растёт и побеждает</text>
+    <text x="40" y="248">   пружину: игла вверх.</text>
+    <text x="40" y="268">3. Топливо брызжет</text>
+    <text x="40" y="284">   в цилиндр облаком.</text>
+    <text x="40" y="304">4. Давление упало: игла села.</text>
+  </g>
+  <text x="410" y="605" text-anchor="middle" font-size="12" fill="#555">Электронные форсунки Common Rail устроены иначе (иглой управляет электромагнит или пьезоэлемент), но правила чистоты те же.</text>
+</svg>

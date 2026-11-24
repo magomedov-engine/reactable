@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 560" font-family="Arial, sans-serif">
+<defs><marker id="m" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#d33"/></marker></defs>
+<rect width="860" height="560" fill="#ffffff" rx="10"/>
+<text x="430" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Стопорение: как крепёж «не откручивается»</text>
+<text x="145" y="60" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Шплинт + корончатая гайка</text>
+<text x="145" y="240" text-anchor="middle" font-size="12" fill="#555">шплинт всегда новый,</text>
+<text x="145" y="255" text-anchor="middle" font-size="12" fill="#555">концы разводят и загибают</text>
+<rect x="129" y="80" width="32" height="140" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<rect x="100" y="150" width="90" height="40" fill="#b7c2cc" stroke="#333" stroke-width="2"/>
+<rect x="115" y="150" width="12" height="16" fill="#fff" stroke="#333"/>
+<rect x="139" y="150" width="12" height="16" fill="#fff" stroke="#333"/>
+<rect x="163" y="150" width="12" height="16" fill="#fff" stroke="#333"/>
+<rect x="85" y="155" width="120" height="7" rx="3" fill="#e59a14" stroke="#7a4a00"/>
+<path d="M 205 158 Q 220 158 217 142" fill="none" stroke="#e59a14" stroke-width="5"/>
+<path d="M 205 160 Q 221 164 215 182" fill="none" stroke="#e59a14" stroke-width="5"/>
+<circle cx="83" cy="158" r="6" fill="none" stroke="#e59a14" stroke-width="4"/>
+<rect x="55" y="190" width="180" height="30" fill="#cfd6dc" stroke="#333" stroke-width="2"/>
+<text x="430" y="60" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Стопорная шайба с усиком</text>
+<text x="430" y="240" text-anchor="middle" font-size="12" fill="#555">один усик загнут на грань гайки,</text>
+<text x="430" y="255" text-anchor="middle" font-size="12" fill="#555">другой за край детали. Шайба новая</text>
+<rect x="340" y="180" width="150" height="40" fill="#cfd6dc" stroke="#333" stroke-width="2"/>
+<rect x="416" y="100" width="28" height="80" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<rect x="370" y="174" width="120" height="6" fill="#e59a14" stroke="#7a4a00"/>
+<rect x="390" y="136" width="80" height="38" fill="#b7c2cc" stroke="#333" stroke-width="2"/>
+<rect x="470" y="140" width="6" height="40" fill="#e59a14" stroke="#7a4a00"/>
+<rect x="490" y="174" width="6" height="30" fill="#e59a14" stroke="#7a4a00"/>
+<text x="482" y="132" font-size="11" fill="#a06000">усик загнут вверх</text>
+<text x="502" y="208" font-size="11" fill="#a06000">вниз</text>
+<text x="715" y="60" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Контргайка</text>
+<text x="715" y="240" text-anchor="middle" font-size="12" fill="#555">вторая гайка прижата к первой:</text>
+<text x="715" y="255" text-anchor="middle" font-size="12" fill="#555">они «заклинивают» друг друга</text>
+<rect x="701" y="80" width="28" height="140" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<rect x="675" y="116" width="80" height="28" fill="#b7c2cc" stroke="#333" stroke-width="2"/><rect x="675" y="146" width="80" height="34" fill="#b7c2cc" stroke="#333" stroke-width="2"/>
+<text x="763" y="135" font-size="11" fill="#222">контргайка</text><text x="763" y="168" font-size="11" fill="#222">основная</text>
+<line x1="660" y1="130" x2="660" y2="144" stroke="#d33" stroke-width="3" marker-end="url(#m)"/><line x1="660" y1="166" x2="660" y2="150" stroke="#d33" stroke-width="3" marker-end="url(#m)"/>
+<rect x="625" y="180" width="180" height="40" fill="#cfd6dc" stroke="#333" stroke-width="2"/>
+<line x1="20" y1="295" x2="840" y2="295" stroke="#ccc" stroke-dasharray="6 4"/>
+<text x="145" y="320" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Контровка проволокой</text>
+<text x="145" y="500" text-anchor="middle" font-size="12" fill="#555">проволока тянет болты в сторону</text>
+<text x="145" y="515" text-anchor="middle" font-size="12" fill="#555">затяжки (красные стрелки)</text>
+<polygon points="125.0,410.0 110.0,436.0 80.0,436.0 65.0,410.0 80.0,384.0 110.0,384.0" fill="#b7c2cc" stroke="#333" stroke-width="2"/><circle cx="95" cy="410" r="5" fill="#fff" stroke="#333"/>
+<polygon points="225.0,410.0 210.0,436.0 180.0,436.0 165.0,410.0 180.0,384.0 210.0,384.0" fill="#b7c2cc" stroke="#333" stroke-width="2"/><circle cx="195" cy="410" r="5" fill="#fff" stroke="#333"/>
+<path d="M 95 410 C 95 380 155 380 165 400 L 195 410" fill="none" stroke="#e59a14" stroke-width="3"/>
+<path d="M 95 410 C 85 450 145 440 165 420 L 195 410" fill="none" stroke="#e59a14" stroke-width="3"/>
+<path d="M 65 370 A 38 38 0 0 1 115 375" fill="none" stroke="#d33" stroke-width="2.5" marker-end="url(#m)"/>
+<path d="M 225 450 A 38 38 0 0 1 175 445" fill="none" stroke="#d33" stroke-width="2.5" marker-end="url(#m)"/>
+<text x="145" y="480" text-anchor="middle" font-size="11" fill="#555">вид сверху на головки болтов</text>
+<text x="430" y="320" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Фиксатор резьбы (анаэробный)</text>
+<text x="430" y="500" text-anchor="middle" font-size="12" fill="#555">капля на чистую сухую резьбу,</text>
+<text x="430" y="515" text-anchor="middle" font-size="12" fill="#555">только марка из ТК</text>
+<rect x="350" y="390" width="40" height="40" fill="#b7c2cc" stroke="#333" stroke-width="2"/>
+<rect x="390" y="398" width="140" height="24" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<line x1="405" y1="398" x2="400" y2="422" stroke="#555"/>
+<line x1="415" y1="398" x2="410" y2="422" stroke="#555"/>
+<line x1="425" y1="398" x2="420" y2="422" stroke="#555"/>
+<line x1="435" y1="398" x2="430" y2="422" stroke="#555"/>
+<line x1="445" y1="398" x2="440" y2="422" stroke="#555"/>
+<line x1="455" y1="398" x2="450" y2="422" stroke="#555"/>
+<line x1="465" y1="398" x2="460" y2="422" stroke="#555"/>
+<line x1="475" y1="398" x2="470" y2="422" stroke="#555"/>
+<line x1="485" y1="398" x2="480" y2="422" stroke="#555"/>
+<line x1="495" y1="398" x2="490" y2="422" stroke="#555"/>
+<line x1="505" y1="398" x2="500" y2="422" stroke="#555"/>
+<line x1="515" y1="398" x2="510" y2="422" stroke="#555"/>
+<path d="M 450 386 q -6 9 0 12 q 6 -3 0 -12 Z" fill="#1e88e5"/>
+<path d="M 475 386 q -6 9 0 12 q 6 -3 0 -12 Z" fill="#1e88e5"/>
+<path d="M 500 386 q -6 9 0 12 q 6 -3 0 -12 Z" fill="#1e88e5"/>
+<text x="490" y="376" font-size="11" fill="#1565c0">состав</text>
+<text x="715" y="320" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Самоконтрящаяся гайка</text>
+<text x="715" y="500" text-anchor="middle" font-size="12" fill="#555">полимерное кольцо зажимает резьбу.</text>
+<text x="715" y="515" text-anchor="middle" font-size="12" fill="#555">Обычно одноразовая</text>
+<rect x="665" y="380" width="100" height="60" fill="#b7c2cc" stroke="#333" stroke-width="2"/>
+<rect x="665" y="360" width="100" height="20" fill="#1e88e5" stroke="#333" stroke-width="2"/>
+<rect x="697" y="360" width="36" height="80" fill="#fff" stroke="#333"/>
+<line x1="697" y1="384" x2="703" y2="387" stroke="#555"/><line x1="733" y1="384" x2="727" y2="387" stroke="#555"/>
+<line x1="697" y1="391" x2="703" y2="394" stroke="#555"/><line x1="733" y1="391" x2="727" y2="394" stroke="#555"/>
+<line x1="697" y1="398" x2="703" y2="401" stroke="#555"/><line x1="733" y1="398" x2="727" y2="401" stroke="#555"/>
+<line x1="697" y1="405" x2="703" y2="408" stroke="#555"/><line x1="733" y1="405" x2="727" y2="408" stroke="#555"/>
+<line x1="697" y1="412" x2="703" y2="415" stroke="#555"/><line x1="733" y1="412" x2="727" y2="415" stroke="#555"/>
+<line x1="697" y1="419" x2="703" y2="422" stroke="#555"/><line x1="733" y1="419" x2="727" y2="422" stroke="#555"/>
+<line x1="697" y1="426" x2="703" y2="429" stroke="#555"/><line x1="733" y1="426" x2="727" y2="429" stroke="#555"/>
+<line x1="697" y1="433" x2="703" y2="436" stroke="#555"/><line x1="733" y1="433" x2="727" y2="436" stroke="#555"/>
+<text x="771" y="374" font-size="11" fill="#1565c0">кольцо</text>
+<text x="715" y="460" text-anchor="middle" font-size="11" fill="#555">гайка в разрезе</text>
+</svg>

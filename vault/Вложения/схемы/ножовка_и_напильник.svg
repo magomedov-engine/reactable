@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 640" font-family="Arial, sans-serif">
+<defs><marker id="m" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto-start-reverse"><path d="M0,0 L12,6 L0,12 Z" fill="#d33"/></marker><marker id="g" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#2a8a3a"/></marker></defs>
+<rect width="860" height="640" fill="#ffffff" rx="10"/>
+<text x="430" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Ножовка и напильник: как пилить и опиливать</text>
+<text x="40" y="62" font-size="14" font-weight="bold" fill="#222">Ножовка по металлу</text>
+<path d="M 80 90 L 80 150 M 80 90 L 470 90 L 470 150" fill="none" stroke="#6c7a89" stroke-width="8" stroke-linejoin="round"/>
+<path d="M 80 150 L 30 165 L 30 195 L 70 185 Z" fill="#8d6e63" stroke="#333" stroke-width="1.5"/>
+<rect x="80" y="144" width="390" height="12" fill="#e3e7eb" stroke="#333"/>
+<polyline points="90,156 90,156 96,156 102,164 102,156 108,156 114,164 114,156 120,156 126,164 126,156 132,156 138,164 138,156 144,156 150,164 150,156 156,156 162,164 162,156 168,156 174,164 174,156 180,156 186,164 186,156 192,156 198,164 198,156 204,156 210,164 210,156 216,156 222,164 222,156 228,156 234,164 234,156 240,156 246,164 246,156 252,156 258,164 258,156 264,156 270,164 270,156 276,156 282,164 282,156 288,156 294,164 294,156 300,156 306,164 306,156 312,156 318,164 318,156 324,156 330,164 330,156 336,156 342,164 342,156 348,156 354,164 354,156 360,156 366,164 366,156 372,156 378,164 378,156 384,156 390,164 390,156 396,156 402,164 402,156 408,156 414,164 414,156 420,156 426,164 426,156 432,156 438,164 438,156 444,156 450,164 450,156 456,156 462,164" fill="none" stroke="#333" stroke-width="1.2"/>
+<circle cx="470" cy="150" r="7" fill="#444"/><text x="300" y="130" font-size="11" fill="#555">барашек справа: натягивает полотно</text>
+<line x1="300" y1="190" x2="420" y2="190" stroke="#2a8a3a" stroke-width="4" marker-end="url(#g)"/>
+<text x="300" y="210" font-size="12" fill="#2a8a3a">рабочий ход: ОТ СЕБЯ, с нажимом</text>
+<text x="300" y="226" font-size="12" fill="#555">обратно: без нажима</text>
+<text x="90" y="182" font-size="11" fill="#d33">зубья смотрят вперёд →</text>
+<text x="560" y="75" font-size="12" fill="#222">• полотно натянуто, не «играет»;</text>
+<text x="560" y="93" font-size="12" fill="#222">• работать всей длиной полотна;</text>
+<text x="560" y="111" font-size="12" fill="#222">• темп ~30–60 двойных ходов в мин;</text>
+<text x="560" y="129" font-size="12" fill="#222">• в работе не меньше 2–3 зубьев;</text>
+<text x="560" y="147" font-size="12" fill="#222">• в конце реза нажим ослабить.</text>
+<line x1="20" y1="245" x2="840" y2="245" stroke="#ccc" stroke-dasharray="6 4"/>
+<text x="40" y="272" font-size="14" font-weight="bold" fill="#222">Напильник: номер насечки</text>
+<rect x="40" y="290" width="140" height="26" fill="#b7c2cc" stroke="#333"/>
+<line x1="44" y1="290" x2="52" y2="316" stroke="#333" stroke-width="1"/>
+<line x1="56" y1="290" x2="64" y2="316" stroke="#333" stroke-width="1"/>
+<line x1="68" y1="290" x2="76" y2="316" stroke="#333" stroke-width="1"/>
+<line x1="80" y1="290" x2="88" y2="316" stroke="#333" stroke-width="1"/>
+<line x1="92" y1="290" x2="100" y2="316" stroke="#333" stroke-width="1"/>
+<line x1="104" y1="290" x2="112" y2="316" stroke="#333" stroke-width="1"/>
+<line x1="116" y1="290" x2="124" y2="316" stroke="#333" stroke-width="1"/>
+<line x1="128" y1="290" x2="136" y2="316" stroke="#333" stroke-width="1"/>
+<line x1="140" y1="290" x2="148" y2="316" stroke="#333" stroke-width="1"/>
+<line x1="152" y1="290" x2="160" y2="316" stroke="#333" stroke-width="1"/>
+<line x1="164" y1="290" x2="172" y2="316" stroke="#333" stroke-width="1"/>
+<line x1="176" y1="290" x2="184" y2="316" stroke="#333" stroke-width="1"/>
+<path d="M 180 298 L 196 301 L 196 305 L 180 308 Z" fill="#555"/><rect x="196" y="295" width="50" height="16" rx="6" fill="#8d6e63" stroke="#333"/>
+<text x="258" y="302" font-size="12" font-weight="bold" fill="#222">№0–1: драчёвый</text><text x="258" y="317" font-size="11" fill="#555">крупная насечка: снять много</text>
+<rect x="40" y="335" width="140" height="26" fill="#c9d0d7" stroke="#333"/>
+<line x1="44" y1="335" x2="52" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="50" y1="335" x2="58" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="56" y1="335" x2="64" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="62" y1="335" x2="70" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="68" y1="335" x2="76" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="74" y1="335" x2="82" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="80" y1="335" x2="88" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="86" y1="335" x2="94" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="92" y1="335" x2="100" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="98" y1="335" x2="106" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="104" y1="335" x2="112" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="110" y1="335" x2="118" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="116" y1="335" x2="124" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="122" y1="335" x2="130" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="128" y1="335" x2="136" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="134" y1="335" x2="142" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="140" y1="335" x2="148" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="146" y1="335" x2="154" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="152" y1="335" x2="160" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="158" y1="335" x2="166" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="164" y1="335" x2="172" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="170" y1="335" x2="178" y2="361" stroke="#333" stroke-width="1"/>
+<line x1="176" y1="335" x2="184" y2="361" stroke="#333" stroke-width="1"/>
+<path d="M 180 343 L 196 346 L 196 350 L 180 353 Z" fill="#555"/><rect x="196" y="340" width="50" height="16" rx="6" fill="#8d6e63" stroke="#333"/>
+<text x="258" y="347" font-size="12" font-weight="bold" fill="#222">№2–3: личной</text><text x="258" y="362" font-size="11" fill="#555">чистовое опиливание</text>
+<rect x="40" y="380" width="140" height="26" fill="#dde2e6" stroke="#333"/>
+<line x1="44" y1="380" x2="52" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="47" y1="380" x2="55" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="50" y1="380" x2="58" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="53" y1="380" x2="61" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="56" y1="380" x2="64" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="59" y1="380" x2="67" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="62" y1="380" x2="70" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="65" y1="380" x2="73" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="68" y1="380" x2="76" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="71" y1="380" x2="79" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="74" y1="380" x2="82" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="77" y1="380" x2="85" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="80" y1="380" x2="88" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="83" y1="380" x2="91" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="86" y1="380" x2="94" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="89" y1="380" x2="97" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="92" y1="380" x2="100" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="95" y1="380" x2="103" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="98" y1="380" x2="106" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="101" y1="380" x2="109" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="104" y1="380" x2="112" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="107" y1="380" x2="115" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="110" y1="380" x2="118" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="113" y1="380" x2="121" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="116" y1="380" x2="124" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="119" y1="380" x2="127" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="122" y1="380" x2="130" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="125" y1="380" x2="133" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="128" y1="380" x2="136" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="131" y1="380" x2="139" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="134" y1="380" x2="142" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="137" y1="380" x2="145" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="140" y1="380" x2="148" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="143" y1="380" x2="151" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="146" y1="380" x2="154" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="149" y1="380" x2="157" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="152" y1="380" x2="160" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="155" y1="380" x2="163" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="158" y1="380" x2="166" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="161" y1="380" x2="169" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="164" y1="380" x2="172" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="167" y1="380" x2="175" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="170" y1="380" x2="178" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="173" y1="380" x2="181" y2="406" stroke="#333" stroke-width="1"/>
+<line x1="176" y1="380" x2="184" y2="406" stroke="#333" stroke-width="1"/>
+<path d="M 180 388 L 196 391 L 196 395 L 180 398 Z" fill="#555"/><rect x="196" y="385" width="50" height="16" rx="6" fill="#8d6e63" stroke="#333"/>
+<text x="258" y="392" font-size="12" font-weight="bold" fill="#222">№4–5: бархатный</text><text x="258" y="407" font-size="11" fill="#555">доводка до гладкости</text>
+<text x="40" y="440" font-size="12" font-weight="bold" fill="#222">Профили (сечение):</text>
+<g transform="translate(50 452)" fill="#9aa5b1" stroke="#333" stroke-width="1.5"><rect x="0" y="6" width="34" height="10"/></g><text x="67" y="492" text-anchor="middle" font-size="11" fill="#222">плоский</text>
+<g transform="translate(130 452)" fill="#9aa5b1" stroke="#333" stroke-width="1.5"><rect x="6" y="0" width="20" height="20"/></g><text x="147" y="492" text-anchor="middle" font-size="11" fill="#222">квадратный</text>
+<g transform="translate(210 452)" fill="#9aa5b1" stroke="#333" stroke-width="1.5"><polygon points="16,0 32,22 0,22"/></g><text x="227" y="492" text-anchor="middle" font-size="11" fill="#222">трёхгранный</text>
+<g transform="translate(290 452)" fill="#9aa5b1" stroke="#333" stroke-width="1.5"><path d="M 0 18 Q 17 -6 34 18 Z"/></g><text x="307" y="492" text-anchor="middle" font-size="11" fill="#222">полукруглый</text>
+<g transform="translate(370 452)" fill="#9aa5b1" stroke="#333" stroke-width="1.5"><circle cx="16" cy="11" r="11"/></g><text x="387" y="492" text-anchor="middle" font-size="11" fill="#222">круглый</text>
+<text x="40" y="520" font-size="11" fill="#555">Без ручки напильником не работают: хвостовик пробьёт ладонь.</text>
+<text x="40" y="536" font-size="11" fill="#555">Забитую насечку чистят щёткой, а не стучат напильником.</text>
+<line x1="445" y1="260" x2="445" y2="560" stroke="#ccc" stroke-dasharray="6 4"/>
+<text x="460" y="272" font-size="14" font-weight="bold" fill="#222">Нажим руками: чтобы плоскость не «завалилась»</text>
+<rect x="515" y="380" width="50" height="40" fill="#f2b84b" stroke="#333"/>
+<rect x="475" y="366" width="90" height="12" fill="#b7c2cc" stroke="#333"/><rect x="447" y="364" width="28" height="16" rx="6" fill="#8d6e63" stroke="#333"/>
+<line x1="461" y1="334" x2="461" y2="358" stroke="#d33" stroke-width="2.7" marker-end="url(#m)"/>
+<line x1="555" y1="306" x2="555" y2="362" stroke="#d33" stroke-width="7.3" marker-end="url(#m)"/>
+<text x="540" y="440" text-anchor="middle" font-size="12" fill="#222">начало хода</text>
+<rect x="635" y="380" width="50" height="40" fill="#f2b84b" stroke="#333"/>
+<rect x="615" y="366" width="90" height="12" fill="#b7c2cc" stroke="#333"/><rect x="587" y="364" width="28" height="16" rx="6" fill="#8d6e63" stroke="#333"/>
+<line x1="601" y1="320" x2="601" y2="358" stroke="#d33" stroke-width="5.0" marker-end="url(#m)"/>
+<line x1="695" y1="320" x2="695" y2="362" stroke="#d33" stroke-width="5.0" marker-end="url(#m)"/>
+<text x="660" y="440" text-anchor="middle" font-size="12" fill="#222">середина</text>
+<rect x="755" y="380" width="50" height="40" fill="#f2b84b" stroke="#333"/>
+<rect x="755" y="366" width="90" height="12" fill="#b7c2cc" stroke="#333"/><rect x="727" y="364" width="28" height="16" rx="6" fill="#8d6e63" stroke="#333"/>
+<line x1="741" y1="306" x2="741" y2="358" stroke="#d33" stroke-width="7.3" marker-end="url(#m)"/>
+<line x1="835" y1="334" x2="835" y2="362" stroke="#d33" stroke-width="2.7" marker-end="url(#m)"/>
+<text x="780" y="440" text-anchor="middle" font-size="12" fill="#222">конец хода</text>
+<text x="480" y="300" font-size="11" fill="#555">ручка слева, носок справа; ход вправо →</text>
+<text x="460" y="470" font-size="12" fill="#222">Начало: сильнее давит рука на носке напильника.</text>
+<text x="460" y="487" font-size="12" fill="#222">Середина: поровну. Конец: сильнее рука на ручке.</text>
+<text x="460" y="504" font-size="12" fill="#222">Рабочий ход вперёд, назад без нажима.</text>
+<text x="460" y="530" font-size="12" fill="#555">Проверка: лекальная линейка или угольник на просвет:</text>
+<text x="460" y="546" font-size="12" fill="#555">ровная щель света = плоско; свет по краям = завал.</text>
+<line x1="20" y1="568" x2="840" y2="568" stroke="#ccc" stroke-dasharray="6 4"/>
+<text x="40" y="592" font-size="13" font-weight="bold" fill="#222">Высота тисков:</text>
+<text x="150" y="592" font-size="12" fill="#222">согнутую руку ставят локтем на губки тисков: кулак должен доставать до подбородка.</text>
+<text x="40" y="616" font-size="12" fill="#222">Деталь зажимают так, чтобы обрабатываемое место выступало над губками на 5–10 мм (~пример). Точные поверхности: через мягкие накладки.</text>
+</svg>

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360" font-family="Arial, sans-serif">
+  <rect width="760" height="360" fill="#ffffff" rx="10"/>
+  <text x="380" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">V12: вид сверху. Два ряда по 6 цилиндров</text>
+
+  <text x="40" y="190" font-size="13" fill="#333" text-anchor="start">ПЕРЕД</text>
+  <text x="40" y="206" font-size="12" fill="#555">(вентилятор,</text>
+  <text x="40" y="220" font-size="12" fill="#555">шкивы)</text>
+  <text x="720" y="190" font-size="13" fill="#333" text-anchor="end">ЗАД</text>
+  <text x="720" y="206" font-size="12" fill="#555" text-anchor="end">(маховик,</text>
+  <text x="720" y="220" font-size="12" fill="#555" text-anchor="end">коробка)</text>
+
+  <!-- левый ряд -->
+  <text x="380" y="62" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Ряд А (левый)</text>
+  <g font-size="20" font-weight="bold" fill="#fff" text-anchor="middle">
+    <rect x="120" y="75" width="70" height="70" rx="6" fill="#3d7ab8"/><text x="155" y="118">1</text>
+    <rect x="200" y="75" width="70" height="70" rx="6" fill="#3d7ab8"/><text x="235" y="118">2</text>
+    <rect x="280" y="75" width="70" height="70" rx="6" fill="#3d7ab8"/><text x="315" y="118">3</text>
+    <rect x="360" y="75" width="70" height="70" rx="6" fill="#3d7ab8"/><text x="395" y="118">4</text>
+    <rect x="440" y="75" width="70" height="70" rx="6" fill="#3d7ab8"/><text x="475" y="118">5</text>
+    <rect x="520" y="75" width="70" height="70" rx="6" fill="#3d7ab8"/><text x="555" y="118">6</text>
+  </g>
+
+  <!-- коленвал -->
+  <rect x="100" y="172" width="520" height="16" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+  <circle cx="640" cy="180" r="36" fill="#9aa5b1" stroke="#333" stroke-width="3"/>
+  <text x="640" y="185" text-anchor="middle" font-size="12" fill="#222">маховик</text>
+  <text x="360" y="167" text-anchor="middle" font-size="12" fill="#333">коленчатый вал (в долине между рядами)</text>
+
+  <!-- правый ряд -->
+  <g font-size="20" font-weight="bold" fill="#fff" text-anchor="middle">
+    <rect x="120" y="215" width="70" height="70" rx="6" fill="#c7502c"/><text x="155" y="258">7</text>
+    <rect x="200" y="215" width="70" height="70" rx="6" fill="#c7502c"/><text x="235" y="258">8</text>
+    <rect x="280" y="215" width="70" height="70" rx="6" fill="#c7502c"/><text x="315" y="258">9</text>
+    <rect x="360" y="215" width="70" height="70" rx="6" fill="#c7502c"/><text x="395" y="258">10</text>
+    <rect x="440" y="215" width="70" height="70" rx="6" fill="#c7502c"/><text x="475" y="258">11</text>
+    <rect x="520" y="215" width="70" height="70" rx="6" fill="#c7502c"/><text x="555" y="258">12</text>
+  </g>
+  <text x="380" y="310" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Ряд Б (правый)</text>
+
+  <text x="380" y="340" text-anchor="middle" font-size="12" fill="#555">Нумерация условная: у разных моторов она может быть иной (1–6 / 7–12, либо 1Л–6Л / 1П–6П). Сверяйте по документации.</text>
+</svg>

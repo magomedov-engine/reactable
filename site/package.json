@@ -1,0 +1,27 @@
+{
+  "name": "slesar-course",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Учебный сайт «Слесарь механосборочных работ: V12-дизель»",
+  "scripts": {
+    "sync": "node scripts/sync-content.mjs",
+    "dev": "node scripts/sync-content.mjs --optional && vite",
+    "build": "node scripts/sync-content.mjs --optional && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@panzoom/panzoom": "^4.6.2",
+    "markdown-it": "^15.0.3",
+    "mermaid": "^12.3.0",
+    "minisearch": "^7.2.0",
+    "three": "^0.187.0",
+    "vue": "^3.5.46",
+    "vue-router": "^5.5.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.11",
+    "vite": "^8.3.8"
+  }
+}

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 680" font-family="Arial, sans-serif">
+<defs><pattern id="h" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#8a96a3" stroke-width="1"/></pattern><pattern id="h2" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(-45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#8a96a3" stroke-width="1"/></pattern><marker id="m" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#d33"/></marker></defs>
+<rect width="860" height="680" fill="#ffffff" rx="10"/>
+<text x="430" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Соединения: шпонка, шлицы, штифты, стопорные кольца</text>
+<text x="30" y="62" font-size="15" font-weight="bold" fill="#222">1. Шпоночное соединение</text>
+<circle cx="120" cy="165" r="70" fill="url(#h2)" stroke="#333" stroke-width="2"/>
+<circle cx="120" cy="165" r="40" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<rect x="110" y="115" width="20" height="22" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+<text x="120" y="169" font-size="11" fill="#555" text-anchor="middle">вал</text>
+<text x="120" y="255" font-size="11" fill="#555" text-anchor="middle">вид с торца</text>
+<rect x="230" y="150" width="170" height="40" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<rect x="280" y="142" width="70" height="12" rx="6" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+<text x="315" y="215" font-size="11" fill="#555" text-anchor="middle">шпонка в пазу вала</text>
+<g font-size="12" fill="#222" stroke="#555">
+<text x="200" y="88" stroke="none">ступица (шестерня, шкив)</text><line x1="198" y1="92" x2="170" y2="120"/>
+<text x="200" y="118" stroke="none" fill="#b26a00">шпонка</text><line x1="198" y1="114" x2="130" y2="125"/>
+</g>
+<text x="30" y="268" font-size="12" fill="#222" text-anchor="start">Шпонка сидит наполовину в пазу вала, наполовину в пазу</text>
+<text x="30" y="284" font-size="12" fill="#222" text-anchor="start">ступицы и передаёт вращение. Её ставят в паз вала плотно,</text>
+<text x="30" y="300" font-size="12" fill="#222" text-anchor="start">без качки; ступицу надевают без перекоса и не забивают.</text>
+<text x="450" y="62" font-size="15" font-weight="bold" fill="#222">2. Шлицевое соединение</text>
+<circle cx="560" cy="165" r="72" fill="url(#h2)" stroke="#333" stroke-width="2"/>
+<polygon points="596.0,165.0 605.7,170.4 603.2,180.9 592.1,181.3 585.5,190.5 588.5,201.1 579.3,206.8 571.1,199.2 560.0,201.0 554.6,210.7 544.1,208.2 543.7,197.1 534.5,190.5 523.9,193.5 518.2,184.3 525.8,176.1 524.0,165.0 514.3,159.6 516.8,149.1 527.9,148.7 534.5,139.5 531.5,128.9 540.7,123.2 548.9,130.8 560.0,129.0 565.4,119.3 575.9,121.8 576.3,132.9 585.5,139.5 596.1,136.5 601.8,145.7 594.2,153.9" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<text x="560" y="169" font-size="11" fill="#555" text-anchor="middle">вал</text>
+<text x="560" y="257" font-size="11" fill="#555" text-anchor="middle">вид с торца</text>
+<text x="650" y="115" font-size="12" fill="#222" text-anchor="start">Много выступов-«шпонок»</text>
+<text x="650" y="131" font-size="12" fill="#222" text-anchor="start">сразу: передаёт большой</text>
+<text x="650" y="147" font-size="12" fill="#222" text-anchor="start">момент. Деталь может</text>
+<text x="650" y="163" font-size="12" fill="#222" text-anchor="start">сдвигаться вдоль вала.</text>
+<text x="650" y="179" font-size="12" fill="#222" text-anchor="start">Шлицы чистые, без забоин;</text>
+<text x="650" y="195" font-size="12" fill="#222" text-anchor="start">иногда есть метка</text>
+<text x="650" y="211" font-size="12" fill="#222" text-anchor="start">положения (по ТК).</text>
+<text x="450" y="268" font-size="12" fill="#555" text-anchor="start">Пример в дизеле: шлицевые валы привода насосов, муфты.</text>
+<line x1="20" y1="310" x2="840" y2="310" stroke="#ccc" stroke-dasharray="6 4"/>
+<text x="30" y="340" font-size="15" font-weight="bold" fill="#222">3. Штифты: точное положение деталей</text>
+<rect x="40" y="380" width="340" height="50" fill="url(#h)" stroke="#333" stroke-width="2"/>
+<rect x="40" y="430" width="340" height="60" fill="url(#h2)" stroke="#333" stroke-width="2"/>
+<rect x="100" y="395" width="20" height="80" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+<polygon points="296,380 316,380 312,470 300,470" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+<rect x="190" y="365" width="40" height="15" fill="#eef1f4" stroke="#333" stroke-width="2"/><rect x="200" y="380" width="20" height="95" fill="#eef1f4" stroke="#333" stroke-width="2"/>
+<text x="110" y="510" font-size="11" fill="#b26a00" text-anchor="middle">цилиндрический</text>
+<text x="210" y="510" font-size="11" fill="#555" text-anchor="middle">болт: прижимает</text>
+<text x="306" y="510" font-size="11" fill="#b26a00" text-anchor="middle">конический</text>
+<text x="30" y="540" font-size="12" fill="#222" text-anchor="start">Болт только прижимает, а положение «до сотки» держат</text>
+<text x="30" y="556" font-size="12" fill="#222" text-anchor="start">штифты. Так стоят головка блока, крышки коренных,</text>
+<text x="30" y="572" font-size="12" fill="#222" text-anchor="start">маховик. Деталь садится на штифты без удара, ровно.</text>
+<line x1="430" y1="320" x2="430" y2="660" stroke="#ccc" stroke-dasharray="6 4"/>
+<text x="450" y="340" font-size="15" font-weight="bold" fill="#222">4. Стопорные кольца</text>
+<rect x="460" y="400" width="150" height="40" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<rect x="560" y="400" width="8" height="40" fill="#fff" stroke="#333"/>
+<rect x="561" y="392" width="6" height="56" fill="#2f6db5"/>
+<rect x="500" y="384" width="56" height="72" fill="#f2b84b" stroke="#333" stroke-width="1.5" opacity="0.8"/>
+<text x="535" y="476" font-size="11" fill="#222" text-anchor="middle">наружное: на вал,</text>
+<text x="535" y="491" font-size="11" fill="#222" text-anchor="middle">держит деталь от сдвига</text>
+<path d="M 690 360 A 40 40 0 1 1 650 400" fill="none" stroke="#2f6db5" stroke-width="8"/>
+<circle cx="690" cy="370" r="5" fill="#fff" stroke="#2f6db5" stroke-width="2"/><circle cx="660" cy="400" r="5" fill="#fff" stroke="#2f6db5" stroke-width="2"/>
+<text x="740" y="380" font-size="11" fill="#2f6db5" text-anchor="start">ушки под</text>
+<text x="740" y="396" font-size="11" fill="#2f6db5" text-anchor="start">щипцы</text>
+<rect x="660" y="460" width="160" height="16" fill="url(#h)" stroke="#333"/><rect x="660" y="520" width="160" height="16" fill="url(#h)" stroke="#333"/>
+<rect x="770" y="456" width="6" height="12" fill="#2f6db5"/><rect x="770" y="528" width="6" height="12" fill="#2f6db5"/>
+<rect x="720" y="476" width="48" height="44" fill="#f2b84b" stroke="#333" opacity="0.8"/>
+<text x="740" y="556" font-size="11" fill="#222" text-anchor="middle">внутреннее: в отверстие</text>
+<text x="450" y="590" font-size="12" fill="#222" text-anchor="start">• Ставят специальными щипцами, сжимают/разводят</text>
+<text x="450" y="606" font-size="12" fill="#222" text-anchor="start">  ровно настолько, чтобы прошло: перегнутое кольцо</text>
+<text x="450" y="622" font-size="12" fill="#222" text-anchor="start">  не держит. • Кольцо должно полностью сесть в канавку</text>
+<text x="450" y="638" font-size="12" fill="#222" text-anchor="start">  (проверить, повернув его). • Часто одноразовые: по ТК.</text>
+</svg>

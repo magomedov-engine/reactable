@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 330" font-family="Arial, sans-serif">
+  <defs>
+    <marker id="d" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#333"/></marker>
+  </defs>
+  <rect width="760" height="330" fill="#ffffff" rx="10"/>
+  <text x="380" y="26" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Болт: из чего состоит</text>
+
+  <!-- головка -->
+  <rect x="60" y="90" width="80" height="100" rx="6" fill="#9aa5b1" stroke="#333" stroke-width="3"/>
+  <text x="100" y="146" text-anchor="middle" font-size="22" font-weight="bold" fill="#fff">10.9</text>
+  <!-- стержень гладкая часть -->
+  <rect x="140" y="115" width="200" height="50" fill="#c5ced6" stroke="#333" stroke-width="2"/>
+  <!-- резьба -->
+  <rect x="340" y="115" width="260" height="50" fill="#b7c3cc" stroke="#333" stroke-width="2"/>
+  <g stroke="#555" stroke-width="2">
+    <line x1="352" y1="115" x2="364" y2="165"/><line x1="376" y1="115" x2="388" y2="165"/><line x1="400" y1="115" x2="412" y2="165"/><line x1="424" y1="115" x2="436" y2="165"/><line x1="448" y1="115" x2="460" y2="165"/><line x1="472" y1="115" x2="484" y2="165"/><line x1="496" y1="115" x2="508" y2="165"/><line x1="520" y1="115" x2="532" y2="165"/><line x1="544" y1="115" x2="556" y2="165"/><line x1="568" y1="115" x2="580" y2="165"/>
+  </g>
+  <!-- ось -->
+  <line x1="40" y1="140" x2="640" y2="140" stroke="#d33" stroke-dasharray="10 3 2 3" stroke-width="1"/>
+
+  <!-- размеры -->
+  <line x1="60" y1="215" x2="600" y2="215" stroke="#333" marker-start="url(#d)" marker-end="url(#d)"/>
+  <text x="330" y="235" text-anchor="middle" font-size="13" fill="#333">Длина L (обычно без головки; сверяйте со стандартом)</text>
+  <line x1="650" y1="115" x2="650" y2="165" stroke="#333" marker-start="url(#d)" marker-end="url(#d)"/>
+  <text x="660" y="144" font-size="13" fill="#333">Диаметр d</text>
+  <line x1="388" y1="100" x2="460" y2="100" stroke="#333" marker-start="url(#d)" marker-end="url(#d)"/>
+  <text x="424" y="92" text-anchor="middle" font-size="13" fill="#333">Шаг P</text>
+
+  <g font-size="13" fill="#222" stroke="#333">
+    <text x="30" y="60" stroke="none">Головка (под ключ, размер S)</text>
+    <line x1="100" y1="66" x2="100" y2="88"/>
+    <text x="150" y="278" stroke="none">Гладкая часть</text>
+    <line x1="220" y1="262" x2="220" y2="168"/>
+    <text x="440" y="278" stroke="none">Резьба</text>
+    <line x1="470" y1="262" x2="470" y2="168"/>
+    <text x="300" y="60" stroke="none">Маркировка класса прочности</text>
+    <line x1="330" y1="66" x2="130" y2="128" stroke-dasharray="4 3"/>
+  </g>
+  <text x="380" y="310" text-anchor="middle" font-size="12" fill="#555">10.9: первое число × 100 = прочность на разрыв в МПа (1000), второе: предел текучести = 0,9 от неё.</text>
+</svg>

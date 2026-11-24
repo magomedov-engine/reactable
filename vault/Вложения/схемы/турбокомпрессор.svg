@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 520" font-family="Arial, sans-serif">
+  <defs>
+    <marker id="r" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#c62828"/></marker>
+    <marker id="g" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#2a8a3a"/></marker>
+    <marker id="y" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#a08300"/></marker>
+  </defs>
+  <rect width="840" height="520" fill="#ffffff" rx="10"/>
+  <text x="420" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Турбокомпрессор в разрезе (упрощённо)</text>
+
+  <!-- турбинный корпус -->
+  <path d="M 150 140 Q 120 140 120 200 L 120 300 Q 120 360 150 360 L 300 360 L 300 140 Z" fill="#ffcdd2" stroke="#c62828" stroke-width="2.5"/>
+  <!-- корпус подшипников -->
+  <rect x="300" y="190" width="180" height="120" fill="#cfd6dc" stroke="#333" stroke-width="2.5"/>
+  <!-- компрессорный корпус -->
+  <path d="M 480 140 L 630 140 Q 660 140 660 200 L 660 300 Q 660 360 630 360 L 480 360 Z" fill="#c8e6c9" stroke="#2a8a3a" stroke-width="2.5"/>
+  <!-- вал -->
+  <rect x="190" y="243" width="400" height="14" fill="#6c7a89" stroke="#222"/>
+  <!-- подшипники -->
+  <rect x="320" y="236" width="30" height="28" fill="#f6e27a" stroke="#a08300"/><rect x="430" y="236" width="30" height="28" fill="#f6e27a" stroke="#a08300"/>
+  <!-- колёса -->
+  <path d="M 230 250 L 270 180 L 290 180 L 290 320 L 270 320 Z" fill="#ef9a9a" stroke="#8e0000" stroke-width="2"/>
+  <path d="M 550 250 L 510 180 L 490 180 L 490 320 L 510 320 Z" fill="#a5d6a7" stroke="#1b5e20" stroke-width="2"/>
+  <!-- потоки -->
+  <path d="M 200 470 L 200 380" stroke="#c62828" stroke-width="6" marker-end="url(#r)"/>
+  <text x="210" y="470" font-size="12" fill="#c62828">горячие газы из коллектора</text>
+  <path d="M 140 250 L 50 250" stroke="#c62828" stroke-width="6" marker-end="url(#r)"/>
+  <text x="30" y="235" font-size="12" fill="#c62828">в выхлопную трубу</text>
+  <path d="M 780 250 L 680 250" stroke="#2a8a3a" stroke-width="6" marker-end="url(#g)"/>
+  <text x="690" y="235" font-size="12" fill="#2a8a3a">чистый воздух</text>
+  <text x="690" y="270" font-size="12" fill="#2a8a3a">из фильтра</text>
+  <path d="M 630 370 L 630 450" stroke="#2a8a3a" stroke-width="6" marker-end="url(#g)"/>
+  <text x="645" y="430" font-size="12" fill="#2a8a3a">сжатый воздух</text><text x="645" y="446" font-size="12" fill="#2a8a3a">в охладитель</text>
+  <!-- масло -->
+  <path d="M 390 100 L 390 185" stroke="#a08300" stroke-width="6" marker-end="url(#y)"/>
+  <path d="M 390 315 L 390 420" stroke="#a08300" stroke-width="10" marker-end="url(#y)"/>
+  <g font-size="12" fill="#222">
+    <text x="400" y="90" font-weight="bold" fill="#a08300">Подвод масла (тонкая трубка, сверху)</text>
+    <text x="402" y="420" font-weight="bold" fill="#a08300">Слив масла: толстая труба</text>
+    <text x="402" y="436" fill="#a08300">вниз в картер, без перегибов</text>
+    <text x="150" y="130" fill="#c62828" font-weight="bold">Турбина: её крутят газы</text>
+    <text x="520" y="130" fill="#2a8a3a" font-weight="bold">Компрессор: качает воздух</text>
+    <text x="304" y="296" font-size="11" fill="#333">подшипники (на масле)</text>
+  </g>
+  <rect x="20" y="380" width="160" height="120" rx="8" fill="#fdecea" stroke="#d33"/>
+  <g font-size="12" fill="#222">
+    <text x="30" y="400" font-weight="bold" fill="#d33">Правила сборщика:</text>
+    <text x="30" y="418">• все отверстия под</text>
+    <text x="30" y="433">  заглушками до монтажа;</text>
+    <text x="30" y="451">• перед запуском залить</text>
+    <text x="30" y="466">  масло в подвод;</text>
+    <text x="30" y="484">• не путать подвод и слив.</text>
+  </g>
+  <text x="420" y="508" text-anchor="middle" font-size="12" fill="#555">Вал вращается очень быстро (десятки тысяч об/мин, ~пример): любая шайба или крошка во впуске разрушит колесо.</text>
+</svg>

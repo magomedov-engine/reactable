@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 560" font-family="Arial, sans-serif">
+<rect width="860" height="560" fill="#ffffff" rx="10"/>
+<text x="430" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Как деталь превращается в чертёж: три вида</text>
+<polygon points="90,250 240,250 240,212 140,212 140,150 90,150" fill="#e3f0fb" stroke="#222" stroke-width="2.5"/>
+<line x1="172.5" y1="250.0" x2="172.5" y2="212.5" stroke="#222" stroke-width="1.2" stroke-dasharray="6 3" fill="none"/>
+<line x1="207.5" y1="250.0" x2="207.5" y2="212.5" stroke="#222" stroke-width="1.2" stroke-dasharray="6 3" fill="none"/>
+<line x1="190.0" y1="260.0" x2="190.0" y2="202.5" stroke="#d33" stroke-width="1" stroke-dasharray="14 3 2 3"/>
+<text x="165" y="132" text-anchor="middle" font-size="14" font-weight="bold" fill="#2f6db5">Главный вид (спереди)</text>
+<rect x="90" y="300" width="150.0" height="100.0" fill="#e8f5e9" stroke="#222" stroke-width="2.5"/>
+<line x1="140.0" y1="300.0" x2="140.0" y2="400.0" stroke="#222" stroke-width="2.5"/>
+<circle cx="190.0" cy="350.0" r="17.5" fill="#fff" stroke="#222" stroke-width="2.5"/>
+<line x1="165.0" y1="350.0" x2="215.0" y2="350.0" stroke="#d33" stroke-width="1" stroke-dasharray="14 3 2 3"/><line x1="190.0" y1="325.0" x2="190.0" y2="375.0" stroke="#d33" stroke-width="1" stroke-dasharray="14 3 2 3"/>
+<text x="255" y="345" font-size="14" font-weight="bold" fill="#2a8a3a">Вид сверху</text><text x="255" y="363" font-size="14" font-weight="bold" fill="#2a8a3a">(под главным)</text>
+<rect x="330" y="150.0" width="100.0" height="100.0" fill="#fdecea" stroke="#222" stroke-width="2.5"/>
+<line x1="362.5" y1="250.0" x2="362.5" y2="212.5" stroke="#222" stroke-width="1.2" stroke-dasharray="6 3" fill="none"/>
+<line x1="397.5" y1="250.0" x2="397.5" y2="212.5" stroke="#222" stroke-width="1.2" stroke-dasharray="6 3" fill="none"/>
+<line x1="380.0" y1="260.0" x2="380.0" y2="202.5" stroke="#d33" stroke-width="1" stroke-dasharray="14 3 2 3"/>
+<text x="380" y="132" text-anchor="middle" font-size="14" font-weight="bold" fill="#d33">Вид слева (справа от главного)</text>
+<g stroke="#bbb" stroke-dasharray="3 4"><line x1="240.0" y1="212.5" x2="330" y2="212.5"/><line x1="140.0" y1="150.0" x2="330" y2="150.0"/><line x1="140.0" y1="250" x2="140.0" y2="300"/><line x1="240.0" y1="250" x2="240.0" y2="300"/></g>
+<polygon points="612.0,211.0 716.0,211.0 752.8,174.2 648.8,174.2" fill="#e8f5e9" stroke="#222" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="716.0,250.0 752.8,213.2 752.8,174.2 716.0,211.0" fill="#fdecea" stroke="#222" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="612.0,211.0 648.8,174.2 648.8,109.2 612.0,146.0" fill="#fdecea" stroke="#222" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="560.0,146.0 612.0,146.0 648.8,109.2 596.8,109.2" fill="#e8f5e9" stroke="#222" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="560.0,250.0 612.0,250.0 612.0,146.0 560.0,146.0" fill="#e3f0fb" stroke="#222" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="612.0,250.0 716.0,250.0 716.0,211.0 612.0,211.0" fill="#e3f0fb" stroke="#222" stroke-width="2" stroke-linejoin="round"/>
+<ellipse cx="682.4" cy="192.6" rx="18.2" ry="8.2" fill="#fff" stroke="#222" stroke-width="2"/>
+<text x="640" y="80" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Сама деталь (наглядно)</text>
+<g font-size="12" fill="#2f6db5"><text x="555" y="300">↑ смотрим спереди → главный вид</text></g>
+<g font-size="12" fill="#2a8a3a"><text x="668" y="100">↓ смотрим сверху → вид сверху</text></g>
+<g font-size="12" fill="#d33"><text x="455" y="210">смотрим слева →</text><text x="455" y="225">вид слева</text></g>
+<line x1="20" y1="410" x2="840" y2="410" stroke="#ccc" stroke-dasharray="6 4"/>
+<line x1="30" y1="430" x2="110" y2="430" stroke="#222" stroke-width="2.5"/>
+<text x="125" y="435" font-size="13" font-weight="bold" fill="#222">Сплошная толстая:</text><text x="265" y="435" font-size="13" fill="#333">видимый контур: всё, что видно глазом</text>
+<line x1="30" y1="458" x2="110" y2="458" stroke="#222" stroke-width="1.2" stroke-dasharray="6 3"/>
+<text x="125" y="463" font-size="13" font-weight="bold" fill="#222">Штриховая:</text><text x="265" y="463" font-size="13" fill="#333">невидимый контур: отверстие внутри, его не видно снаружи</text>
+<line x1="30" y1="486" x2="110" y2="486" stroke="#d33" stroke-width="1" stroke-dasharray="14 3 2 3"/>
+<text x="125" y="491" font-size="13" font-weight="bold" fill="#222">Штрихпунктирная:</text><text x="265" y="491" font-size="13" fill="#333">ось симметрии, центр отверстия</text>
+<text x="30" y="530" font-size="12" fill="#555">Каждый вид показывает деталь с одной стороны. Мысленно «соберите» их: ширину берём с главного вида и вида сверху,</text>
+<text x="30" y="546" font-size="12" fill="#555">высоту с главного и вида слева, глубину с вида сверху и вида слева. Отверстие сверху видно кругом, а спереди и слева только штрихами.</text>
+</svg>

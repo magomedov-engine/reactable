@@ -1,0 +1,16 @@
+# сайт
+site/node_modules/
+site/dist/
+# копия материалов: собирается из vault скриптом npm run sync
+site/src/content/
+
+# Obsidian: личное состояние окон и кэш (настройки хранилища коммитятся)
+vault/.obsidian/workspace*.json
+vault/.obsidian/cache
+vault/.trash/
+
+# служебное
+.claude/
+.DS_Store
+Thumbs.db
+*.log

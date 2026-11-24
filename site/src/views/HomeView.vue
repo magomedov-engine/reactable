@@ -1,0 +1,129 @@
+<script setup>
+import { computed } from 'vue'
+import { sections, lessons, getLesson, lessonLabel, glossary, schemeCount } from '../lib/content.js'
+import { isDone, doneCount, donePercent, nextLesson, progress, resetProgress } from '../lib/store.js'
+
+const PLAN = [
+  { day: 1, ids: ['basics-01', 'extra-04'], note: 'Профессия и единицы измерения' },
+  { day: 2, ids: ['basics-02'], note: 'Самый важный урок: читать внимательно' },
+  { day: 3, ids: ['basics-03'] },
+  { day: 4, ids: ['basics-04'] },
+  { day: 5, ids: ['basics-05'], note: 'Если есть штангенциркуль, потренируйтесь мерить' },
+  { day: 6, ids: ['basics-06'] },
+  { day: 7, ids: ['basics-07'] },
+  { day: 8, ids: ['extra-01'] },
+  { day: 9, ids: ['extra-02', 'extra-03'] },
+  { day: 10, ids: ['engine-01', 'engine-02'] },
+  { day: 11, ids: ['engine-03'] },
+  { day: 12, ids: ['engine-04', 'engine-05'] },
+  { day: 13, ids: ['engine-06', 'assembly-01'] },
+  { day: 14, ids: [], note: 'Повторение: пройдите самопроверки всех уроков, выпишите вопросы наставнику' },
+]
+const plan = PLAN.map((p) => ({ ...p, lessons: p.ids.map(getLesson) }))
+const dayDone = (p) => p.lessons.length > 0 && p.lessons.every((l) => isDone(l.id))
+const started = computed(() => doneCount.value > 0 || !!progress.last)
+const resumeTo = computed(() => {
+  const l = nextLesson.value
+  if (!l) return null
+  const resume = progress.last?.id === l.id && progress.last.y > 200
+  return { path: `/lesson/${l.id}`, query: resume ? { resume: 1 } : {} }
+})
+function reset() {
+  if (confirm('Сбросить отметки о пройденных уроках?')) resetProgress()
+}
+</script>
+
+<template>
+  <div class="page home">
+    <section class="hero">
+      <div class="hero-kicker">Курс для старта с нуля</div>
+      <h1 class="hero-title">Слесарь механосборочных работ<span class="hero-accent">: сборка V12-дизеля</span></h1>
+      <p class="hero-sub">
+        «Карта местности» перед заводским обучением: из чего состоит большой дизель, как его собирают и как не навредить себе и изделию.
+        Объяснения простыми словами, схемы можно приближать.
+      </p>
+      <div class="hero-actions">
+        <RouterLink v-if="resumeTo" :to="resumeTo" class="btn btn-primary">
+          {{ started ? 'Продолжить' : 'Начать с первого урока' }}
+          <span class="btn-sub">{{ nextLesson.title }}</span>
+        </RouterLink>
+        <RouterLink v-else to="/glossary" class="btn btn-primary">Все уроки пройдены · повторить глоссарий</RouterLink>
+        <RouterLink to="/glossary" class="btn btn-ghost">Глоссарий</RouterLink>
+      </div>
+      <div class="stats">
+        <div class="stat"><strong>{{ lessons.length }}</strong><span>уроков</span></div>
+        <div class="stat"><strong>{{ schemeCount }}</strong><span>схем</span></div>
+        <div class="stat"><strong>{{ glossary.length }}</strong><span>терминов</span></div>
+        <div class="stat progress-stat">
+          <strong>{{ donePercent }}%</strong><span>пройдено</span>
+          <div class="bar"><div class="bar-fill" :style="{ width: donePercent + '%' }" /></div>
+        </div>
+      </div>
+    </section>
+
+    <RouterLink to="/model" class="promo-3d">
+      <div class="promo-cube" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z" /><path d="m3 7 9 5 9-5M12 12v10" /></svg>
+      </div>
+      <div class="promo-text">
+        <strong>3D-модель V12</strong>
+        <span>Покрутите двигатель, нажмите на любую деталь, разберите его ползунком и посмотрите, как по порядку работают все 12 цилиндров.</span>
+      </div>
+      <span class="promo-go">Открыть →</span>
+    </RouterLink>
+
+    <div class="note-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20z" /><path d="M12 10v4M12 17v.5" /></svg>
+      <p>
+        Курс универсальный: описан «типовой» V12-дизель. Числа с пометкой <span class="badge badge-example">пример</span> — ориентиры.
+        На заводе всегда главнее <strong>технологическая карта</strong> и слова наставника.
+      </p>
+    </div>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>План на 2 недели</h2>
+        <p>Примерно 1,5–2 часа в день: чтение, схемы, самопроверка.</p>
+      </div>
+      <ol class="plan">
+        <li v-for="p in plan" :key="p.day" class="plan-day" :class="{ done: dayDone(p) }">
+          <div class="plan-num">
+            <span v-if="!dayDone(p)">{{ p.day }}</span>
+            <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10" /></svg>
+          </div>
+          <div class="plan-body">
+            <RouterLink v-for="l in p.lessons" :key="l.id" :to="`/lesson/${l.id}`" class="plan-link" :class="{ done: isDone(l.id) }">
+              {{ l.title }}
+            </RouterLink>
+            <RouterLink v-if="!p.lessons.length" to="/glossary" class="plan-link">Повторение и глоссарий</RouterLink>
+            <div v-if="p.note" class="plan-note">{{ p.note }}</div>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section v-for="s in sections" :key="s.id" class="block">
+      <div class="block-head">
+        <h2>{{ s.title }}</h2>
+      </div>
+      <div class="cards">
+        <RouterLink v-for="(l, i) in s.lessons" :key="l.id" :to="`/lesson/${l.id}`" class="card" :class="{ done: isDone(l.id) }" :style="{ '--i': i }">
+          <div class="card-top">
+            <span class="card-label">{{ lessonLabel(l) || 'Урок' }}</span>
+            <span v-if="isDone(l.id)" class="card-done">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10" /></svg>
+            </span>
+            <span v-else-if="l.time" class="card-time">{{ l.time }}</span>
+          </div>
+          <h3 class="card-title">{{ l.title }}</h3>
+          <p class="card-text">{{ l.summary }}</p>
+        </RouterLink>
+      </div>
+    </section>
+
+    <footer class="home-foot">
+      <span>Прогресс хранится только в этом браузере.</span>
+      <button v-if="doneCount" type="button" class="link-btn" @click="reset">Сбросить прогресс</button>
+    </footer>
+  </div>
+</template>

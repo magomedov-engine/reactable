@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 640" font-family="Arial, sans-serif">
+  <defs>
+    <pattern id="dz" patternUnits="userSpaceOnUse" width="16" height="16" patternTransform="rotate(45)"><rect width="8" height="16" fill="#fdd835"/><rect x="8" width="8" height="16" fill="#222"/></pattern>
+  </defs>
+  <rect width="860" height="640" fill="#ffffff" rx="10"/>
+  <text x="430" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Груз на кране, стропы и знаки безопасности</text>
+
+  <!-- ===== Зона под грузом ===== -->
+  <text x="210" y="60" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Опасная зона под грузом</text>
+  <line x1="210" y1="70" x2="210" y2="110" stroke="#555" stroke-width="3"/>
+  <path d="M 200 110 Q 210 128 220 110" fill="none" stroke="#333" stroke-width="4"/>
+  <line x1="210" y1="122" x2="160" y2="180" stroke="#555" stroke-width="2.5"/>
+  <line x1="210" y1="122" x2="260" y2="180" stroke="#555" stroke-width="2.5"/>
+  <rect x="140" y="180" width="140" height="70" rx="6" fill="#9aa5b1" stroke="#333" stroke-width="2"/>
+  <text x="210" y="220" text-anchor="middle" font-size="13" fill="#222">двигатель ~2 т</text>
+  <!-- проекция и зона -->
+  <path d="M 140 250 L 60 400 L 360 400 L 280 250 Z" fill="#fdecea" opacity="0.8"/>
+  <rect x="40" y="400" width="340" height="14" fill="url(#dz)"/>
+  <text x="210" y="340" text-anchor="middle" font-size="22" font-weight="bold" fill="#d33">НЕ СТОЯТЬ</text>
+  <text x="210" y="365" text-anchor="middle" font-size="12" fill="#d33">груз может упасть и отлететь в сторону</text>
+  <!-- человек в безопасной зоне -->
+  <g stroke="#2a8a3a" stroke-width="3" fill="none">
+    <circle cx="420" cy="330" r="10"/><line x1="420" y1="340" x2="420" y2="375"/><line x1="420" y1="375" x2="408" y2="400"/><line x1="420" y1="375" x2="432" y2="400"/><line x1="420" y1="350" x2="404" y2="365"/><line x1="420" y1="350" x2="436" y2="340"/>
+  </g>
+  <text x="420" y="425" text-anchor="middle" font-size="12" fill="#2a8a3a">сбоку, на виду</text>
+  <text x="420" y="440" text-anchor="middle" font-size="12" fill="#2a8a3a">у стропальщика</text>
+
+  <line x1="470" y1="50" x2="470" y2="450" stroke="#ccc" stroke-dasharray="6 4"/>
+
+  <!-- ===== Угол строп ===== -->
+  <text x="665" y="60" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Угол между стропами</text>
+  <!-- маленький угол -->
+  <line x1="560" y1="90" x2="535" y2="170" stroke="#2a8a3a" stroke-width="3"/><line x1="560" y1="90" x2="585" y2="170" stroke="#2a8a3a" stroke-width="3"/>
+  <rect x="520" y="170" width="80" height="34" fill="#9aa5b1" stroke="#333"/>
+  <text x="560" y="222" text-anchor="middle" font-size="12" fill="#2a8a3a">~30°: норм.</text>
+  <!-- 90 -->
+  <line x1="680" y1="110" x2="620" y2="170" stroke="#e59a14" stroke-width="3"/><line x1="680" y1="110" x2="740" y2="170" stroke="#e59a14" stroke-width="3"/>
+  <rect x="610" y="170" width="140" height="34" fill="#9aa5b1" stroke="#333"/>
+  <text x="680" y="222" text-anchor="middle" font-size="12" fill="#a06000">90°: обычно предел</text>
+  <!-- 120 -->
+  <line x1="800" y1="140" x2="752" y2="168" stroke="#d33" stroke-width="3"/><line x1="800" y1="140" x2="848" y2="168" stroke="#d33" stroke-width="3"/>
+  <rect x="752" y="170" width="96" height="34" fill="#9aa5b1" stroke="#333"/>
+  <text x="800" y="222" text-anchor="middle" font-size="12" fill="#d33">120°: нельзя</text>
+  <!-- таблица -->
+  <g font-size="12" fill="#222">
+    <rect x="500" y="245" width="330" height="125" fill="#f9fafb" stroke="#ccc"/>
+    <text x="510" y="265" font-weight="bold">Нагрузка на одну стропу (из двух)</text>
+    <text x="510" y="285">угол 0° (стропы вертикально): 0,5 веса груза</text>
+    <text x="510" y="303">угол 60°: ~0,58 веса</text>
+    <text x="510" y="321">угол 90°: ~0,71 веса</text>
+    <text x="510" y="339" fill="#d33">угол 120°: 1,0 веса: каждая стропа держит весь груз!</text>
+    <text x="510" y="359" fill="#555">Чем шире разведены стропы, тем больше их тянет.</text>
+  </g>
+  <text x="500" y="395" font-size="12" fill="#555">Строповку делает только допущенный стропальщик.</text>
+  <text x="500" y="411" font-size="12" fill="#555">Предельный угол и схемы строповки: в ТК и на</text>
+  <text x="500" y="427" font-size="12" fill="#555">плакатах участка (~пример: часто не более 90°).</text>
+
+  <line x1="20" y1="460" x2="840" y2="460" stroke="#ccc" stroke-dasharray="6 4"/>
+
+  <!-- ===== Знаки ===== -->
+  <text x="430" y="486" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Знаки безопасности: смысл понятен по цвету и форме</text>
+  <!-- запрещающий -->
+  <circle cx="110" cy="545" r="38" fill="#fff" stroke="#d32f2f" stroke-width="8"/>
+  <g stroke="#222" stroke-width="3" fill="none"><circle cx="110" cy="528" r="6"/><line x1="110" y1="534" x2="110" y2="556"/><line x1="110" y1="556" x2="102" y2="570"/><line x1="110" y1="556" x2="118" y2="570"/></g>
+  <line x1="84" y1="519" x2="136" y2="571" stroke="#d32f2f" stroke-width="7"/>
+  <text x="110" y="604" text-anchor="middle" font-size="12" font-weight="bold" fill="#d32f2f">Запрещающий</text>
+  <text x="110" y="620" text-anchor="middle" font-size="11" fill="#222">красный круг с чертой: НЕЛЬЗЯ</text>
+  <!-- предупреждающий -->
+  <path d="M 320 505 L 362 580 L 278 580 Z" fill="#fdd835" stroke="#222" stroke-width="4" stroke-linejoin="round"/>
+  <text x="320" y="572" text-anchor="middle" font-size="40" font-weight="bold" fill="#222">!</text>
+  <text x="320" y="604" text-anchor="middle" font-size="12" font-weight="bold" fill="#a06000">Предупреждающий</text>
+  <text x="320" y="620" text-anchor="middle" font-size="11" fill="#222">жёлтый треугольник: ОСТОРОЖНО</text>
+  <!-- предписывающий -->
+  <circle cx="540" cy="545" r="38" fill="#1565c0"/>
+  <g stroke="#fff" stroke-width="3" fill="none"><circle cx="526" cy="545" r="10"/><circle cx="554" cy="545" r="10"/><line x1="536" y1="545" x2="544" y2="545"/><line x1="516" y1="543" x2="508" y2="538"/><line x1="564" y1="543" x2="572" y2="538"/></g>
+  <text x="540" y="604" text-anchor="middle" font-size="12" font-weight="bold" fill="#1565c0">Предписывающий</text>
+  <text x="540" y="620" text-anchor="middle" font-size="11" fill="#222">синий круг: ОБЯЗАТЕЛЬНО (тут: очки)</text>
+  <!-- эвакуационный -->
+  <rect x="705" y="515" width="90" height="60" rx="4" fill="#2e7d32"/>
+  <g stroke="#fff" stroke-width="3" fill="none"><circle cx="735" cy="530" r="5"/><line x1="735" y1="535" x2="730" y2="552"/><line x1="730" y1="552" x2="722" y2="566"/><line x1="730" y1="552" x2="742" y2="562"/><line x1="733" y1="541" x2="745" y2="546"/><line x1="733" y1="541" x2="722" y2="548"/><rect x="755" y="525" width="24" height="42"/></g>
+  <text x="750" y="604" text-anchor="middle" font-size="12" font-weight="bold" fill="#2e7d32">Эвакуационный</text>
+  <text x="750" y="620" text-anchor="middle" font-size="11" fill="#222">зелёный: выход, путь, аптечка</text>
+</svg>

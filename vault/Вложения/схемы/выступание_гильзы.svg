@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 580" font-family="Arial, sans-serif">
+  <defs>
+    <pattern id="h" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#8a96a3" stroke-width="1"/></pattern>
+    <marker id="e" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8 Z" fill="#d33"/></marker>
+  </defs>
+  <rect width="860" height="580" fill="#ffffff" rx="10"/>
+  <text x="430" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Выступание гильзы над блоком: что это и как мерить</text>
+
+  <g transform="translate(6 20) scale(0.88)">
+  <!-- ===== Увеличенный разрез ===== -->
+  <text x="230" y="62" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Разрез у верха гильзы (сильно увеличено)</text>
+  <!-- головка (приподнята) -->
+  <rect x="40" y="95" width="380" height="50" fill="#9aa5b1" stroke="#333" stroke-width="2" opacity="0.55"/>
+  <text x="230" y="125" text-anchor="middle" font-size="13" fill="#222">головка блока (опустится вниз)</text>
+  <line x1="230" y1="150" x2="230" y2="190" stroke="#555" stroke-width="2" stroke-dasharray="5 3"/>
+  <path d="M 222 182 L 230 196 L 238 182 Z" fill="#555"/>
+  <!-- прокладка -->
+  <rect x="40" y="205" width="380" height="9" fill="#e59a14" stroke="#333" opacity="0.8"/>
+  <text x="430" y="214" font-size="12" fill="#a06000">прокладка</text>
+  <!-- блок -->
+  <path d="M 40 260 L 200 260 L 200 280 L 260 280 L 260 470 L 40 470 Z" fill="url(#h)" stroke="#333" stroke-width="2"/>
+  <rect x="40" y="260" width="160" height="210" fill="#cfd6dc" opacity="0.6"/>
+  <!-- рубашка воды -->
+  <rect x="200" y="300" width="60" height="150" fill="#8ec6f0" stroke="#3d8fd1"/>
+  <text x="230" y="380" text-anchor="middle" font-size="11" fill="#1b5e9a" transform="rotate(-90 230 380)">вода</text>
+  <!-- гильза с буртом -->
+  <path d="M 200 236 L 310 236 L 310 470 L 270 470 L 270 280 L 200 280 Z" fill="#6c7a89" stroke="#222" stroke-width="2"/>
+  <!-- полость цилиндра -->
+  <rect x="310" y="236" width="110" height="234" fill="#ffffff"/>
+  <text x="365" y="400" text-anchor="middle" font-size="12" fill="#555">цилиндр</text>
+  <!-- линия плоскости блока -->
+  <line x1="40" y1="260" x2="440" y2="260" stroke="#2f6db5" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <text x="44" y="254" font-size="12" fill="#2f6db5">плоскость блока</text>
+  <!-- размер выступания -->
+  <line x1="330" y1="236" x2="460" y2="236" stroke="#d33" stroke-width="1"/>
+  <line x1="450" y1="210" x2="450" y2="236" stroke="#d33" stroke-width="1.5" marker-end="url(#e)"/>
+  <line x1="450" y1="286" x2="450" y2="260" stroke="#d33" stroke-width="1.5" marker-end="url(#e)"/>
+  <text x="458" y="246" font-size="13" font-weight="bold" fill="#d33">выступание</text>
+  <text x="458" y="262" font-size="12" fill="#d33">доли мм (~пример:</text>
+  <text x="458" y="277" font-size="12" fill="#d33">0,05–0,15 мм)</text>
+  <g font-size="12" fill="#222" stroke="#555">
+    <text x="60" y="500" stroke="none">бурт гильзы (верхний «воротник»)</text>
+    <line x1="160" y1="488" x2="215" y2="250"/>
+    <text x="60" y="520" stroke="none">гильза</text>
+    <line x1="100" y1="514" x2="288" y2="440"/>
+    <text x="60" y="540" stroke="none">блок цилиндров</text>
+    <line x1="150" y1="534" x2="120" y2="470"/>
+  </g>
+  <text x="300" y="530" font-size="12" fill="#555">Бурт чуть выше блока: головка через</text>
+  <text x="300" y="546" font-size="12" fill="#555">прокладку прижмёт гильзу сильнее всего.</text>
+
+  </g>
+  <line x1="530" y1="50" x2="530" y2="570" stroke="#ccc" stroke-dasharray="6 4"/>
+  <!-- ===== Как мерить ===== -->
+  <text x="690" y="62" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Как мерят индикатором</text>
+  <g transform="translate(-60 0)">
+  <rect x="620" y="130" width="70" height="40" fill="#cfd6dc" stroke="#333"/>
+  <rect x="690" y="124" width="40" height="46" fill="#6c7a89" stroke="#222"/>
+  <circle cx="650" cy="88" r="16" fill="#fff" stroke="#333" stroke-width="2"/><line x1="650" y1="88" x2="650" y2="74" stroke="#d33" stroke-width="2"/>
+  <line x1="650" y1="104" x2="650" y2="130" stroke="#333" stroke-width="3"/>
+  </g>
+  <text x="680" y="92" font-size="12" fill="#222">1. Наконечник на блок,</text>
+  <text x="680" y="107" font-size="12" fill="#222">шкалу ставят на «0».</text>
+  <g transform="translate(-60 110)">
+  <rect x="620" y="130" width="70" height="40" fill="#cfd6dc" stroke="#333"/>
+  <rect x="690" y="124" width="40" height="46" fill="#6c7a89" stroke="#222"/>
+  <circle cx="708" cy="82" r="16" fill="#fff" stroke="#333" stroke-width="2"/><line x1="708" y1="82" x2="718" y2="70" stroke="#d33" stroke-width="2"/>
+  <line x1="708" y1="98" x2="708" y2="124" stroke="#333" stroke-width="3"/>
+  </g>
+  <text x="680" y="200" font-size="12" fill="#222">2. Переставить на бурт</text>
+  <text x="680" y="215" font-size="12" fill="#222">гильзы: показание</text>
+  <text x="680" y="230" font-size="12" fill="#222">= выступание.</text>
+  <text x="545" y="300" font-size="12" fill="#555">Мерят в нескольких точках по кругу каждой</text>
+  <text x="545" y="315" font-size="12" fill="#555">гильзы и записывают в карту. Часто гильзу</text>
+  <text x="545" y="330" font-size="12" fill="#555">перед замером прижимают приспособлением.</text>
+  <text x="690" y="362" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">Что бывает</text>
+  <g font-size="12" transform="translate(-60 20)">
+    <rect x="615" y="350" width="250" height="56" rx="6" fill="#fdecea" stroke="#d33"/>
+    <text x="625" y="370" font-weight="bold" fill="#d33">Мало (или ниже блока)</text>
+    <text x="625" y="386" fill="#222">гильза не прижата: прорыв газов,</text>
+    <text x="625" y="400" fill="#222">вода в цилиндре, прожиг прокладки</text>
+    <rect x="615" y="414" width="250" height="44" rx="6" fill="#e8f5e9" stroke="#2a8a3a"/>
+    <text x="625" y="434" font-weight="bold" fill="#2a8a3a">В допуске ТК</text>
+    <text x="625" y="450" fill="#222">записать замер, работать дальше</text>
+    <rect x="615" y="466" width="250" height="56" rx="6" fill="#fdecea" stroke="#d33"/>
+    <text x="625" y="486" font-weight="bold" fill="#d33">Много</text>
+    <text x="625" y="502" fill="#222">перекос головки, может треснуть</text>
+    <text x="625" y="516" fill="#222">бурт гильзы или прокладка</text>
+  </g>
+  <text x="690" y="565" text-anchor="middle" font-size="12" font-weight="bold" fill="#222">Не в допуске: стоп, сообщить мастеру.</text>
+</svg>

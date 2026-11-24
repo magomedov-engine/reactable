@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Курс для старта с нуля: слесарь механосборочных работ, сборка 12-цилиндрового дизеля. Уроки, схемы, глоссарий." />
+    <meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1216" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>Слесарь-сборщик · V12</title>
+    <script>
+      // тема до загрузки приложения, чтобы не было вспышки светлого фона
+      try {
+        var t = localStorage.getItem('slesar:theme') || 'system'
+        var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+        var fs = localStorage.getItem('slesar:font')
+        if (fs) document.documentElement.style.setProperty('--reader-scale', fs)
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

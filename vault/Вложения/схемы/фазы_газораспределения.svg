@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 560" font-family="Arial, sans-serif">
+<rect width="860" height="560" fill="#ffffff" rx="10"/>
+<text x="430" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Фазы газораспределения: когда открыты клапаны</text>
+<text x="430" y="48" text-anchor="middle" font-size="12" fill="#555">Углы показаны как ~пример. Точные значения для вашего мотора только в документации.</text>
+<circle cx="260" cy="300" r="185" fill="none" stroke="#ddd"/>
+<line x1="260" y1="95" x2="260" y2="505" stroke="#999" stroke-dasharray="6 4"/>
+<path d="M 201.9 140.3 A 170 170 0 1 1 129.8 409.3" fill="none" stroke="#2a8a3a" stroke-width="14" stroke-linecap="butt"/>
+<path d="M 367.2 390.0 A 140 140 0 1 1 307.9 168.4" fill="none" stroke="#c62828" stroke-width="14" stroke-linecap="butt"/>
+<path d="M 222.4 196.6 A 110 110 0 0 1 297.6 196.6" fill="none" stroke="#e59a14" stroke-width="10" stroke-linecap="butt"/>
+<circle cx="235.4" cy="208.2" r="7" fill="#e65100"/>
+<circle cx="260" cy="300" r="8" fill="#333"/>
+<defs><marker id="m" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#555"/></marker></defs>
+<path d="M 312.0 270.0 A 60 60 0 0 1 312.0 330.0" fill="none" stroke="#555" stroke-width="2" marker-end="url(#m)"/>
+<text x="305" y="305" font-size="11" fill="#555">вращение</text>
+<text x="260" y="88" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">ВМТ</text>
+<text x="260" y="528" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">НМТ</text>
+<line x1="205.3" y1="149.6" x2="191.6" y2="112.1" stroke="#2a8a3a" stroke-width="2"/>
+<line x1="137.4" y1="402.8" x2="106.8" y2="428.6" stroke="#2a8a3a" stroke-width="2"/>
+<line x1="359.6" y1="383.6" x2="413.2" y2="428.6" stroke="#c62828" stroke-width="2"/>
+<line x1="304.5" y1="177.8" x2="328.4" y2="112.1" stroke="#c62828" stroke-width="2"/>
+<text x="30" y="86" font-size="12" fill="#2a8a3a">впуск открылся</text>
+<text x="30" y="101" font-size="12" fill="#2a8a3a">(~20° до ВМТ)</text>
+<text x="330" y="86" font-size="12" fill="#c62828">выпуск закрылся</text>
+<text x="330" y="101" font-size="12" fill="#c62828">(~20° после ВМТ)</text>
+<text x="20" y="462" font-size="12" fill="#2a8a3a">впуск закрылся</text>
+<text x="20" y="477" font-size="12" fill="#2a8a3a">(~50° после НМТ)</text>
+<text x="395" y="462" font-size="12" fill="#c62828">выпуск открылся</text>
+<text x="395" y="477" font-size="12" fill="#c62828">(~50° до НМТ)</text>
+<rect x="520" y="100" width="22" height="12" fill="#2a8a3a"/><text x="552" y="111" font-size="13" fill="#222">Зелёная дуга: впускной клапан открыт</text>
+<rect x="520" y="130" width="22" height="12" fill="#c62828"/><text x="552" y="141" font-size="13" fill="#222">Красная дуга: выпускной клапан открыт</text>
+<rect x="520" y="160" width="22" height="12" fill="#e59a14"/><text x="552" y="171" font-size="13" fill="#222">Оранжевая: перекрытие, открыты оба</text>
+<rect x="520" y="190" width="22" height="12" fill="#e65100"/><text x="552" y="201" font-size="13" fill="#222">Точка: впрыск топлива, чуть до ВМТ</text>
+<text x="520" y="250" font-size="12" fill="#222" font-weight="bold">Как читать:</text>
+<text x="520" y="268" font-size="12" fill="#222">Круг = поворот коленвала. Полный цикл</text>
+<text x="520" y="286" font-size="12" fill="#222">цилиндра = 2 оборота, поэтому дуги</text>
+<text x="520" y="304" font-size="12" fill="#222">наложены друг на друга.</text>
+<text x="520" y="322" font-size="12" fill="#222"></text>
+<text x="520" y="340" font-size="12" fill="#222">Клапаны открываются чуть раньше и</text>
+<text x="520" y="358" font-size="12" fill="#222">закрываются чуть позже «мёртвых точек»:</text>
+<text x="520" y="376" font-size="12" fill="#222">газы и воздух инертны, им нужно время,</text>
+<text x="520" y="394" font-size="12" fill="#222">чтобы войти и выйти.</text>
+<text x="520" y="412" font-size="12" fill="#222"></text>
+<text x="520" y="430" font-size="12" fill="#222">Сборщику: эти углы задаёт распредвал.</text>
+<text x="520" y="448" font-size="12" fill="#222">Вы их обеспечиваете, ставя шестерни</text>
+<text x="520" y="466" font-size="12" fill="#222">точно по меткам (схема с метками).</text>
+</svg>

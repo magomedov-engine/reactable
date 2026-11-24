@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" font-family="Arial, sans-serif">
+<defs><marker id="a" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#222"/></marker><marker id="g" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#2a8a3a"/></marker><marker id="s" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#666"/></marker></defs>
+<rect width="800" height="520" fill="#ffffff" rx="10"/>
+<text x="400" y="26" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Четыре такта дизеля (один цилиндр, 720° поворота вала)</text>
+<g transform="translate(20 45)">
+<text x="85" y="0" text-anchor="middle" font-size="15" font-weight="bold" fill="#2a8a3a">1. Впуск</text>
+<text x="58" y="22" text-anchor="middle" font-size="10" fill="#2a8a3a">впуск</text>
+<text x="112" y="22" text-anchor="middle" font-size="10" fill="#777">выпуск</text>
+<rect x="35" y="76" width="100" height="160" fill="#e8f5e9"/>
+<line x1="35" y1="76" x2="35" y2="236" stroke="#333" stroke-width="3"/><line x1="135" y1="76" x2="135" y2="236" stroke="#333" stroke-width="3"/>
+<rect x="30" y="56" width="110" height="20" fill="#9aa5b1" stroke="#333" stroke-width="2"/>
+<rect x="78" y="44" width="14" height="26" fill="#e59a14" stroke="#333" stroke-width="1.5" opacity="0.5"/>
+<line x1="58" y1="40" x2="58" y2="86" stroke="#2a8a3a" stroke-width="5"/><polygon points="52,86 64,86 73,92 43,92" fill="#2a8a3a" stroke="#222"/>
+<line x1="112" y1="40" x2="112" y2="70" stroke="#444" stroke-width="5"/><polygon points="106,70 118,70 127,76 97,76" fill="#444" stroke="#222"/>
+<line x1="48" y1="100" x2="48" y2="135" stroke="#2a8a3a" stroke-width="3" marker-end="url(#g)"/><line x1="68" y1="100" x2="68" y2="135" stroke="#2a8a3a" stroke-width="3" marker-end="url(#g)"/>
+<circle cx="85" cy="290" r="52" fill="#f8d48a" stroke="#333" stroke-width="2"/>
+<line x1="85" y1="175.6" x2="129.3" y2="297.8" stroke="#222" stroke-width="8" stroke-linecap="round"/>
+<rect x="37" y="160.6" width="96" height="30" fill="#6c7a89" stroke="#222" stroke-width="2"/>
+<circle cx="85" cy="175.6" r="5" fill="#fff" stroke="#222"/>
+<circle cx="85" cy="290" r="6" fill="#333"/>
+<circle cx="129.3" cy="297.8" r="8" fill="#e59a14" stroke="#222" stroke-width="1.5"/>
+<line x1="160" y1="120" x2="160" y2="200" stroke="#222" stroke-width="3" marker-end="url(#a)"/>
+<text x="85" y="370" text-anchor="middle" font-size="13" fill="#333">Поршень идёт вниз.</text>
+<text x="85" y="386" text-anchor="middle" font-size="13" fill="#333">Впускной клапан открыт.</text>
+<text x="85" y="402" text-anchor="middle" font-size="13" fill="#2a8a3a">Входит чистый воздух</text>
+</g>
+<g transform="translate(220 45)">
+<text x="85" y="0" text-anchor="middle" font-size="15" font-weight="bold" fill="#2f6db5">2. Сжатие</text>
+<text x="58" y="22" text-anchor="middle" font-size="10" fill="#2a8a3a">впуск</text>
+<text x="112" y="22" text-anchor="middle" font-size="10" fill="#777">выпуск</text>
+<rect x="35" y="76" width="100" height="160" fill="#e3f0fb"/>
+<line x1="35" y1="76" x2="35" y2="236" stroke="#333" stroke-width="3"/><line x1="135" y1="76" x2="135" y2="236" stroke="#333" stroke-width="3"/>
+<rect x="30" y="56" width="110" height="20" fill="#9aa5b1" stroke="#333" stroke-width="2"/>
+<rect x="78" y="44" width="14" height="26" fill="#e59a14" stroke="#333" stroke-width="1.5" opacity="0.5"/>
+<line x1="58" y1="40" x2="58" y2="70" stroke="#444" stroke-width="5"/><polygon points="52,70 64,70 73,76 43,76" fill="#444" stroke="#222"/>
+<line x1="112" y1="40" x2="112" y2="70" stroke="#444" stroke-width="5"/><polygon points="106,70 118,70 127,76 97,76" fill="#444" stroke="#222"/>
+<circle cx="85" cy="290" r="52" fill="#f8d48a" stroke="#333" stroke-width="2"/>
+<line x1="85" y1="143.5" x2="46" y2="267.5" stroke="#222" stroke-width="8" stroke-linecap="round"/>
+<rect x="37" y="128.5" width="96" height="30" fill="#6c7a89" stroke="#222" stroke-width="2"/>
+<circle cx="85" cy="143.5" r="5" fill="#fff" stroke="#222"/>
+<circle cx="85" cy="290" r="6" fill="#333"/>
+<circle cx="46" cy="267.5" r="8" fill="#e59a14" stroke="#222" stroke-width="1.5"/>
+<line x1="160" y1="200" x2="160" y2="120" stroke="#222" stroke-width="3" marker-end="url(#a)"/>
+<text x="85" y="370" text-anchor="middle" font-size="13" fill="#333">Поршень идёт вверх.</text>
+<text x="85" y="386" text-anchor="middle" font-size="13" fill="#333">Оба клапана закрыты.</text>
+<text x="85" y="402" text-anchor="middle" font-size="13" fill="#d33">Воздух сжат и раскалён</text>
+</g>
+<g transform="translate(420 45)">
+<text x="85" y="0" text-anchor="middle" font-size="15" font-weight="bold" fill="#d33">3. Рабочий ход</text>
+<text x="58" y="22" text-anchor="middle" font-size="10" fill="#2a8a3a">впуск</text>
+<text x="112" y="22" text-anchor="middle" font-size="10" fill="#777">выпуск</text>
+<rect x="35" y="76" width="100" height="160" fill="#fdecea"/>
+<line x1="35" y1="76" x2="35" y2="236" stroke="#333" stroke-width="3"/><line x1="135" y1="76" x2="135" y2="236" stroke="#333" stroke-width="3"/>
+<rect x="30" y="56" width="110" height="20" fill="#9aa5b1" stroke="#333" stroke-width="2"/>
+<rect x="78" y="34" width="14" height="36" fill="#e59a14" stroke="#333" stroke-width="1.5"/>
+<polygon points="85,78 62,108 108,108" fill="#ff7043" opacity="0.85"/>
+<text x="85" y="124" text-anchor="middle" font-size="10" fill="#b23">вспышка</text>
+<line x1="58" y1="40" x2="58" y2="70" stroke="#444" stroke-width="5"/><polygon points="52,70 64,70 73,76 43,76" fill="#444" stroke="#222"/>
+<line x1="112" y1="40" x2="112" y2="70" stroke="#444" stroke-width="5"/><polygon points="106,70 118,70 127,76 97,76" fill="#444" stroke="#222"/>
+<circle cx="85" cy="290" r="52" fill="#f8d48a" stroke="#333" stroke-width="2"/>
+<line x1="85" y1="143.5" x2="124" y2="267.5" stroke="#222" stroke-width="8" stroke-linecap="round"/>
+<rect x="37" y="128.5" width="96" height="30" fill="#6c7a89" stroke="#222" stroke-width="2"/>
+<circle cx="85" cy="143.5" r="5" fill="#fff" stroke="#222"/>
+<circle cx="85" cy="290" r="6" fill="#333"/>
+<circle cx="124" cy="267.5" r="8" fill="#e59a14" stroke="#222" stroke-width="1.5"/>
+<line x1="160" y1="120" x2="160" y2="200" stroke="#222" stroke-width="3" marker-end="url(#a)"/>
+<text x="85" y="370" text-anchor="middle" font-size="13" fill="#333">Впрыск топлива.</text>
+<text x="85" y="386" text-anchor="middle" font-size="13" fill="#333">Оба клапана закрыты.</text>
+<text x="85" y="402" text-anchor="middle" font-size="13" fill="#d33">Газы толкают поршень вниз</text>
+</g>
+<g transform="translate(620 45)">
+<text x="85" y="0" text-anchor="middle" font-size="15" font-weight="bold" fill="#666">4. Выпуск</text>
+<text x="58" y="22" text-anchor="middle" font-size="10" fill="#2a8a3a">впуск</text>
+<text x="112" y="22" text-anchor="middle" font-size="10" fill="#777">выпуск</text>
+<rect x="35" y="76" width="100" height="160" fill="#eceff1"/>
+<line x1="35" y1="76" x2="35" y2="236" stroke="#333" stroke-width="3"/><line x1="135" y1="76" x2="135" y2="236" stroke="#333" stroke-width="3"/>
+<rect x="30" y="56" width="110" height="20" fill="#9aa5b1" stroke="#333" stroke-width="2"/>
+<rect x="78" y="44" width="14" height="26" fill="#e59a14" stroke="#333" stroke-width="1.5" opacity="0.5"/>
+<line x1="58" y1="40" x2="58" y2="70" stroke="#444" stroke-width="5"/><polygon points="52,70 64,70 73,76 43,76" fill="#444" stroke="#222"/>
+<line x1="112" y1="40" x2="112" y2="86" stroke="#888" stroke-width="5"/><polygon points="106,86 118,86 127,92 97,92" fill="#888" stroke="#222"/>
+<line x1="102" y1="160" x2="102" y2="106" stroke="#666" stroke-width="3" marker-end="url(#s)"/><line x1="122" y1="160" x2="122" y2="106" stroke="#666" stroke-width="3" marker-end="url(#s)"/>
+<circle cx="85" cy="290" r="52" fill="#f8d48a" stroke="#333" stroke-width="2"/>
+<line x1="85" y1="185.9" x2="38" y2="307.1" stroke="#222" stroke-width="8" stroke-linecap="round"/>
+<rect x="37" y="170.9" width="96" height="30" fill="#6c7a89" stroke="#222" stroke-width="2"/>
+<circle cx="85" cy="185.9" r="5" fill="#fff" stroke="#222"/>
+<circle cx="85" cy="290" r="6" fill="#333"/>
+<circle cx="38" cy="307.1" r="8" fill="#e59a14" stroke="#222" stroke-width="1.5"/>
+<line x1="160" y1="200" x2="160" y2="120" stroke="#222" stroke-width="3" marker-end="url(#a)"/>
+<text x="85" y="370" text-anchor="middle" font-size="13" fill="#333">Поршень идёт вверх.</text>
+<text x="85" y="386" text-anchor="middle" font-size="13" fill="#333">Выпускной клапан открыт.</text>
+<text x="85" y="402" text-anchor="middle" font-size="13" fill="#555">Газы уходят наружу</text>
+</g>
+<text x="400" y="487" text-anchor="middle" font-size="13" fill="#555">Цветной клапан = открыт, тёмный = закрыт (прижат к седлу). Оранжевый кружок внизу: шатунная шейка вала.</text>
+<text x="400" y="507" text-anchor="middle" font-size="13" fill="#555">Вал делает 2 оборота = 4 хода поршня = 1 рабочий ход на цилиндр.</text>
+</svg>

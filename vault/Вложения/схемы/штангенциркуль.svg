@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 600" font-family="Arial, sans-serif">
+  <rect width="820" height="600" fill="#ffffff" rx="10"/>
+  <text x="410" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Штангенциркуль: из чего состоит и как прочитать размер</text>
+
+  <!-- ===== ОБЩИЙ ВИД ===== -->
+  <g>
+    <!-- штанга -->
+    <rect x="70" y="110" width="680" height="26" fill="#e3e7eb" stroke="#333" stroke-width="2"/>
+    <g stroke="#555" stroke-width="1">
+      <line x1="110" y1="110" x2="110" y2="120"/><line x1="130" y1="110" x2="130" y2="118"/><line x1="150" y1="110" x2="150" y2="118"/><line x1="170" y1="110" x2="170" y2="118"/><line x1="190" y1="110" x2="190" y2="122"/><line x1="210" y1="110" x2="210" y2="118"/>
+      <line x1="430" y1="110" x2="430" y2="118"/><line x1="450" y1="110" x2="450" y2="122"/><line x1="470" y1="110" x2="470" y2="118"/><line x1="490" y1="110" x2="490" y2="118"/><line x1="510" y1="110" x2="510" y2="118"/><line x1="530" y1="110" x2="530" y2="122"/><line x1="550" y1="110" x2="550" y2="118"/><line x1="570" y1="110" x2="570" y2="118"/><line x1="590" y1="110" x2="590" y2="118"/><line x1="610" y1="110" x2="610" y2="122"/><line x1="630" y1="110" x2="630" y2="118"/><line x1="650" y1="110" x2="650" y2="118"/>
+    </g>
+    <!-- неподвижные губки -->
+    <rect x="70" y="136" width="36" height="96" fill="#c9d0d7" stroke="#333" stroke-width="2"/>
+    <rect x="70" y="72" width="22" height="38" fill="#c9d0d7" stroke="#333" stroke-width="2"/>
+    <!-- рамка с нониусом -->
+    <rect x="230" y="96" width="180" height="56" rx="4" fill="#b7c2cc" stroke="#333" stroke-width="2"/>
+    <rect x="240" y="136" width="150" height="12" fill="#e3e7eb" stroke="#555"/>
+    <g stroke="#2a8a3a" stroke-width="1.2"><line x1="246" y1="136" x2="246" y2="148"/></g>
+    <g stroke="#555" stroke-width="1"><line x1="260" y1="136" x2="260" y2="144"/><line x1="274" y1="136" x2="274" y2="144"/><line x1="288" y1="136" x2="288" y2="144"/><line x1="302" y1="136" x2="302" y2="144"/><line x1="316" y1="136" x2="316" y2="146"/><line x1="330" y1="136" x2="330" y2="144"/><line x1="344" y1="136" x2="344" y2="144"/><line x1="358" y1="136" x2="358" y2="144"/><line x1="372" y1="136" x2="372" y2="144"/><line x1="386" y1="136" x2="386" y2="146"/></g>
+    <!-- подвижные губки -->
+    <rect x="230" y="152" width="36" height="80" fill="#c9d0d7" stroke="#333" stroke-width="2"/>
+    <rect x="244" y="72" width="22" height="24" fill="#c9d0d7" stroke="#333" stroke-width="2"/>
+    <!-- винт -->
+    <circle cx="330" cy="86" r="11" fill="#6c7a89" stroke="#222" stroke-width="2"/>
+    <!-- глубиномер -->
+    <rect x="750" y="119" width="40" height="8" fill="#c9d0d7" stroke="#333" stroke-width="1.5"/>
+    <!-- деталь между губками -->
+    <rect x="106" y="176" width="124" height="44" fill="#f2b84b" stroke="#333" stroke-width="1.5"/>
+    <text x="168" y="203" text-anchor="middle" font-size="12" fill="#333">деталь</text>
+
+    <g font-size="12" fill="#222" stroke="#333">
+      <text x="20" y="58" stroke="none">Верхние губки: внутренний размер (отверстие)</text>
+      <line x1="80" y1="62" x2="80" y2="74"/><line x1="200" y1="62" x2="252" y2="74"/>
+      <text x="350" y="66" stroke="none">Винт-фиксатор: зажимает рамку</text>
+      <line x1="348" y1="70" x2="338" y2="80"/>
+      <text x="460" y="96" stroke="none">Штанга с основной шкалой (мм)</text>
+      <line x1="560" y1="100" x2="560" y2="110"/>
+      <text x="20" y="252" stroke="none">Нижние губки: наружный размер (вал, толщина)</text>
+      <line x1="88" y1="240" x2="88" y2="232"/><line x1="248" y1="240" x2="248" y2="232"/>
+      <text x="420" y="178" stroke="none">Нониус: шкала на рамке, по ней читают доли мм</text>
+      <line x1="418" y1="174" x2="390" y2="146"/>
+      <text x="660" y="160" stroke="none">Линейка-глубиномер</text>
+      <line x1="740" y1="148" x2="770" y2="128"/>
+    </g>
+  </g>
+
+  <line x1="20" y1="275" x2="800" y2="275" stroke="#ccc" stroke-dasharray="6 4"/>
+
+  <!-- ===== КАК ЧИТАТЬ (увеличено) ===== -->
+  <text x="410" y="302" text-anchor="middle" font-size="16" font-weight="bold" fill="#222">Пример отсчёта, нониус 0,1 мм (шкалы увеличены)</text>
+
+  <!-- основная шкала 20..44 мм: x = 90 + (мм-20)*26 -->
+  <rect x="80" y="320" width="650" height="44" fill="#eef1f4" stroke="#333" stroke-width="1.5"/>
+  <g stroke="#333" stroke-width="1.2">
+    <line x1="90" y1="364" x2="90" y2="340"/><line x1="116" y1="364" x2="116" y2="354"/><line x1="142" y1="364" x2="142" y2="354"/><line x1="168" y1="364" x2="168" y2="354"/><line x1="194" y1="364" x2="194" y2="354"/>
+    <line x1="220" y1="364" x2="220" y2="348"/><line x1="246" y1="364" x2="246" y2="354"/><line x1="272" y1="364" x2="272" y2="354"/><line x1="298" y1="364" x2="298" y2="354"/><line x1="324" y1="364" x2="324" y2="354"/>
+    <line x1="350" y1="364" x2="350" y2="340"/><line x1="376" y1="364" x2="376" y2="354"/><line x1="402" y1="364" x2="402" y2="354"/><line x1="428" y1="364" x2="428" y2="354"/><line x1="454" y1="364" x2="454" y2="354"/>
+    <line x1="480" y1="364" x2="480" y2="348"/><line x1="506" y1="364" x2="506" y2="354"/><line x1="532" y1="364" x2="532" y2="354"/><line x1="558" y1="364" x2="558" y2="354"/><line x1="584" y1="364" x2="584" y2="354"/>
+    <line x1="610" y1="364" x2="610" y2="340"/><line x1="636" y1="364" x2="636" y2="354"/><line x1="662" y1="364" x2="662" y2="354"/><line x1="688" y1="364" x2="688" y2="354"/><line x1="714" y1="364" x2="714" y2="354"/>
+  </g>
+  <!-- целое 24 мм выделено -->
+  <line x1="194" y1="364" x2="194" y2="350" stroke="#2f6db5" stroke-width="3"/>
+  <g font-size="15" font-weight="bold" fill="#222" text-anchor="middle">
+    <text x="90" y="337">2</text><text x="350" y="337">3</text><text x="610" y="337">4</text>
+  </g>
+  <text x="740" y="346" font-size="12" fill="#555">штанга</text>
+
+  <!-- нониус: x = 90 + (24,6-20)*26 + k*1,9*26 = 209.6 + 49.4k -->
+  <rect x="200" y="364" width="520" height="44" fill="#dfe6ec" stroke="#333" stroke-width="1.5"/>
+  <g stroke="#333" stroke-width="1.2">
+    <line x1="259" y1="364" x2="259" y2="376"/><line x1="308.4" y1="364" x2="308.4" y2="376"/><line x1="357.8" y1="364" x2="357.8" y2="376"/><line x1="407.2" y1="364" x2="407.2" y2="376"/>
+    <line x1="456.6" y1="364" x2="456.6" y2="382"/><line x1="555.4" y1="364" x2="555.4" y2="376"/><line x1="604.8" y1="364" x2="604.8" y2="376"/><line x1="654.2" y1="364" x2="654.2" y2="376"/>
+    <line x1="703.6" y1="364" x2="703.6" y2="382"/>
+  </g>
+  <line x1="209.6" y1="364" x2="209.6" y2="386" stroke="#2a8a3a" stroke-width="3"/>
+  <line x1="506" y1="352" x2="506" y2="384" stroke="#d33" stroke-width="3"/>
+  <g font-size="13" fill="#222" text-anchor="middle">
+    <text x="209.6" y="400" fill="#2a8a3a" font-weight="bold">0</text><text x="456.6" y="400">5</text><text x="703.6" y="400">10</text>
+    <text x="506" y="400" fill="#d33" font-weight="bold">6</text>
+  </g>
+  <text x="730" y="392" font-size="12" fill="#555">нониус</text>
+
+  <!-- шаги -->
+  <g font-size="14" fill="#222">
+    <circle cx="40" cy="438" r="11" fill="#2f6db5"/><text x="40" y="443" text-anchor="middle" fill="#fff" font-weight="bold">1</text>
+    <text x="60" y="436">Найдите <tspan fill="#2a8a3a" font-weight="bold">ноль нониуса</tspan> (зелёная черта). Слева от него последняя черта штанги: <tspan fill="#2f6db5" font-weight="bold">24 мм</tspan>.</text>
+    <text x="60" y="454" font-size="12" fill="#555">Цифры на штанге обычно в сантиметрах: «2» = 20 мм, «3» = 30 мм. От «2» отсчитали ещё 4 черты: 24.</text>
+    <circle cx="40" cy="484" r="11" fill="#d33"/><text x="40" y="489" text-anchor="middle" fill="#fff" font-weight="bold">2</text>
+    <text x="60" y="482">Найдите черту нониуса, которая <tspan fill="#d33" font-weight="bold">точно совпала</tspan> с любой чертой штанги: это <tspan fill="#d33" font-weight="bold">6-я</tspan>.</text>
+    <text x="60" y="500" font-size="12" fill="#555">Цена деления этого нониуса 0,1 мм (написано на рамке), значит 6 × 0,1 = 0,6 мм.</text>
+    <circle cx="40" cy="530" r="11" fill="#222"/><text x="40" y="535" text-anchor="middle" fill="#fff" font-weight="bold">3</text>
+    <text x="60" y="535">Сложите: <tspan font-weight="bold">24 + 0,6 = 24,6 мм</tspan>.</text>
+  </g>
+  <text x="410" y="575" text-anchor="middle" font-size="12" fill="#555">У нониуса 0,05 мм черт 20, у 0,02 мм черт 50: принцип тот же, номер совпавшей черты умножают на цену деления.</text>
+</svg>

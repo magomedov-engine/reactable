@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 330" font-family="Arial, sans-serif">
+  <defs>
+    <marker id="o" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#b8651b"/></marker>
+  </defs>
+  <rect width="840" height="330" fill="#ffffff" rx="10"/>
+  <text x="420" y="26" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Путь топлива в дизеле</text>
+
+  <g font-size="13" font-weight="bold" fill="#222" text-anchor="middle">
+    <rect x="20" y="130" width="115" height="70" rx="8" fill="#ffe0b2" stroke="#b8651b" stroke-width="2"/>
+    <text x="77" y="162">Топливный</text><text x="77" y="180">бак</text>
+    <rect x="155" y="130" width="115" height="70" rx="8" fill="#ffe0b2" stroke="#b8651b" stroke-width="2"/>
+    <text x="212" y="157">Фильтр грубой</text><text x="212" y="175">очистки</text>
+    <rect x="290" y="130" width="115" height="70" rx="8" fill="#ffe0b2" stroke="#b8651b" stroke-width="2"/>
+    <text x="347" y="157">Подкачивающий</text><text x="347" y="175">насос</text>
+    <rect x="425" y="130" width="115" height="70" rx="8" fill="#ffe0b2" stroke="#b8651b" stroke-width="2"/>
+    <text x="482" y="157">Фильтр тонкой</text><text x="482" y="175">очистки</text>
+    <rect x="560" y="130" width="115" height="70" rx="8" fill="#ffab91" stroke="#c0392b" stroke-width="2"/>
+    <text x="617" y="157">ТНВД (насос</text><text x="617" y="175">высокого давл.)</text>
+    <rect x="695" y="130" width="130" height="70" rx="8" fill="#ffab91" stroke="#c0392b" stroke-width="2"/>
+    <text x="760" y="157">Форсунки</text><text x="760" y="175">(по 1 на цилиндр)</text>
+  </g>
+  <g stroke="#b8651b" stroke-width="3" marker-end="url(#o)">
+    <line x1="137" y1="165" x2="152" y2="165"/>
+    <line x1="272" y1="165" x2="287" y2="165"/>
+    <line x1="407" y1="165" x2="422" y2="165"/>
+    <line x1="542" y1="165" x2="557" y2="165"/>
+    <line x1="677" y1="165" x2="692" y2="165"/>
+  </g>
+  <!-- слив -->
+  <path d="M 760 130 L 760 78 L 77 78 L 77 128" fill="none" stroke="#b8651b" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#o)"/>
+  <text x="418" y="70" text-anchor="middle" font-size="13" fill="#b8651b">Слив излишков топлива обратно в бак (обратная магистраль)</text>
+
+  <!-- скобки давления -->
+  <path d="M 20 222 L 20 232 L 540 232 L 540 222" fill="none" stroke="#b8651b" stroke-width="2"/>
+  <text x="280" y="252" text-anchor="middle" font-size="13" fill="#555">Низкое давление: подача и очистка</text>
+  <path d="M 560 222 L 560 232 L 825 232 L 825 222" fill="none" stroke="#c0392b" stroke-width="2"/>
+  <text x="692" y="252" text-anchor="middle" font-size="13" fill="#c0392b">Высокое давление (~пример: десятки МПа)</text>
+  <text x="420" y="300" text-anchor="middle" font-size="12" fill="#555">В системе Common Rail вместо секционного ТНВД стоит насос высокого давления и общая топливная «рампа».</text>
+</svg>

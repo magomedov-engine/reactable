@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 520" font-family="Arial, sans-serif">
+  <defs>
+    <marker id="v" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#d33"/></marker>
+  </defs>
+  <rect width="760" height="520" fill="#ffffff" rx="10"/>
+  <text x="380" y="26" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Как кулачок открывает клапан</text>
+  <text x="380" y="48" text-anchor="middle" font-size="12" fill="#555">Цепочка: кулачок → толкатель → штанга → коромысло → клапан. Кулачок ушёл: пружина закрывает клапан.</text>
+
+  <!-- головка блока с каналом -->
+  <rect x="250" y="250" width="190" height="115" fill="#cfd6dc" stroke="#333" stroke-width="2"/>
+  <rect x="300" y="340" width="90" height="25" fill="#ffffff"/>
+  <rect x="337" y="250" width="16" height="55" fill="#7d8a96"/>
+  <!-- пружина и тарелка -->
+  <polyline points="327,175 363,185 327,195 363,205 327,215 363,225 327,235 363,245 345,250" fill="none" stroke="#2f6db5" stroke-width="3"/>
+  <rect x="320" y="168" width="50" height="7" fill="#555"/>
+  <!-- клапан (стержень + тарелка) -->
+  <line x1="345" y1="150" x2="345" y2="335" stroke="#222" stroke-width="8"/>
+  <polygon points="335,335 355,335 380,352 310,352" fill="#555" stroke="#222"/>
+  <!-- коромысло на оси -->
+  <rect x="130" y="117" width="260" height="16" fill="#7d8a96" stroke="#333" stroke-width="2"/>
+  <circle cx="260" cy="125" r="14" fill="#444" stroke="#222" stroke-width="2"/>
+  <rect x="338" y="133" width="14" height="12" fill="#e59a14" stroke="#333"/>
+  <!-- штанга -->
+  <line x1="150" y1="133" x2="150" y2="350" stroke="#444" stroke-width="8"/>
+  <!-- толкатель -->
+  <rect x="130" y="350" width="40" height="42" fill="#6c7a89" stroke="#222" stroke-width="2"/>
+  <!-- кулачок: круг + выступ, выступ сейчас смотрит вверх -->
+  <path d="M 120 440 A 30 30 0 0 0 180 440 C 180 420 164 392 150 392 C 136 392 120 420 120 440 Z" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+  <circle cx="150" cy="440" r="7" fill="#333"/>
+
+  <!-- стрелки движения -->
+  <line x1="205" y1="425" x2="205" y2="365" stroke="#d33" stroke-width="3" marker-end="url(#v)"/>
+  <text x="214" y="405" font-size="12" fill="#d33">выступ кулачка</text>
+  <text x="214" y="420" font-size="12" fill="#d33">толкает вверх</text>
+  <line x1="292" y1="150" x2="292" y2="212" stroke="#d33" stroke-width="3" marker-end="url(#v)"/>
+  <text x="283" y="182" text-anchor="end" font-size="12" fill="#d33">клапан идёт вниз</text>
+  <text x="283" y="197" text-anchor="end" font-size="12" fill="#d33">(открывается)</text>
+
+  <g font-size="13" fill="#222" stroke="#333">
+    <text x="20" y="492" stroke="none">Кулачок распредвала</text>
+    <line x1="120" y1="480" x2="132" y2="458"/><circle cx="132" cy="458" r="3"/>
+    <text x="20" y="372" stroke="none">Толкатель</text>
+    <line x1="88" y1="368" x2="130" y2="370"/><circle cx="130" cy="370" r="3"/>
+    <text x="20" y="250" stroke="none">Штанга</text>
+    <line x1="70" y1="246" x2="146" y2="246"/><circle cx="146" cy="246" r="3"/>
+    <text x="470" y="122" stroke="none">Коромысло (качается на оси)</text>
+    <line x1="466" y1="118" x2="392" y2="124"/><circle cx="392" cy="124" r="3"/>
+    <text x="470" y="162" stroke="none">Регулировочный винт;</text>
+    <text x="470" y="178" stroke="none">под ним тепловой зазор</text>
+    <line x1="466" y1="158" x2="354" y2="141"/><circle cx="354" cy="141" r="3"/>
+    <text x="470" y="218" stroke="none">Пружина клапана</text>
+    <line x1="466" y1="214" x2="368" y2="215"/><circle cx="368" cy="215" r="3"/>
+    <text x="470" y="300" stroke="none">Головка блока</text>
+    <line x1="466" y1="296" x2="430" y2="290"/><circle cx="430" cy="290" r="3"/>
+    <text x="470" y="380" stroke="none">Клапан: тарелка закрывает</text>
+    <text x="470" y="396" stroke="none">канал, садясь на седло</text>
+    <line x1="466" y1="376" x2="380" y2="351"/><circle cx="380" cy="351" r="3"/>
+  </g>
+</svg>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" font-family="Arial, sans-serif">
+  <rect width="760" height="380" fill="#ffffff" rx="10"/>
+  <text x="380" y="26" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Как коленвал превращает ход поршня во вращение</text>
+
+  <!-- ВМТ -->
+  <g>
+    <line x1="95" y1="60" x2="95" y2="210" stroke="#333" stroke-width="3"/><line x1="165" y1="60" x2="165" y2="210" stroke="#333" stroke-width="3"/>
+    <rect x="102" y="102" width="56" height="36" fill="#6c7a89" stroke="#222" stroke-width="2"/>
+    <line x1="130" y1="120" x2="130" y2="220" stroke="#222" stroke-width="8"/>
+    <circle cx="130" cy="250" r="30" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+    <circle cx="130" cy="250" r="5" fill="#333"/><circle cx="130" cy="220" r="7" fill="#e59a14" stroke="#333" stroke-width="2"/>
+    <text x="130" y="310" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">1. ВМТ</text>
+    <text x="130" y="328" text-anchor="middle" font-size="12" fill="#555">поршень в самом верху</text>
+  </g>
+  <!-- середина -->
+  <g>
+    <line x1="345" y1="60" x2="345" y2="210" stroke="#333" stroke-width="3"/><line x1="415" y1="60" x2="415" y2="210" stroke="#333" stroke-width="3"/>
+    <rect x="352" y="137" width="56" height="36" fill="#6c7a89" stroke="#222" stroke-width="2"/>
+    <line x1="380" y1="155" x2="410" y2="250" stroke="#222" stroke-width="8"/>
+    <circle cx="380" cy="250" r="30" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+    <circle cx="380" cy="250" r="5" fill="#333"/><circle cx="410" cy="250" r="7" fill="#e59a14" stroke="#333" stroke-width="2"/>
+    <text x="380" y="310" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">2. Середина хода</text>
+    <text x="380" y="328" text-anchor="middle" font-size="12" fill="#555">шатун наклонён, вал повёрнут на 90°</text>
+  </g>
+  <!-- НМТ -->
+  <g>
+    <line x1="595" y1="60" x2="595" y2="215" stroke="#333" stroke-width="3"/><line x1="665" y1="60" x2="665" y2="215" stroke="#333" stroke-width="3"/>
+    <rect x="602" y="162" width="56" height="36" fill="#6c7a89" stroke="#222" stroke-width="2"/>
+    <line x1="630" y1="180" x2="630" y2="280" stroke="#222" stroke-width="8"/>
+    <circle cx="630" cy="250" r="30" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+    <circle cx="630" cy="250" r="5" fill="#333"/><circle cx="630" cy="280" r="7" fill="#e59a14" stroke="#333" stroke-width="2"/>
+    <text x="630" y="310" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">3. НМТ</text>
+    <text x="630" y="328" text-anchor="middle" font-size="12" fill="#555">поршень внизу, вал повёрнут на 180°</text>
+  </g>
+
+  <text x="250" y="190" text-anchor="middle" font-size="26" fill="#2f6db5">→</text>
+  <text x="500" y="190" text-anchor="middle" font-size="26" fill="#2f6db5">→</text>
+  <text x="380" y="352" text-anchor="middle" font-size="12" fill="#555">ВМТ / НМТ = верхняя / нижняя мёртвая точка. Оранжевый кружок: шатунная шейка вала.</text>
+  <text x="380" y="368" text-anchor="middle" font-size="12" fill="#555">За один оборот вала поршень проходит вниз и обратно вверх.</text>
+</svg>

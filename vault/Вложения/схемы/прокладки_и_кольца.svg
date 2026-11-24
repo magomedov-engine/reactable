@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 690" font-family="Arial, sans-serif">
+<defs><pattern id="h" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#8a96a3" stroke-width="1"/></pattern><pattern id="h2" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(-45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#8a96a3" stroke-width="1"/></pattern><marker id="m" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#d33"/></marker><marker id="y" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#a08300"/></marker></defs>
+<rect width="860" height="690" fill="#ffffff" rx="10"/>
+<text x="430" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Прокладки и резиновые кольца: как они держат жидкость</text>
+<text x="30" y="62" font-size="15" font-weight="bold" fill="#222">1. Прокладка: заполняет неровности между деталями</text>
+<text x="220" y="82" text-anchor="middle" font-size="12" font-weight="bold" fill="#d33">Без затяжки: щели, масло течёт</text>
+<polygon points="40,105 400,105 400,150 " fill="none"/>
+<path d="M 40 105 L 400 105 L 400 150 L 400 147 L 380 153 L 360 147 L 340 153 L 320 147 L 300 153 L 280 147 L 260 153 L 240 147 L 220 153 L 200 147 L 180 153 L 160 147 L 140 153 L 120 147 L 100 153 L 80 147 L 60 153 L 40 147 Z" fill="url(#h)" stroke="#333" stroke-width="2"/>
+<path d="M 40 180 L 40 183 L 60 177 L 80 183 L 100 177 L 120 183 L 140 177 L 160 183 L 180 177 L 200 183 L 220 177 L 240 183 L 260 177 L 280 183 L 300 177 L 320 183 L 340 177 L 360 183 L 380 177 L 400 183 L 400 225 L 40 225 Z" fill="url(#h2)" stroke="#333" stroke-width="2"/>
+<rect x="60" y="154" width="320" height="10" fill="#e59a14" opacity="0.85" stroke="#7a4a00"/>
+<line x1="390" y1="160" x2="440" y2="170" stroke="#a08300" stroke-width="3" marker-end="url(#y)"/>
+<line x1="230" y1="80" x2="230" y2="98" stroke="#d33" stroke-width="0"/>
+<text x="620" y="82" text-anchor="middle" font-size="12" font-weight="bold" fill="#2a8a3a">Затянули по ТК: прокладка сжата, щелей нет</text>
+<polygon points="440,105 800,105 800,150 " fill="none"/>
+<path d="M 440 105 L 800 105 L 800 150 L 800 147 L 780 153 L 760 147 L 740 153 L 720 147 L 700 153 L 680 147 L 660 153 L 640 147 L 620 153 L 600 147 L 580 153 L 560 147 L 540 153 L 520 147 L 500 153 L 480 147 L 460 153 L 440 147 Z" fill="url(#h)" stroke="#333" stroke-width="2"/>
+<path d="M 440 168 L 440 171 L 460 165 L 480 171 L 500 165 L 520 171 L 540 165 L 560 171 L 580 165 L 600 171 L 620 165 L 640 171 L 660 165 L 680 171 L 700 165 L 720 171 L 740 165 L 760 171 L 780 165 L 800 171 L 800 213 L 440 213 Z" fill="url(#h2)" stroke="#333" stroke-width="2"/>
+<rect x="460" y="151" width="320" height="18" fill="#e59a14" opacity="0.85" stroke="#7a4a00"/>
+<line x1="500" y1="86" x2="500" y2="102" stroke="#d33" stroke-width="3" marker-end="url(#m)"/>
+<line x1="740" y1="86" x2="740" y2="102" stroke="#d33" stroke-width="3" marker-end="url(#m)"/>
+<text x="40" y="250" font-size="12" fill="#222" text-anchor="start">Прокладка мягче металла: при затяжке она «вминается» в неровности обеих деталей и закрывает путь</text>
+<text x="40" y="266" font-size="12" fill="#222" text-anchor="start">жидкости. Поэтому важны: чистые ровные поверхности, НОВАЯ прокладка, правильный момент и порядок затяжки.</text>
+<text x="40" y="282" font-size="12" fill="#222" text-anchor="start">Старая прокладка уже смята «под чужие» неровности и второй раз не уплотнит.</text>
+<line x1="20" y1="305" x2="840" y2="305" stroke="#ccc" stroke-dasharray="6 4"/>
+<text x="30" y="332" font-size="15" font-weight="bold" fill="#222">2. Какие бывают прокладки</text>
+<rect x="40" y="356" width="90" height="44" rx="6" fill="#9aa5b1" stroke="#333" stroke-width="2"/><circle cx="58" cy="378" r="6" fill="#fff" stroke="#333"/><circle cx="112" cy="378" r="6" fill="#fff" stroke="#333"/><rect x="72" y="366" width="26" height="24" rx="4" fill="#fff" stroke="#333"/>
+<text x="40" y="422" font-size="12" fill="#222" text-anchor="start" font-weight="bold">Металлическая</text>
+<text x="40" y="438" font-size="12" fill="#222" text-anchor="start">многослойная сталь:</text>
+<text x="40" y="454" font-size="12" fill="#222" text-anchor="start">головка блока,</text>
+<text x="40" y="470" font-size="12" fill="#222" text-anchor="start">выпуск</text>
+<rect x="205" y="356" width="90" height="44" rx="6" fill="#bcaaa4" stroke="#333" stroke-width="2"/><circle cx="223" cy="378" r="6" fill="#fff" stroke="#333"/><circle cx="277" cy="378" r="6" fill="#fff" stroke="#333"/><rect x="237" y="366" width="26" height="24" rx="4" fill="#fff" stroke="#333"/>
+<text x="205" y="422" font-size="12" fill="#222" text-anchor="start" font-weight="bold">Паронит, картон</text>
+<text x="205" y="438" font-size="12" fill="#222" text-anchor="start">крышки, фланцы,</text>
+<text x="205" y="454" font-size="12" fill="#222" text-anchor="start">корпуса насосов</text>
+<rect x="370" y="356" width="90" height="44" rx="6" fill="#424242" stroke="#333" stroke-width="2"/><circle cx="388" cy="378" r="6" fill="#fff" stroke="#333"/><circle cx="442" cy="378" r="6" fill="#fff" stroke="#333"/><rect x="402" y="366" width="26" height="24" rx="4" fill="#fff" stroke="#333"/>
+<text x="370" y="422" font-size="12" fill="#222" text-anchor="start" font-weight="bold">Резиновая</text>
+<text x="370" y="438" font-size="12" fill="#222" text-anchor="start">клапанные крышки,</text>
+<text x="370" y="454" font-size="12" fill="#222" text-anchor="start">поддон, кольца</text>
+<circle cx="575" cy="378" r="24" fill="#d4874a" stroke="#333" stroke-width="2"/><circle cx="575" cy="378" r="11" fill="#fff" stroke="#333"/>
+<text x="535" y="422" font-size="12" fill="#222" text-anchor="start" font-weight="bold">Медная шайба</text>
+<text x="535" y="438" font-size="12" fill="#222" text-anchor="start">форсунки, пробки,</text>
+<text x="535" y="454" font-size="12" fill="#222" text-anchor="start">поворотные штуцеры</text>
+<circle cx="740" cy="378" r="24" fill="#e0e0e0" stroke="#333" stroke-width="2"/><circle cx="740" cy="378" r="11" fill="#fff" stroke="#333"/>
+<text x="700" y="422" font-size="12" fill="#222" text-anchor="start" font-weight="bold">Алюминиевая</text>
+<text x="700" y="438" font-size="12" fill="#222" text-anchor="start">пробки, штуцеры</text>
+<line x1="20" y1="490" x2="840" y2="490" stroke="#ccc" stroke-dasharray="6 4"/>
+<text x="30" y="516" font-size="15" font-weight="bold" fill="#222">3. Резиновое кольцо в канавке: правильно и типичные ошибки (разрез)</text>
+<path d="M 60 540 L 190 540 L 190 560 L 160 560 L 160 600 L 190 600 L 190 620 L 60 620 Z" fill="url(#h)" stroke="#333" stroke-width="2"/>
+<rect x="192" y="540" width="40" height="80" fill="url(#h2)" stroke="#333" stroke-width="2"/>
+<ellipse cx="177" cy="580" rx="14" ry="16" fill="#424242"/>
+<text x="145" y="640" text-anchor="middle" font-size="13" font-weight="bold" fill="#2a8a3a">Правильно</text>
+<path d="M 260 540 L 390 540 L 390 560 L 360 560 L 360 600 L 390 600 L 390 620 L 260 620 Z" fill="url(#h)" stroke="#333" stroke-width="2"/>
+<rect x="392" y="540" width="40" height="80" fill="url(#h2)" stroke="#333" stroke-width="2"/>
+<ellipse cx="377" cy="580" rx="14" ry="16" fill="#424242"/><path d="M 366 570 L 388 590 M 366 590 L 388 570" stroke="#d33" stroke-width="2.5"/>
+<text x="345" y="640" text-anchor="middle" font-size="13" font-weight="bold" fill="#d33">Скручено</text>
+<path d="M 460 540 L 590 540 L 590 560 L 560 560 L 560 600 L 590 600 L 590 620 L 460 620 Z" fill="url(#h)" stroke="#333" stroke-width="2"/>
+<rect x="592" y="540" width="40" height="80" fill="url(#h2)" stroke="#333" stroke-width="2"/>
+<path d="M 564 580 A 14 16 0 0 1 578 564 L 576 580 L 590 580 A 14 16 0 0 1 564 580 Z" fill="#424242"/><line x1="566" y1="582" x2="588" y2="582" stroke="#fff" stroke-width="3"/>
+<text x="545" y="640" text-anchor="middle" font-size="13" font-weight="bold" fill="#d33">Порезано</text>
+<path d="M 660 540 L 790 540 L 790 560 L 760 560 L 760 600 L 790 600 L 790 620 L 660 620 Z" fill="url(#h)" stroke="#333" stroke-width="2"/>
+<rect x="792" y="540" width="40" height="80" fill="url(#h2)" stroke="#333" stroke-width="2"/>
+<ellipse cx="774" cy="580" rx="12" ry="14" fill="#424242"/><path d="M 786 574 L 798 576 L 786 586 Z" fill="#d33"/>
+<text x="745" y="640" text-anchor="middle" font-size="13" font-weight="bold" fill="#d33">Зажато в зазор</text>
+<text x="145" y="656" font-size="11" fill="#555" text-anchor="middle">кольцо целое, лежит в канавке,</text>
+<text x="145" y="672" font-size="11" fill="#555" text-anchor="middle">чуть сжато сопрягаемой деталью</text>
+<text x="345" y="656" font-size="11" fill="#555" text-anchor="middle">перекрутили при надевании:</text>
+<text x="345" y="672" font-size="11" fill="#555" text-anchor="middle">потечёт</text>
+<text x="545" y="656" font-size="11" fill="#555" text-anchor="middle">протащили по резьбе или</text>
+<text x="545" y="672" font-size="11" fill="#555" text-anchor="middle">острой кромке</text>
+<text x="745" y="656" font-size="11" fill="#555" text-anchor="middle">вылезло из канавки при</text>
+<text x="745" y="672" font-size="11" fill="#555" text-anchor="middle">сборке, кусок срезан</text>
+</svg>

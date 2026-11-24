@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 520" font-family="Arial, sans-serif">
+<rect width="860" height="520" fill="#ffffff" rx="10"/>
+<text x="430" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Углы, температура, объём и мощность</text>
+<text x="30" y="62" font-size="15" font-weight="bold" fill="#222">1. Углы и обороты</text>
+<circle cx="150" cy="190" r="95" fill="#f4f6f8" stroke="#333" stroke-width="2"/>
+<path d="M 150 190 L 150 95 A 95 95 0 0 1 245.0 190.0 Z" fill="#2a8a3a" opacity="0.35" stroke="#2a8a3a" stroke-width="2"/>
+<text x="150.0" y="83.0" text-anchor="middle" font-size="12" fill="#222">0° / 360°</text>
+<text x="261.0" y="194.0" text-anchor="middle" font-size="12" fill="#222">90°</text>
+<text x="150.0" y="305.0" text-anchor="middle" font-size="12" fill="#222">180°</text>
+<text x="39.0" y="194.0" text-anchor="middle" font-size="12" fill="#222">270°</text>
+<circle cx="150" cy="190" r="5" fill="#333"/>
+<text x="180" y="160" font-size="12" fill="#1b5e20" text-anchor="start" font-weight="bold">90° =</text>
+<text x="180" y="176" font-size="12" fill="#1b5e20" text-anchor="start">¼ оборота</text>
+<text x="30" y="320" font-size="12" fill="#222" text-anchor="start">Полный оборот = 360°.</text>
+<text x="30" y="336" font-size="12" fill="#222" text-anchor="start">90° = четверть, 180° = половина оборота.</text>
+<text x="30" y="352" font-size="12" fill="#222" text-anchor="start">Доворот «на 90°» = на четверть оборота.</text>
+<text x="30" y="368" font-size="12" fill="#222" text-anchor="start">1 цикл четырёхтактного двигателя =</text>
+<text x="30" y="384" font-size="12" fill="#222" text-anchor="start">2 оборота коленвала = 720°.</text>
+<text x="30" y="400" font-size="12" fill="#222" text-anchor="start">Скорость вращения: об/мин</text>
+<text x="30" y="416" font-size="12" fill="#222" text-anchor="start">(оборотов в минуту).</text>
+<line x1="300" y1="50" x2="300" y2="500" stroke="#ccc" stroke-dasharray="6 4"/>
+<text x="320" y="62" font-size="15" font-weight="bold" fill="#222">2. Температура (°C)</text>
+<rect x="350" y="90" width="22" height="300" rx="11" fill="#fff" stroke="#333" stroke-width="2"/><circle cx="361" cy="400" r="20" fill="#d33" stroke="#333" stroke-width="2"/>
+<rect x="355" y="160" width="12" height="240" fill="#d33"/>
+<line x1="372" y1="380" x2="392" y2="380" stroke="#333" stroke-width="1.5"/>
+<line x1="372" y1="328" x2="392" y2="328" stroke="#333" stroke-width="1.5"/>
+<line x1="372" y1="159" x2="392" y2="159" stroke="#333" stroke-width="1.5"/>
+<line x1="372" y1="120" x2="392" y2="120" stroke="#333" stroke-width="1.5"/>
+<line x1="372" y1="94" x2="392" y2="94" stroke="#333" stroke-width="1.5"/>
+<text x="398" y="384.0" font-size="12" fill="#222" text-anchor="start">0 °C: замерзает вода</text>
+<text x="398" y="332.0" font-size="12" fill="#222" text-anchor="start">~20 °C: цех, меряют детали</text>
+<text x="398" y="167.0" font-size="12" fill="#222" text-anchor="start">~80–90 °C: термостат</text>
+<text x="398" y="128.0" font-size="12" fill="#222" text-anchor="start">100 °C: кипит вода</text>
+<text x="398" y="96.0" font-size="12" fill="#a06000" text-anchor="start">~80–110 °C: нагрев</text>
+<text x="398" y="110.0" font-size="12" fill="#a06000" text-anchor="start">подшипника</text>
+<text x="320" y="430" font-size="12" fill="#555" text-anchor="start">Значения с «~» примерные, точные в ТК.</text>
+<text x="320" y="446" font-size="12" fill="#555" text-anchor="start">Нагретая деталь больше холодной:</text>
+<text x="320" y="462" font-size="12" fill="#555" text-anchor="start">поэтому меряют после того, как деталь</text>
+<text x="320" y="478" font-size="12" fill="#555" text-anchor="start">«отлежалась» в цеху.</text>
+<line x1="590" y1="50" x2="590" y2="500" stroke="#ccc" stroke-dasharray="6 4"/>
+<text x="610" y="62" font-size="15" font-weight="bold" fill="#222">3. Объём, мощность</text>
+<rect x="620" y="90" width="80" height="100" fill="#e3f0fb" stroke="#2f6db5" stroke-width="2"/>
+<rect x="620" y="110" width="80" height="80" fill="#90caf9" opacity="0.6"/>
+<text x="660" y="210" font-size="12" fill="#222" text-anchor="middle" font-weight="bold">1 литр</text>
+<text x="720" y="110" font-size="12" fill="#222" text-anchor="start">1 л = 1000 мл</text>
+<text x="720" y="126" font-size="12" fill="#222" text-anchor="start">1 мл = 1 см³</text>
+<text x="720" y="142" font-size="12" fill="#222" text-anchor="start">1 л = 1 дм³</text>
+<text x="610" y="250" font-size="12" fill="#555" text-anchor="start">Объём двигателя «20 л» =</text>
+<text x="610" y="266" font-size="12" fill="#555" text-anchor="start">общий объём, который проходят</text>
+<text x="610" y="282" font-size="12" fill="#555" text-anchor="start">поршни всех цилиндров.</text>
+<rect x="610" y="310" width="230" height="110" rx="8" fill="#fff8e1" stroke="#e59a14"/>
+<text x="622" y="332" font-size="12" fill="#222" text-anchor="start" font-weight="bold">Мощность:</text>
+<text x="622" y="348" font-size="12" fill="#222" text-anchor="start">кВт (киловатт): основная</text>
+<text x="622" y="364" font-size="12" fill="#222" text-anchor="start">л.с. (лошадиная сила): старая</text>
+<text x="622" y="380" font-size="12" fill="#222" text-anchor="start">1 л.с. ≈ 0,74 кВт</text>
+<text x="622" y="396" font-size="12" fill="#222" text-anchor="start">1 кВт ≈ 1,36 л.с.</text>
+<text x="610" y="450" font-size="12" fill="#222" text-anchor="start">Пример: 500 л.с. ≈ 370 кВт.</text>
+</svg>

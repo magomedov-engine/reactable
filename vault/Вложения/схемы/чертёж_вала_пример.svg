@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 450" font-family="Arial, sans-serif">
+  <defs>
+    <marker id="e" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8 Z" fill="#222"/></marker>
+  </defs>
+  <rect width="780" height="450" fill="#ffffff" rx="10"/>
+  <text x="390" y="26" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Учебный чертёж вала: что здесь написано</text>
+
+  <!-- контур вала: Ø50 (слева), Ø70 (середина), резьба M30 (справа); фаски на торцах -->
+  <path d="M 116 170 L 305 170 L 305 154 L 467 154 L 467 186 L 624 186 L 630 192 L 630 228 L 624 234 L 467 234 L 467 266 L 305 266 L 305 250 L 116 250 L 110 244 L 110 176 Z"
+        fill="#eef1f4" stroke="#222" stroke-width="2.5"/>
+  <!-- линии фасок на виде -->
+  <line x1="116" y1="170" x2="116" y2="250" stroke="#222" stroke-width="2.5"/>
+  <line x1="624" y1="186" x2="624" y2="234" stroke="#222" stroke-width="2.5"/>
+  <!-- резьба по ГОСТ: наружный диаметр сплошной толстой, внутренний сплошной тонкой, граница резьбы толстой -->
+  <line x1="500" y1="190" x2="630" y2="190" stroke="#222" stroke-width="1"/>
+  <line x1="500" y1="230" x2="630" y2="230" stroke="#222" stroke-width="1"/>
+  <line x1="500" y1="186" x2="500" y2="234" stroke="#222" stroke-width="2.5"/>
+
+  <!-- осевая линия (штрихпунктир) -->
+  <line x1="90" y1="210" x2="652" y2="210" stroke="#d33" stroke-dasharray="16 4 3 4" stroke-width="1"/>
+
+  <!-- размер Ø50 g6 -->
+  <line x1="110" y1="170" x2="62" y2="170" stroke="#222" stroke-width="0.8"/>
+  <line x1="110" y1="250" x2="62" y2="250" stroke="#222" stroke-width="0.8"/>
+  <line x1="70" y1="170" x2="70" y2="250" stroke="#222" stroke-width="0.8" marker-start="url(#e)" marker-end="url(#e)"/>
+  <text x="62" y="215" text-anchor="end" font-size="14" fill="#222">Ø50 g6</text>
+  <!-- размер Ø70 (выносные линии вверх) -->
+  <line x1="386" y1="154" x2="386" y2="266" stroke="#222" stroke-width="0.8" marker-start="url(#e)" marker-end="url(#e)"/>
+  <rect x="392" y="200" width="36" height="18" fill="#eef1f4"/>
+  <text x="394" y="214" font-size="14" fill="#222">Ø70</text>
+  <!-- обозначение резьбы -->
+  <line x1="565" y1="186" x2="565" y2="140" stroke="#222" stroke-width="0.8"/>
+  <line x1="565" y1="140" x2="640" y2="140" stroke="#222" stroke-width="0.8"/>
+  <text x="570" y="135" font-size="14" fill="#222">M30×2</text>
+
+  <!-- размер длины участка Ø50 -->
+  <line x1="305" y1="250" x2="305" y2="296" stroke="#222" stroke-width="0.8"/>
+  <line x1="110" y1="244" x2="110" y2="330" stroke="#222" stroke-width="0.8"/>
+  <line x1="110" y1="290" x2="305" y2="290" stroke="#222" stroke-width="0.8" marker-start="url(#e)" marker-end="url(#e)"/>
+  <text x="207" y="285" text-anchor="middle" font-size="14" fill="#222">120</text>
+  <!-- общая длина -->
+  <line x1="630" y1="228" x2="630" y2="330" stroke="#222" stroke-width="0.8"/>
+  <line x1="110" y1="324" x2="630" y2="324" stroke="#222" stroke-width="0.8" marker-start="url(#e)" marker-end="url(#e)"/>
+  <text x="370" y="319" text-anchor="middle" font-size="14" fill="#222">320</text>
+
+  <!-- знак шероховатости на поверхности Ø50 -->
+  <path d="M 196 160 L 204 170 L 218 138 L 256 138" fill="none" stroke="#222" stroke-width="1.5"/>
+  <text x="222" y="134" font-size="13" fill="#222">Ra 0,8</text>
+
+  <!-- выноски-пояснения (синим, на настоящем чертеже их нет) -->
+  <g font-size="13" fill="#2f6db5" stroke="#2f6db5">
+    <text x="20" y="58" stroke="none">«Ø50 g6»: диаметр 50 мм, поле допуска g6</text>
+    <text x="20" y="74" stroke="none">(вал чуть меньше 50: от 49,975 до 49,991)</text>
+    <line x1="60" y1="80" x2="44" y2="203" stroke-dasharray="4 3"/>
+    <text x="260" y="98" stroke="none">«Ra 0,8»: поверхность должна быть очень гладкой</text>
+    <line x1="300" y1="104" x2="250" y2="134" stroke-dasharray="4 3"/>
+    <text x="520" y="58" stroke="none">«M30×2»: метрическая резьба,</text>
+    <text x="520" y="74" stroke="none">диаметр 30 мм, шаг 2 мм</text>
+    <line x1="600" y1="80" x2="600" y2="122" stroke-dasharray="4 3"/>
+    <text x="660" y="270" stroke="none">Фаска:</text>
+    <text x="660" y="286" stroke="none">срезанная</text>
+    <text x="660" y="302" stroke="none">кромка</text>
+    <line x1="680" y1="258" x2="629" y2="231" stroke-dasharray="4 3"/>
+    <text x="20" y="362" stroke="none">Числа без единиц на чертеже = миллиметры (120 и 320 здесь: длины в мм).</text>
+    <text x="20" y="378" stroke="none">Стрелки стоят на размерной линии; тонкие выносные линии «отводят» размер от детали.</text>
+  </g>
+  <g font-size="12" fill="#555">
+    <text x="20" y="410">Линии: сплошная толстая = видимый контур; сплошная тонкая = размеры, выносные, внутренний диаметр резьбы;</text>
+    <text x="20" y="426">штрихпунктирная = ось. Фаски на рисунке показаны крупнее, чем в масштабе. Размеры учебные.</text>
+  </g>
+</svg>

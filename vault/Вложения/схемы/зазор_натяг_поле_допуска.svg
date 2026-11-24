@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 450" font-family="Arial, sans-serif">
+  <rect width="760" height="450" fill="#ffffff" rx="10"/>
+  <text x="380" y="26" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Зазор и натяг: вал в отверстии</text>
+
+  <!-- 1. Зазор -->
+  <g transform="translate(20 40)">
+    <rect x="10" y="10" width="200" height="150" rx="8" fill="#cfd8dc" stroke="#333" stroke-width="2"/>
+    <circle cx="110" cy="85" r="58" fill="#ffffff" stroke="#333" stroke-width="2"/>
+    <circle cx="110" cy="91" r="50" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+    <text x="110" y="95" text-anchor="middle" font-size="13" fill="#222">вал</text>
+    <path d="M 160 33 L 160 41" stroke="#2a8a3a" stroke-width="3"/>
+    <text x="110" y="185" text-anchor="middle" font-size="14" font-weight="bold" fill="#2a8a3a">Зазор</text>
+    <text x="110" y="203" text-anchor="middle" font-size="12" fill="#333">вал МЕНЬШЕ отверстия</text>
+    <text x="110" y="219" text-anchor="middle" font-size="12" fill="#333">вращается свободно</text>
+  </g>
+
+  <!-- 2. Переходная -->
+  <g transform="translate(270 40)">
+    <rect x="10" y="10" width="200" height="150" rx="8" fill="#cfd8dc" stroke="#333" stroke-width="2"/>
+    <circle cx="110" cy="85" r="55" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+    <text x="110" y="90" text-anchor="middle" font-size="13" fill="#222">вал</text>
+    <text x="110" y="185" text-anchor="middle" font-size="14" font-weight="bold" fill="#e59a14">Переходная</text>
+    <text x="110" y="203" text-anchor="middle" font-size="12" fill="#333">размеры почти равны</text>
+    <text x="110" y="219" text-anchor="middle" font-size="12" fill="#333">может быть чуть зазор или натяг</text>
+  </g>
+
+  <!-- 3. Натяг -->
+  <g transform="translate(520 40)">
+    <rect x="10" y="10" width="200" height="150" rx="8" fill="#cfd8dc" stroke="#333" stroke-width="2"/>
+    <circle cx="110" cy="85" r="62" fill="#f2b84b" stroke="#d33" stroke-width="4"/>
+    <circle cx="110" cy="85" r="50" fill="none" stroke="#333" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="110" y="90" text-anchor="middle" font-size="13" fill="#222">вал</text>
+    <text x="110" y="185" text-anchor="middle" font-size="14" font-weight="bold" fill="#d33">Натяг</text>
+    <text x="110" y="203" text-anchor="middle" font-size="12" fill="#333">вал БОЛЬШЕ отверстия</text>
+    <text x="110" y="219" text-anchor="middle" font-size="12" fill="#333">запрессовывают или греют/охлаждают</text>
+  </g>
+
+  <line x1="30" y1="272" x2="730" y2="272" stroke="#999" stroke-dasharray="3 3"/>
+  <text x="380" y="294" text-anchor="middle" font-size="15" font-weight="bold" fill="#222">«Поле допуска» на примере Ø50: отверстие H7 и вал g6 (~пример, мкм)</text>
+
+  <!-- ось нуля -->
+  <line x1="120" y1="360" x2="640" y2="360" stroke="#222" stroke-width="2"/>
+  <text x="110" y="364" text-anchor="end" font-size="12" fill="#222">0 (номинал 50,000)</text>
+  <!-- отверстие H7: 0..+25 мкм (3 px/мкм) -->
+  <rect x="200" y="285" width="140" height="0" fill="none"/>
+  <rect x="200" y="330" width="140" height="30" fill="#3d7ab8" opacity="0.85"/>
+  <text x="270" y="350" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">Отверстие H7</text>
+  <text x="270" y="322" text-anchor="middle" font-size="12" fill="#333">от 0 до +25 мкм</text>
+  <!-- вал g6: -9..-25 мкм -->
+  <rect x="420" y="369" width="140" height="21" fill="#2a8a3a" opacity="0.85"/>
+  <text x="490" y="384" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">Вал g6</text>
+  <text x="490" y="410" text-anchor="middle" font-size="12" fill="#333">от -25 до -9 мкм</text>
+
+  <line x1="380" y1="330" x2="380" y2="390" stroke="#d33" stroke-width="2"/>
+  <text x="580" y="352" font-size="13" fill="#d33">Зазор всегда:</text>
+  <text x="580" y="369" font-size="13" fill="#d33">от 9 до 50 мкм</text>
+  <text x="580" y="386" font-size="12" fill="#555">(1 мкм = 0,001 мм)</text>
+  <text x="380" y="440" text-anchor="middle" font-size="11" fill="#777">Значения для иллюстрации; точные отклонения берите из чертежа и справочника.</text>
+</svg>

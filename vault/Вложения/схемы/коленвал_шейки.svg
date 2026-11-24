@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 485" font-family="Arial, sans-serif">
+<rect width="780" height="485" fill="#ffffff" rx="10"/>
+<text x="390" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222">Коленчатый вал V12: что где (упрощённо)</text>
+<rect x="40" y="203" width="50" height="34" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<rect x="52" y="192" width="16" height="56" fill="#b7c2cc" stroke="#333" stroke-width="1.5"/>
+<rect x="90" y="195" width="30" height="50" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<text x="105" y="225" text-anchor="middle" font-size="11" fill="#333">1</text>
+<rect x="120" y="142" width="12" height="108" fill="#9aa5b1" stroke="#333" stroke-width="1.5"/>
+<rect x="120" y="244" width="12" height="34" fill="#6c7a89" stroke="#333" stroke-width="1.5"/>
+<rect x="162" y="142" width="12" height="108" fill="#9aa5b1" stroke="#333" stroke-width="1.5"/>
+<rect x="162" y="244" width="12" height="34" fill="#6c7a89" stroke="#333" stroke-width="1.5"/>
+<rect x="132" y="150" width="30" height="44" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+<line x1="105" y1="220" x2="147" y2="172" stroke="#a08300" stroke-width="2.5" stroke-dasharray="5 3"/>
+<rect x="174" y="195" width="30" height="50" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<text x="189" y="225" text-anchor="middle" font-size="11" fill="#333">2</text>
+<rect x="204" y="190" width="12" height="84" fill="#9aa5b1" stroke="#333" stroke-width="1.5"/>
+<rect x="204" y="162" width="12" height="34" fill="#6c7a89" stroke="#333" stroke-width="1.5"/>
+<rect x="246" y="190" width="12" height="84" fill="#9aa5b1" stroke="#333" stroke-width="1.5"/>
+<rect x="246" y="162" width="12" height="34" fill="#6c7a89" stroke="#333" stroke-width="1.5"/>
+<rect x="216" y="222" width="30" height="44" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+<line x1="189" y1="220" x2="231" y2="244" stroke="#a08300" stroke-width="2.5" stroke-dasharray="5 3"/>
+<rect x="258" y="195" width="30" height="50" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<text x="273" y="225" text-anchor="middle" font-size="11" fill="#333">3</text>
+<rect x="288" y="190" width="12" height="84" fill="#9aa5b1" stroke="#333" stroke-width="1.5"/>
+<rect x="288" y="162" width="12" height="34" fill="#6c7a89" stroke="#333" stroke-width="1.5"/>
+<rect x="330" y="190" width="12" height="84" fill="#9aa5b1" stroke="#333" stroke-width="1.5"/>
+<rect x="330" y="162" width="12" height="34" fill="#6c7a89" stroke="#333" stroke-width="1.5"/>
+<rect x="300" y="222" width="30" height="44" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+<line x1="273" y1="220" x2="315" y2="244" stroke="#a08300" stroke-width="2.5" stroke-dasharray="5 3"/>
+<rect x="342" y="195" width="30" height="50" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<text x="357" y="225" text-anchor="middle" font-size="11" fill="#333">4</text>
+<rect x="372" y="190" width="12" height="84" fill="#9aa5b1" stroke="#333" stroke-width="1.5"/>
+<rect x="372" y="162" width="12" height="34" fill="#6c7a89" stroke="#333" stroke-width="1.5"/>
+<rect x="414" y="190" width="12" height="84" fill="#9aa5b1" stroke="#333" stroke-width="1.5"/>
+<rect x="414" y="162" width="12" height="34" fill="#6c7a89" stroke="#333" stroke-width="1.5"/>
+<rect x="384" y="222" width="30" height="44" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+<line x1="357" y1="220" x2="399" y2="244" stroke="#a08300" stroke-width="2.5" stroke-dasharray="5 3"/>
+<rect x="426" y="195" width="30" height="50" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<text x="441" y="225" text-anchor="middle" font-size="11" fill="#333">5</text>
+<rect x="456" y="190" width="12" height="84" fill="#9aa5b1" stroke="#333" stroke-width="1.5"/>
+<rect x="456" y="162" width="12" height="34" fill="#6c7a89" stroke="#333" stroke-width="1.5"/>
+<rect x="498" y="190" width="12" height="84" fill="#9aa5b1" stroke="#333" stroke-width="1.5"/>
+<rect x="498" y="162" width="12" height="34" fill="#6c7a89" stroke="#333" stroke-width="1.5"/>
+<rect x="468" y="222" width="30" height="44" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+<line x1="441" y1="220" x2="483" y2="244" stroke="#a08300" stroke-width="2.5" stroke-dasharray="5 3"/>
+<rect x="510" y="195" width="30" height="50" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<text x="525" y="225" text-anchor="middle" font-size="11" fill="#333">6</text>
+<rect x="540" y="142" width="12" height="108" fill="#9aa5b1" stroke="#333" stroke-width="1.5"/>
+<rect x="540" y="244" width="12" height="34" fill="#6c7a89" stroke="#333" stroke-width="1.5"/>
+<rect x="582" y="142" width="12" height="108" fill="#9aa5b1" stroke="#333" stroke-width="1.5"/>
+<rect x="582" y="244" width="12" height="34" fill="#6c7a89" stroke="#333" stroke-width="1.5"/>
+<rect x="552" y="150" width="30" height="44" fill="#f2b84b" stroke="#333" stroke-width="2"/>
+<line x1="525" y1="220" x2="567" y2="172" stroke="#a08300" stroke-width="2.5" stroke-dasharray="5 3"/>
+<rect x="594" y="195" width="30" height="50" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<text x="609" y="225" text-anchor="middle" font-size="11" fill="#333">7</text>
+<rect x="340" y="190" width="4" height="60" fill="#2f6db5"/><rect x="370" y="190" width="4" height="60" fill="#2f6db5"/>
+<rect x="624" y="160" width="26" height="120" fill="#d9dee3" stroke="#333" stroke-width="2"/>
+<rect x="650" y="175" width="40" height="90" fill="none" stroke="#444" stroke-dasharray="5 4"/>
+<line x1="25" y1="220" x2="704" y2="220" stroke="#d33" stroke-dasharray="14 3 2 3"/>
+<g font-size="12" fill="#222" stroke="#555">
+<text x="30" y="80" stroke="none">Носок: шестерня привода ГРМ, шкив</text><line x1="60" y1="84" x2="62" y2="192"/>
+<text x="250" y="70" stroke="none" fill="#b26a00" font-weight="bold">Шатунная шейка: на ней ДВА шатуна (левый и правый ряд)</text><line x1="300" y1="74" x2="149" y2="150"/>
+<text x="500" y="100" stroke="none">Щека</text><line x1="520" y1="104" x2="504" y2="195"/>
+<text x="30" y="345" stroke="none">Коренная шейка: лежит во вкладышах блока (номера 1–7)</text><line x1="80" y1="333" x2="105" y2="245"/>
+<text x="330" y="310" stroke="none">Противовес</text><line x1="370" y1="298" x2="294" y2="270"/>
+<text x="430" y="370" stroke="none" fill="#2f6db5">Упорные полукольца: держат вал от сдвига вдоль оси</text><line x1="500" y1="358" x2="372" y2="250" stroke="#2f6db5"/>
+<text x="30" y="370" stroke="none" fill="#7a6500">Пунктир внутри: масляный канал от коренной шейки к шатунной</text><line x1="130" y1="358" x2="135" y2="226" stroke="#a08300"/>
+<text x="600" y="130" stroke="none">Фланец маховика</text><line x1="650" y1="134" x2="637" y2="162"/>
+</g>
+<text x="30" y="405" font-size="12" fill="#555">Сборщику важно: шейки не царапать и не трогать железом; масляные каналы чистые (продуты);</text>
+<text x="30" y="421" font-size="12" fill="#555">вал укладывают краном на мягких стропах ровно, не ударяя шейками; после каждой крышки проверяют,</text>
+<text x="30" y="437" font-size="12" fill="#555">что вал крутится от руки; осевой люфт меряют индикатором.</text>
+<text x="30" y="472" font-size="11" fill="#999">У V12 обычно 7 коренных и 6 шатунных шеек. Положение шатунных шеек по кругу на рисунке условное.</text>
+</svg>
