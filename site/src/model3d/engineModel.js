@@ -5,7 +5,9 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import { PARTS, PART, SYSTEMS, STROKES } from './partsInfo.js'
+import { createSection, createFlows } from './features.js'
 
 const DEG = Math.PI / 180
 
@@ -26,6 +28,10 @@ const LIFT_P = (LIFT_V * ARM_P) / ARM_V
 const PIVOT = 4.14 // ось коромысел
 const PUSH_W = 1.05 // штанги: расстояние от оси цилиндра в сторону развала
 const GEAR_X = -6.05
+const TAP_H = 0.28 // высота толкателя
+const SCR = 0.2 // кончик регулировочного винта ниже оси коромысла
+const SPR_SEAT = 3.45 // опора пружины в головке
+const RET = 0.8 // тарелка пружины: от седла клапана по стержню
 
 export const FIRING = [1, 12, 5, 8, 3, 10, 6, 7, 2, 11, 4, 9]
 const FIRE_AT = {} // цилиндр → угол начала рабочего хода (0…720°)
@@ -110,6 +116,73 @@ function lobeShape() {
     pts.push(P(a, CAM_R + LIFT_P * l))
   }
   return new THREE.Shape(pts)
+}
+// зубчатый венец: кольцо с мелкими зубьями снаружи
+function ringGearShape(n, rp, rin) {
+  const ro = rp + 0.04, rr = rp - 0.03, p = (2 * Math.PI) / n
+  const pts = []
+  for (let i = 0; i < n; i++) {
+    const a0 = i * p
+    pts.push(P(a0, rr), P(a0 + 0.22 * p, ro), P(a0 + 0.48 * p, ro), P(a0 + 0.7 * p, rr))
+  }
+  const s = new THREE.Shape(pts)
+  const hole = new THREE.Path()
+  hole.absarc(0, 0, rin, 0, Math.PI * 2, true)
+  s.holes.push(hole)
+  return s
+}
+// половина нижней головки шатуна: sign=+1 — верх (шатун), −1 — крышка; профиль в (y, z)
+function bigEndShape(sign) {
+  const pts = [[0, -0.52], [0.13, -0.52], [0.2, -0.4]]
+  for (let i = 0; i <= 8; i++) pts.push(P(-1.05 + (2.1 * i) / 8, 0.43).toArray())
+  pts.push([0.2, 0.4], [0.13, 0.52], [0, 0.52], [0, 0.3])
+  for (let i = 1; i < 12; i++) pts.push(P(Math.PI / 2 - (Math.PI * i) / 12, 0.3).toArray())
+  pts.push([0, -0.3])
+  return new THREE.Shape(pts.map(([y, z]) => new THREE.Vector2(sign * y, z)))
+}
+// полукольцо (нижняя половина) в плоскости (y, z)
+function halfRingShape(rIn, rOut, n = 16) {
+  const pts = []
+  for (let i = 0; i <= n; i++) pts.push(P(Math.PI / 2 + (Math.PI * i) / n, rOut))
+  for (let i = n; i >= 0; i--) pts.push(P(Math.PI / 2 + (Math.PI * i) / n, rIn))
+  return new THREE.Shape(pts)
+}
+// кольцо вокруг оси X (манжеты): профиль прямоугольник
+const ringX = (rIn, rOut, t, seg = 32) =>
+  new THREE.LatheGeometry([[rIn, -t / 2], [rOut, -t / 2], [rOut, t / 2], [rIn, t / 2], [rIn, -t / 2]].map(([r, y]) => new THREE.Vector2(r, y)), seg).rotateZ(-Math.PI / 2)
+// цилиндр между двумя точками
+const UP = new THREE.Vector3(0, 1, 0)
+function cylBetween(a, b, r, seg = 10) {
+  const d = new THREE.Vector3().subVectors(b, a)
+  const g = new THREE.CylinderGeometry(r, r, d.length(), seg)
+  g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(UP, d.clone().normalize()))
+  g.translate((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2)
+  return g
+}
+// склейка нескольких геометрий в одну (меньше вызовов отрисовки)
+function merge(list) {
+  const prepared = list.map((g) => {
+    const n = g.index ? g.toNonIndexed() : g
+    for (const k of Object.keys(n.attributes)) if (!['position', 'normal', 'uv'].includes(k)) n.deleteAttribute(k)
+    if (!n.attributes.uv) n.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array((n.attributes.position.count) * 2), 2))
+    return n
+  })
+  const out = mergeGeometries(prepared)
+  new Set([...list, ...prepared]).forEach((g) => g.dispose())
+  return out
+}
+const at = (g, x, y, z) => g.translate(x, y, z)
+// пружина: винтовая линия единичной высоты (растягивается по Y через scale)
+class Helix extends THREE.Curve {
+  constructor(r, turns) {
+    super()
+    this.r = r
+    this.turns = turns
+  }
+  getPoint(t, v = new THREE.Vector3()) {
+    const a = t * this.turns * Math.PI * 2
+    return v.set(this.r * Math.cos(a), t, this.r * Math.sin(a))
+  }
 }
 
 function numberTexture(n) {
@@ -221,17 +294,40 @@ export function createEngine(host, cb = {}) {
       40,
     ),
     jacket: new THREE.CylinderGeometry(0.72, 0.72, 1.75, 32, 1, true),
-    piston: new THREE.CylinderGeometry(0.48, 0.48, 0.95, 40),
+    // поршень с ω-образной камерой сгорания в днище
+    piston: new THREE.LatheGeometry(
+      [[0, -0.475], [0.48, -0.475], [0.48, 0.475], [0.34, 0.475], [0.3, 0.44], [0.32, 0.37], [0.28, 0.29], [0.18, 0.26], [0.09, 0.31], [0.0, 0.39]].map(([r, y]) => new THREE.Vector2(r, y)),
+      36,
+    ),
     ring: new THREE.CylinderGeometry(0.505, 0.505, 0.045, 40),
     ppin: cylX(0.13, 0.78, 20),
-    rodBig: cylX(0.4, 0.34, 28),
-    rodShank: new THREE.BoxGeometry(0.3, ROD - 0.42, 0.2),
+    rodBig: profile(bigEndShape(1), 0.34, 4),
+    // стержень шатуна двутаврового сечения
+    rodShank: new THREE.ExtrudeGeometry(
+      new THREE.Shape([[-0.15, -0.11], [0.15, -0.11], [0.15, -0.06], [0.045, -0.06], [0.045, 0.06], [0.15, 0.06], [0.15, 0.11], [-0.15, 0.11], [-0.15, 0.06], [-0.045, 0.06], [-0.045, -0.06], [-0.15, -0.06]].map(([a, b]) => new THREE.Vector2(a, b))),
+      { depth: ROD - 0.45, bevelEnabled: false },
+    ).rotateX(-Math.PI / 2).translate(0, 0.28, 0),
     rodSmall: cylX(0.19, 0.34, 20),
+    rodCap: merge([
+      profile(bigEndShape(-1), 0.34, 4),
+      at(new THREE.CylinderGeometry(0.045, 0.045, 0.5, 8), 0, -0.05, 0.45),
+      at(new THREE.CylinderGeometry(0.045, 0.045, 0.5, 8), 0, -0.05, -0.45),
+      at(new THREE.CylinderGeometry(0.08, 0.08, 0.08, 6), 0, -0.24, 0.45),
+      at(new THREE.CylinderGeometry(0.08, 0.08, 0.08, 6), 0, -0.24, -0.45),
+    ]),
+    tappet: merge([new THREE.CylinderGeometry(0.11, 0.11, TAP_H - 0.06, 14), at(new THREE.CylinderGeometry(0.13, 0.13, 0.06, 14), 0, -TAP_H / 2 + 0.03, 0)]),
+    spring: new THREE.TubeGeometry(new Helix(0.1, 5), 48, 0.02, 4),
+    retainer: merge([new THREE.CylinderGeometry(0.13, 0.11, 0.04, 16), at(new THREE.CylinderGeometry(0.065, 0.05, 0.07, 8), 0, 0.05, 0)]),
+    adjscrew: merge([
+      at(new THREE.CylinderGeometry(0.035, 0.035, 0.36, 8), 0, -0.02, 0),
+      at(new THREE.CylinderGeometry(0.075, 0.075, 0.06, 6), 0, 0.09, 0),
+      at(new THREE.SphereGeometry(0.045, 8, 6), 0, -SCR + 0.045, 0),
+    ]),
     head: new RoundedBoxGeometry(1.5, 0.8, 1.5, 3, 0.07),
     stem: new THREE.CylinderGeometry(0.045, 0.045, 0.95, 12),
     vhead: new THREE.CylinderGeometry(0.19, 0.06, 0.08, 24),
     rocker: new THREE.BoxGeometry(0.16, 0.12, 1.05),
-    pushrod: new THREE.CylinderGeometry(0.045, 0.045, PIVOT - (CAM_Y * Math.cos(BETA) + CAM_R), 10),
+    pushrod: new THREE.CylinderGeometry(0.045, 0.045, PIVOT - SCR - (CAM_Y * Math.cos(BETA) + CAM_R + TAP_H), 10),
     injector: new THREE.CylinderGeometry(0.085, 0.07, 1.2, 16),
     injTop: new THREE.CylinderGeometry(0.13, 0.13, 0.14, 16),
     lobe: profile(lobeShape(), 0.2, 4),
@@ -295,12 +391,71 @@ export function createEngine(host, cb = {}) {
   flange.position.x = 5.31 + 0.4
   crankG.add(nose, flange)
 
+  // крышки коренных подшипников: полукольцо снизу шейки + два болта
+  const capShape = new THREE.Shape([new THREE.Vector2(0, -0.7), new THREE.Vector2(-0.75, -0.7), new THREE.Vector2(-0.75, 0.7), new THREE.Vector2(0, 0.7)])
+  for (let i = 0; i <= 12; i++) capShape.lineTo(...P(Math.PI / 2 + (Math.PI * i) / 12, 0.38).toArray())
+  const capGeo = merge([
+    profile(capShape, 0.36, 4),
+    ...[-0.52, 0.52].flatMap((z) => [at(new THREE.CylinderGeometry(0.05, 0.05, 0.78, 8), 0, -0.41, z), at(new THREE.CylinderGeometry(0.1, 0.1, 0.1, 6), 0, -0.8, z)]),
+  ])
+  geos.add(capGeo)
+  for (let i = 0; i < 7; i++) {
+    const m = mk(capGeo, 'maincap', { label: `Крышка коренного подшипника № ${i + 1}` })
+    m.position.x = PITCH * (i - 3)
+    root.add(reg(m, 'maincap', 'world'))
+  }
+  // упорные полукольца по бокам средней (4-й) коренной шейки
+  const thrustGeo = profile(halfRingShape(0.33, 0.56), 0.04, 4)
+  for (const dx of [-0.23, 0.23]) {
+    const m = mk(thrustGeo, 'thrust')
+    m.position.x = dx
+    root.add(reg(m, 'thrust', 'world'))
+  }
+  // манжеты на выходе вала из блока: спереди на носке, сзади на фланце
+  const sealF = mk(ringX(0.3, 0.44, 0.1), 'seal', { label: 'Передняя манжета' })
+  sealF.position.x = -5.64
+  root.add(reg(sealF, 'seal', 'world'))
+  const sealR = mk(ringX(0.78, 0.92, 0.1, 48), 'seal', { label: 'Задняя манжета' })
+  sealR.position.x = 5.64
+  root.add(reg(sealR, 'seal', 'world'))
+  sealR.userData.exp.x *= -1
+  // гаситель крутильных колебаний на носке вала
+  const damper = reg(
+    mk(
+      merge([
+        cylX(0.75, 0.2, 40),
+        at(cylX(0.62, 0.24, 40), -0.02, 0, 0),
+        at(cylX(0.3, 0.34, 24), -0.04, 0, 0),
+        ...[0, 1, 2, 3, 4, 5].map((i) => at(cylX(0.05, 0.08, 6), -0.24, 0.42 * Math.cos(i * Math.PI / 3), 0.42 * Math.sin(i * Math.PI / 3))),
+      ]),
+      'damper',
+    ),
+    'damper',
+    'world',
+  )
+  damper.position.x = -6.44
+  damper.userData.base.copy(damper.position)
+  root.add(damper)
+
+  // главная масляная магистраль: вдоль блока над валом справа, отводы к коренным опорам
+  {
+    const gy = 0.2, gz = 1.35
+    const dir = new THREE.Vector3(0, gy, gz).normalize()
+    const parts = [at(cylX(0.07, 10.8, 10), 0, gy, gz)]
+    for (let i = 0; i < 7; i++) {
+      const x = PITCH * (i - 3)
+      parts.push(cylBetween(new THREE.Vector3(x, gy, gz), new THREE.Vector3(x, 0, 0).addScaledVector(dir, 0.4), 0.045, 8))
+    }
+    root.add(reg(mk(merge(parts), 'oilgallery'), 'oilgallery', 'world'))
+  }
+
   // маховик
   const fly = reg(new THREE.Group(), 'flywheel', 'world')
   fly.position.x = 6.42
   fly.userData.base.copy(fly.position)
   const flyDisc = mk(cylX(1.35, 0.45, 64), 'flywheel')
-  const ring = mk(cylX(1.48, 0.22, 90), 'flywheel')
+  // зубчатый венец под шестерню стартера
+  const ring = mk(profile(ringGearShape(100, 1.47, 1.3), 0.22, 40), 'flywheel')
   ring.position.x = 0.1
   const flyMark = mk(new THREE.BoxGeometry(0.05, 0.42, 0.1), 'gearmark')
   flyMark.position.set(0.24, 1.1, 0)
@@ -355,8 +510,20 @@ export function createEngine(host, cb = {}) {
   const camShaft = mk(cylX(0.16, 11.3), 'camshaft')
   camShaft.position.set(-0.4, CAM_Y, 0)
   camG.add(camShaft)
+  // опорные шейки распредвала между парами кулачков
+  const camJ = mk(merge([0, 1, 2, 3, 4, 5, 6].map((i) => at(cylX(0.3, 0.24, 24), PITCH * (i - 3), CAM_Y, 0))), 'camshaft', { label: 'Опорные шейки распредвала' })
+  camG.add(camJ)
 
   // ---------- ряды цилиндров
+  const rockerShaftGeo = merge([cylX(0.05, 9.7, 10), ...[0, 1, 2, 3, 4, 5].map((k) => at(new THREE.BoxGeometry(0.14, 0.24, 0.18), PITCH * (k - 2.5), -0.12, 0))])
+  const boltGeo = merge(
+    [[-0.52, -0.52], [0.52, -0.52], [-0.52, 0.52], [0.52, 0.52]].flatMap(([x, z]) => [
+      at(new THREE.CylinderGeometry(0.085, 0.085, 0.08, 6), x, 0.04, z),
+      at(new THREE.CylinderGeometry(0.11, 0.11, 0.015, 12), x, 0.0075, z),
+      at(new THREE.CylinderGeometry(0.035, 0.035, 0.9, 6), x, -0.45, z),
+    ]),
+  )
+  geos.add(rockerShaftGeo).add(boltGeo)
   const banks = {}
   for (const side of ['L', 'R']) {
     const g = new THREE.Group()
@@ -400,6 +567,11 @@ export function createEngine(host, cb = {}) {
     comp.position.set(shift + 6.85, 3.5, out * 1.35)
     comp.userData.base.copy(comp.position)
     g.add(comp)
+    banks[side].comp = comp
+    // ось коромысел со стойками над каждой головкой
+    const shaft = mk(rockerShaftGeo, 'rocker', { label: 'Ось коромысел' })
+    shaft.position.set(shift, PIVOT, -out * 0.55)
+    g.add(reg(shaft, 'rocker', 'bank', out))
   }
 
   // впускной коллектор в развале
@@ -429,6 +601,62 @@ export function createEngine(host, cb = {}) {
   of.position.set(-2.2, -0.5, 1.95)
   of.userData.base.copy(of.position)
   root.add(of)
+  // навесное: детали собраны в одну геометрию и стоят в мировых координатах
+  const addWorld = (geo, id, x, y, z, extra) => {
+    const m = mk(geo, id, extra)
+    m.position.set(x, y, z)
+    root.add(reg(m, id, 'world'))
+    return m
+  }
+  // стартер: шестерня входит в венец маховика, корпус за маховиком слева внизу
+  {
+    const sy = -1.24, sz = -1.09
+    const ou = new THREE.Vector2(sy, sz).normalize().multiplyScalar(0.44)
+    addWorld(
+      merge([
+        at(cylX(0.3, 1.0, 24), 0.75, 0, 0),
+        at(cylX(0.33, 0.12, 24), 0.3, 0, 0),
+        at(cylX(0.07, 0.4, 10), 0.05, 0, 0),
+        at(profile(gearShape(11, 0.13), 0.2, 2), -0.1, 0, 0),
+        at(cylX(0.14, 0.6, 14), 0.75, ou.x, ou.y),
+      ]),
+      'starter', 6.65, sy, sz,
+    )
+  }
+  // генератор спереди справа, шкив перед блоком
+  addWorld(
+    merge([cylX(0.42, 0.8, 28), at(cylX(0.22, 0.14, 20), -0.48, 0, 0), at(cylX(0.08, 0.2, 8), -0.4, 0, 0), at(new THREE.BoxGeometry(0.3, 0.5, 0.2), 0, -0.4, -0.25)]),
+    'generator', -6.05, 0.9, 1.95,
+  )
+  // термостат: корпус спереди в развале, патрубок вверх и вперёд к радиатору
+  addWorld(
+    merge([
+      new THREE.CylinderGeometry(0.22, 0.24, 0.32, 18),
+      at(new THREE.CylinderGeometry(0.11, 0.11, 0.55, 12), 0, 0.4, 0),
+      cylBetween(new THREE.Vector3(0, 0.62, 0), new THREE.Vector3(-0.9, 0.62, 0), 0.11, 12),
+      at(new THREE.SphereGeometry(0.11, 12, 8), 0, 0.62, 0),
+    ]),
+    'thermostat', -5.55, 2.85, 0,
+  )
+  // топливный фильтр на левом боку блока
+  addWorld(
+    merge([
+      new THREE.CylinderGeometry(0.28, 0.28, 0.75, 20),
+      at(new RoundedBoxGeometry(0.66, 0.2, 0.66, 2, 0.05), 0, 0.47, 0),
+      at(new THREE.BoxGeometry(0.3, 0.16, 0.4), 0, 0.47, 0.42),
+    ]),
+    'fuelfilter', 3.0, -0.6, -1.95,
+  )
+  // охладитель наддувочного воздуха сверху над ТНВД: сердцевина, рёбра, бачки
+  const ic = addWorld(
+    merge([
+      new THREE.BoxGeometry(1.3, 0.5, 1.2),
+      ...Array.from({ length: 11 }, (_, i) => at(new THREE.BoxGeometry(0.025, 0.62, 1.24), -0.6 + i * 0.12, 0, 0)),
+      at(new RoundedBoxGeometry(1.36, 0.6, 0.2, 2, 0.06), 0, 0, 0.7),
+      at(new RoundedBoxGeometry(1.36, 0.6, 0.2, 2, 0.06), 0, 0, -0.7),
+    ]),
+    'intercooler', 6.3, 4.45, 0,
+  )
 
   // ---------- цилиндры
   const cyls = []
@@ -484,6 +712,12 @@ export function createEngine(host, cb = {}) {
     rsm.position.y = ROD
     rod.add(rb, rs, rsm)
     add(rod, 'rod')
+    const rcap = mk(G.rodCap, 'rodcap', inf)
+    add(rcap, 'rodcap')
+    // болты крепления головки: 4 вокруг форсунки
+    const hb = mk(boltGeo, 'headbolt', inf)
+    hb.position.set(x, 3.9, 0)
+    add(hb, 'headbolt')
 
     const fm = new THREE.MeshBasicMaterial({ color: '#ff7a1a', transparent: true, opacity: 0, depthWrite: false })
     flashMats.push(fm)
@@ -499,25 +733,37 @@ export function createEngine(host, cb = {}) {
       stem.position.y = 0.475
       const vh = mk(G.vhead, type)
       vh.position.y = -0.02
-      v.add(stem, vh)
+      // тарелка пружины с сухарями едет вместе с клапаном
+      const ret = mk(G.retainer, 'spring', inf)
+      ret.position.y = RET + 0.02
+      v.add(stem, vh, ret)
       v.position.set(xv, SEAT, 0)
       add(v, type)
+      const spr = mk(G.spring, 'spring', inf)
+      spr.position.set(xv, SPR_SEAT, 0)
+      add(spr, 'spring')
       const rk = new THREE.Group()
       const rkm = mk(G.rocker, 'rocker')
       rkm.position.z = -out * 0.025
-      rk.add(rkm)
+      // регулировочный винт с контргайкой на плече штанги
+      const scr = mk(G.adjscrew, 'adjscrew', inf)
+      scr.position.z = -out * (PUSH_W - 0.55)
+      rk.add(rkm, scr)
       rk.position.set(xv, PIVOT, -out * 0.55)
       add(rk, 'rocker')
       const pr = mk(G.pushrod, 'pushrod')
       pr.position.set(xv, 0, -out * PUSH_W)
       add(pr, 'pushrod')
+      const tp = mk(G.tappet, 'tappet', inf)
+      tp.position.set(xv, 0, -out * PUSH_W)
+      add(tp, 'tappet')
       // кулачок: «носик» смотрит на штангу в момент максимального подъёма
       const peak = type === 'valve_in' ? (IN_WIN[0] + IN_WIN[1]) / 2 : (EX_WIN[0] + EX_WIN[1]) / 2
       const delta = (beta / DEG - (FIRE_AT[c] + peak) / 2) * DEG
       const lobe = mk(G.lobe, 'camshaft', inf)
       lobe.position.set(xv, CAM_Y, 0)
       camG.add(lobe)
-      valves.push({ type, v, rk, pr, lobe, delta, xv })
+      valves.push({ type, v, rk, pr, tp, spr, lobe, delta, xv })
     }
 
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: numberTexture(c), depthTest: false, transparent: true }))
@@ -528,7 +774,120 @@ export function createEngine(host, cb = {}) {
     g.add(sp)
     sprites.push(sp)
 
-    cyls.push({ c, side, out, x, beta, piston, rings, ppin, rod, flash, fm, valves, sprite: sp })
+    cyls.push({ c, side, out, x, beta, piston, rings, ppin, rod, rcap, inj, flash, fm, valves, sprite: sp })
+  }
+
+  // ---------- гибкие трубки: строятся в координатах root по текущему положению концов
+  // (перестраиваются при «разборке», чтобы не отрываться от ТНВД, форсунок, компрессоров)
+  const V3 = (x, y, z) => new THREE.Vector3(x, y, z)
+  const tmpW = new THREE.Vector3()
+  function cylTopWorld(c, dy = 0.67, dz = 0) {
+    const cy = cyls.find((q) => q.c === c)
+    if (!cy) return null
+    cy.inj.updateWorldMatrix(true, false)
+    return cy.inj.localToWorld(V3(0, dy, dz))
+  }
+  const tubes = []
+  function tube(id, r, seg, pointsFn, extra) {
+    const t = { r, seg, pointsFn }
+    t.mesh = mk(new THREE.BufferGeometry(), id, extra)
+    root.add(t.mesh)
+    tubes.push(t)
+  }
+  function rebuildTubes() {
+    root.updateMatrixWorld(true)
+    for (const t of tubes) {
+      const old = t.mesh.geometry
+      const g = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(t.pointsFn(), false, 'centripetal'), t.seg, t.r, 5)
+      t.mesh.geometry = g
+      geos.delete(old)
+      old.dispose()
+      geos.add(g)
+    }
+  }
+  // трубки высокого давления: от верха ТНВД вдоль развала к каждой форсунке
+  for (const cy of cyls) {
+    const k = (cy.c - 1) % 6
+    const s = cy.out
+    tube('hpline', 0.035, 40, () => {
+      const pp = pump.position
+      const ox = pp.x - 0.5 + 0.17 * k
+      const ry = pp.y + 0.6 + 0.06 * k
+      const rz = s * (0.36 + 0.06 * k)
+      return [
+        V3(ox, pp.y + 0.4, s * 0.25),
+        V3(ox - 0.12, ry, rz),
+        V3(cy.x + 0.5, ry, rz),
+        V3(cy.x, ry + 0.02, rz + s * 0.1),
+        cylTopWorld(cy.c, 0.6, -s * 0.6),
+        cylTopWorld(cy.c, 0.6, -s * 0.13),
+      ]
+    }, { cyl: cy.c })
+  }
+  // патрубки наддува: компрессоры → охладитель → впускной коллектор
+  for (const side of ['L', 'R']) {
+    const s = side === 'R' ? 1 : -1
+    tube('intercooler', 0.16, 32, () => {
+      const c = banks[side].comp.getWorldPosition(tmpW).clone()
+      const p = ic.position
+      return [c, V3(c.x, c.y + 0.9, c.z - s * 0.25), V3(p.x + 0.35, p.y, s * 1.35), V3(p.x + 0.1, p.y, s * 0.72)]
+    }, { label: 'Патрубок от компрессора к охладителю' })
+  }
+  tube('intercooler', 0.17, 24, () => {
+    const p = ic.position, m = mIn.position
+    return [V3(p.x - 0.4, p.y - 0.2, 0), V3(p.x - 0.75, p.y - 0.45, 0), V3(m.x + 4.85, m.y + 3.7, 0), V3(m.x + 4.6, m.y + 3.2, 0)]
+  }, { label: 'Патрубок от охладителя во впускной коллектор' })
+  rebuildTubes()
+
+  // ---------- потоки по системам (строятся по собранному двигателю, в координатах root)
+  root.updateMatrixWorld(true)
+  const flows = createFlows(root)
+  {
+    const W = (side, x, y, z) => banks[side].localToWorld(V3(x, y, z))
+    const path = (...pts) => ({ pts })
+    const sh = (side) => (side === 'R' ? OFF : -OFF)
+    const tubePts = (id) => tubes.filter((t) => t.mesh.userData.part === id).map((t) => ({ pts: t.pointsFn().map((v) => v.clone()) }))
+    const bankCyls = (side) => cyls.filter((c) => c.side === side)
+    // масло: поддон → насос → фильтр → магистраль → коренные опоры → обратно в поддон
+    const oil = [
+      path(V3(1.6, -2.35, 0), V3(-2.5, -2.3, 0.4), V3(-5.5, -1.9, 0.9), V3(-5.85, -1.15, 1.0), V3(-4.6, -0.95, 1.7), V3(-2.2, -1.05, 1.95), V3(-2.2, -0.5, 1.95), V3(-2.2, 0.0, 1.6), V3(-2.2, 0.2, 1.35)),
+      path(V3(-2.2, 0.2, 1.35), V3(5.4, 0.2, 1.35)),
+      path(V3(-2.2, 0.2, 1.35), V3(-5.4, 0.2, 1.35)),
+    ]
+    const dir = new THREE.Vector3(0, 0.2, 1.35).normalize()
+    for (let i = 0; i < 7; i++) {
+      const x = PITCH * (i - 3)
+      oil.push({ pts: [V3(x, 0.2, 1.35), V3(x, 0, 0).addScaledVector(dir, 0.38)], speed: 0.6 })
+      oil.push({ pts: [V3(x, -0.35, 0.1), V3(x + 0.2, -1.2, 0.2), V3(x + 0.3, -2.05, 0.1)], speed: 0.45 })
+    }
+    flows.define('oil', '#d97706', oil)
+    // охлаждающая жидкость: насос → рубашки рядов → головки → термостат → к радиатору
+    const water = []
+    for (const side of ['L', 'R']) {
+      const o = side === 'R' ? 1 : -1
+      water.push(path(V3(-6.0, -0.75, -1.35), V3(-5.6, -0.2, o * 1.1), W(side, -5.0, 1.35, o * 0.85), W(side, 5.1, 1.35, o * 0.85)))
+      for (const cy of bankCyls(side)) water.push({ pts: [W(side, cy.x, 1.4, o * 0.8), W(side, cy.x, 2.4, o * 0.78), W(side, cy.x + 0.25, 3.3, o * 0.55)], speed: 0.6 })
+      water.push(path(W(side, 5.0, 3.3, o * 0.55), W(side, -4.9, 3.3, o * 0.55), W(side, -5.3, 3.3, 0), V3(-5.55, 2.95, 0), V3(-5.55, 3.47, 0), V3(-6.45, 3.47, 0)))
+    }
+    flows.define('water', '#1d4ed8', water)
+    // воздух: компрессоры → охладитель → коллектор → впускные клапаны
+    const air = [...tubePts('intercooler'), path(V3(4.6, 3.08, 0), V3(-5.0, 3.08, 0))]
+    for (const cy of cyls) air.push({ pts: [V3(cy.x - 0.3, 3.08, 0), W(cy.side, cy.x - 0.3, 3.35, 0), W(cy.side, cy.x - 0.3, 2.85, 0)], speed: 0.5 })
+    flows.define('air', '#15803d', air)
+    // выхлоп: выпускные клапаны → коллектор ряда → турбина → наружу
+    const ex = []
+    for (const cy of cyls) {
+      const o = cy.out
+      ex.push({ pts: [W(cy.side, cy.x + 0.3, 2.85, 0), W(cy.side, cy.x + 0.3, 3.4, o * 0.2), W(cy.side, cy.x, 3.5, o * 1.35)], speed: 0.5 })
+    }
+    for (const side of ['L', 'R']) {
+      const o = side === 'R' ? 1 : -1
+      ex.push(path(W(side, sh(side) - 4.9, 3.5, o * 1.35), W(side, sh(side) + 5.75, 3.5, o * 1.35), W(side, sh(side) + 5.95, 4.3, o * 1.45), W(side, sh(side) + 5.95, 5.2, o * 1.6)))
+    }
+    flows.define('exhaust', '#b91c1c', ex)
+    // топливо: от бака → фильтр → ТНВД → трубки высокого давления → форсунки
+    const fuel = [path(V3(1.2, -0.9, -2.6), V3(3.0, -0.7, -2.3), V3(3.0, -0.6, -1.95), V3(3.25, 0.0, -1.95), V3(4.6, 1.6, -1.3), V3(5.6, 2.7, -0.45), V3(5.85, 3.0, 0)), ...tubePts('hpline').map((p) => ({ ...p, speed: 1.6 }))]
+    flows.define('fuel', '#c2410c', fuel)
   }
 
   // тень под двигателем
@@ -538,6 +897,10 @@ export function createEngine(host, cb = {}) {
   shadow.userData.noPick = true
   root.add(shadow)
 
+  // разрез: общая плоскость отсечения для всех материалов деталей
+  const section = createSection(renderer, [...Object.values(mats), blueMat])
+  let numbersOn = true
+
   // ================================================================
   // кинематика
   let theta = 40 // градусы, 0…720
@@ -546,6 +909,7 @@ export function createEngine(host, cb = {}) {
     crankG.rotation.x = th
     fly.rotation.x = th
     gearC.rotation.x = th
+    damper.rotation.x = th
     gearI.rotation.x = rotI0 - th * (NC / NI)
     gearK.rotation.x = rotK0 + th * (NC / NK)
     for (const cy of cyls) {
@@ -559,6 +923,8 @@ export function createEngine(host, cb = {}) {
       setPos(cy.ppin, cy.x, sPin, 0)
       setPos(cy.rod, cy.x, sp, np)
       cy.rod.rotation.x = Math.atan2(-np, sPin - sp)
+      setPos(cy.rcap, cy.x, sp, np)
+      cy.rcap.rotation.x = cy.rod.rotation.x
       const psi = mod(theta - FIRE_AT[cy.c], 720)
       // вспышка: начало рабочего хода
       const f = psi < 50 ? 1 - psi / 50 : 0
@@ -570,7 +936,9 @@ export function createEngine(host, cb = {}) {
         setPos(va.v, va.xv, SEAT - l * LIFT_V, 0)
         va.rk.rotation.x = cy.out * Math.asin((l * LIFT_V) / ARM_V)
         const sBot = CAM_Y * Math.cos(BETA) + CAM_R + l * LIFT_P
-        setPos(va.pr, va.xv, sBot + PUSH_LEN / 2, -cy.out * PUSH_W)
+        setPos(va.tp, va.xv, sBot + TAP_H / 2, -cy.out * PUSH_W)
+        setPos(va.pr, va.xv, sBot + TAP_H + PUSH_LEN / 2, -cy.out * PUSH_W)
+        va.spr.scale.y = SEAT + RET - l * LIFT_V - SPR_SEAT
         va.lobe.rotation.x = th / 2 + va.delta
       }
     }
@@ -578,7 +946,7 @@ export function createEngine(host, cb = {}) {
 
   // ================================================================
   // внешний вид: подсветка, слои, прозрачность корпуса
-  const state = { selected: null, hover: null, layer: 'all', casing: 0.3, cylinder: null }
+  const state = { selected: null, hover: null, layer: 'all', casing: 0.3, cylinder: null, only: null, fresh: null }
   let flashScale = 1
   const accent = new THREE.Color('#f59e0b')
   function applyLook() {
@@ -605,6 +973,14 @@ export function createEngine(host, cb = {}) {
         emis = accent
         emisI = 0.18
       }
+      // режим сборки: показываем только поставленные детали, новые подсвечены
+      if (state.only) {
+        if (!state.only.has(p.id) && !(p.id === 'gearmark' && state.only.has('gear'))) op = 0
+        else if (state.fresh?.has(p.id) && !state.selected) {
+          emis = accent
+          emisI = 0.22
+        }
+      }
       const tr = op < 0.99
       if (m.transparent !== tr) m.needsUpdate = true
       m.transparent = tr
@@ -616,8 +992,12 @@ export function createEngine(host, cb = {}) {
     }
     blueMat.opacity = mats.gearmark.opacity
     blueMat.transparent = mats.gearmark.transparent
-    flashScale = state.selected || state.layer !== 'all' ? 0.35 : 1
-    for (const cy of cyls) cy.sprite.material.color.set(state.cylinder === cy.c ? '#f59e0b' : '#ffffff')
+    flashScale = state.only && !state.only.has('piston') ? 0 : state.selected || state.layer !== 'all' ? 0.35 : 1
+    for (const cy of cyls) {
+      cy.sprite.material.color.set(state.cylinder === cy.c ? '#f59e0b' : '#ffffff')
+      cy.sprite.visible = numbersOn && (!state.only || state.only.has('liner'))
+    }
+    flows.show(state.layer !== 'all' && !state.only && explodeF < 0.05 ? state.layer : null)
     dirty = true
   }
 
@@ -632,6 +1012,7 @@ export function createEngine(host, cb = {}) {
     const hits = ray.intersectObject(root, true).filter((h) => {
       const p = h.object.userData.part
       if (!p || h.object.userData.noPick || !h.object.visible) return false
+      if (section.on && section.plane.distanceToPoint(h.point) < 0) return false
       const info = PART[p]
       if (info.pickable === false && state.selected !== p && state.layer !== 'water') return false
       return h.object.material.opacity > 0.12 || state.selected === p
@@ -716,7 +1097,11 @@ export function createEngine(host, cb = {}) {
     const c = box.getCenter(new THREE.Vector3())
     const size = Math.max(box.getSize(tmpV).length(), 2)
     const dir = camera.position.clone().sub(controls.target).normalize()
-    flyTo(c.clone().addScaledVector(dir, Math.min(size * 1.15 + 3, 34)), c)
+    // дистанция, при которой габарит детали помещается в кадр по ширине и высоте
+    const vf = (camera.fov * Math.PI) / 180
+    const fov = Math.min(vf, 2 * Math.atan(Math.tan(vf / 2) * camera.aspect))
+    const dist = (size * 0.5) / Math.tan(fov / 2) + 1.5
+    flyTo(c.clone().addScaledVector(dir, Math.min(Math.max(dist, 4.5), 40)), c)
   }
   const VIEWS = {
     iso: [new THREE.Vector3(-15, 9, 15), new THREE.Vector3(0, 1.3, 0)],
@@ -770,6 +1155,7 @@ export function createEngine(host, cb = {}) {
       dirty = true
     }
     if (controls.update()) dirty = true
+    if (flows.tick(dt * (playing ? Math.max(0.5, speed) : 0.6))) dirty = true
     if (dirty) {
       renderer.render(scene, camera)
       dirty = false
@@ -827,7 +1213,8 @@ export function createEngine(host, cb = {}) {
       explodeF = f
       for (const o of placed) o.position.copy(o.userData.base).addScaledVector(o.userData.exp, explodeF)
       update()
-      dirty = true
+      rebuildTubes()
+      applyLook()
     },
     setPlaying(p) {
       playing = p
@@ -837,7 +1224,25 @@ export function createEngine(host, cb = {}) {
       speed = s
     },
     setNumbers(v) {
-      sprites.forEach((s) => (s.visible = v))
+      numbersOn = v
+      applyLook()
+    },
+    // режим сборки: ids — детали, которые уже стоят (null — все), fresh — поставленные на этом шаге
+    setOnly(ids, fresh = null) {
+      state.only = ids
+      state.fresh = fresh
+      applyLook()
+    },
+    // разрез: 'none' | 'x' (поперёк через пару цилиндров k и k+6) | 'bank' (вдоль правого ряда)
+    setSection(mode, pair = 1) {
+      if (mode === 'x') {
+        const x = PITCH * (pair - 3.5)
+        section.set(new THREE.Vector3(1, 0, 0), x)
+        flyTo(new THREE.Vector3(x - 15, 5.5, 8).sub(V3(x, 1.4, 0)).multiplyScalar(fitScale()).add(V3(x, 1.4, 0)), V3(x, 1.4, 0))
+      } else if (mode === 'bank') {
+        section.set(new THREE.Vector3(0, Math.sin(BETA), -Math.cos(BETA)), 0)
+        flyTo(new THREE.Vector3(-2, -2, 25).multiplyScalar(fitScale()).add(V3(0, 1.2, 0)), V3(0, 1.2, 0))
+      } else section.set(null)
       dirty = true
     },
     setCylinder(c) {
@@ -862,6 +1267,16 @@ export function createEngine(host, cb = {}) {
       if (VIEWS[name]) flyTo(...viewPos(name))
     },
     focusPart,
+    // мировая точка верха форсунки цилиндра c (THREE.Vector3)
+    cylTopWorld: (c) => cylTopWorld(c),
+    getRoot: () => root,
+    getScene: () => scene,
+    getCamera: () => camera,
+    getRenderer: () => renderer,
+    markDirty() {
+      dirty = true
+    },
+    partIds: () => Object.keys(meshesByPart),
     dispose() {
       cancelAnimationFrame(raf)
       ro.disconnect()
@@ -870,6 +1285,7 @@ export function createEngine(host, cb = {}) {
       Object.values(mats).forEach((m) => m.dispose())
       blueMat.dispose()
       flashMats.forEach((m) => m.dispose())
+      flows.dispose()
       sprites.forEach((s) => {
         s.material.map.dispose()
         s.material.dispose()
