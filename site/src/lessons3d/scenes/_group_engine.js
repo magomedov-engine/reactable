@@ -2,8 +2,8 @@
 const scene = (id) => () => import('./engine-scenes.js').then((m) => ({ default: m.SCENES[id] }))
 
 export default [
-  { id: 'v12-overview', title: 'V12 целиком', replaces: 'v12_общий_вид_сбоку.svg', load: scene('v12-overview') },
-  { id: 'v12-front', title: 'Вид спереди: развал 60°', replaces: 'v12_вид_спереди.svg', load: scene('v12-front') },
+  { id: 'v12-overview', title: 'V12 (ЯМЗ-240М2) целиком', replaces: 'v12_общий_вид_сбоку.svg', load: scene('v12-overview') },
+  { id: 'v12-front', title: 'Вид спереди: развал 90°', replaces: 'v12_вид_спереди.svg', load: scene('v12-front') },
   { id: 'v12-numbering', title: 'Нумерация цилиндров и порядок работы', replaces: 'v12_вид_сверху_нумерация.svg', load: scene('v12-numbering') },
   { id: 'four-stroke', title: 'Четыре такта дизеля', replaces: '4_такта_дизеля.svg', load: scene('four-stroke') },
   { id: 'crank-train', title: 'Кривошипно-шатунный механизм', replaces: 'кшм_движение.svg', load: scene('crank-train') },

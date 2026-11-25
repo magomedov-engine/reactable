@@ -13,8 +13,8 @@ const props = defineProps({
 const emit = defineEmits(['preset', 'solo', 'reset'])
 const current = computed(() => SHOW_PRESETS.find((p) => p.id === props.preset) || null)
 const banks = [
-  { t: 'Левый ряд', c: [1, 2, 3, 4, 5, 6] },
-  { t: 'Правый ряд', c: [7, 8, 9, 10, 11, 12] },
+  { t: 'Ряд 1–6', c: [1, 2, 3, 4, 5, 6] },
+  { t: 'Ряд 7–12', c: [7, 8, 9, 10, 11, 12] },
 ]
 </script>
 

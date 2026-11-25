@@ -1,7 +1,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { createEngine, FIRING } from '../model3d/engineModel.js'
+import { createEngine, FIRING, FIRE_AT } from '../model3d/engineModel.js'
 import { PARTS, PART, GROUPS, SYSTEMS, STROKES } from '../model3d/partsInfo.js'
 import { DETAILS, QUIZ } from '../model3d/partsDetails.js'
 import { ASSEMBLY, TIGHTEN } from '../model3d/assemblySteps.js'
@@ -206,7 +206,7 @@ const sect = reactive({ mode: 'none', pair: 1 })
 const sectModes = [
   { id: 'none', t: 'Нет' },
   { id: 'x', t: 'Поперёк' },
-  { id: 'bank', t: 'Вдоль ряда' },
+  { id: 'bank', t: 'Вдоль ряда 7–12' },
 ]
 function setSection(mode, pair = sect.pair) {
   sect.mode = mode
@@ -311,7 +311,6 @@ function revealAnswer() {
 }
 
 // метки ГРМ и регулировка тепловых зазоров
-const FIRE_AT = Object.fromEntries(FIRING.map((c, i) => [c, i * 60]))
 const IN_WIN = [340, 590]
 const EX_WIN = [130, 380]
 const MARGIN = 15
@@ -336,7 +335,7 @@ function setTdc(c, { marks = false } = {}) {
     s.cylinder = null
     eng?.setCylinder(null)
     select('gearmark')
-    eng?.view('front')
+    eng?.view('gears')
   } else {
     s.cylinder = c
     eng?.setCylinder(c)
@@ -356,22 +355,22 @@ const work = reactive({
   fx: { gas: true, air: true, fuel: true, fire: true, exhaust: true, forces: true, glass: true },
 })
 const FX = [
-  { id: 'air', t: 'Воздух: впуск и наддув', c: '#a2c08f' },
+  { id: 'air', t: 'Воздух: впуск', c: '#a2c08f' },
   { id: 'fuel', t: 'Топливо: подача и впрыск', c: '#c47a45' },
   { id: 'fire', t: 'Вспышка и сгорание', c: '#e3874a' },
-  { id: 'exhaust', t: 'Выхлоп и турбина', c: '#958e84' },
+  { id: 'exhaust', t: 'Выхлоп', c: '#958e84' },
   { id: 'gas', t: 'Газ в цилиндре (цвет — температура)', c: '#86a8c6' },
   { id: 'forces', t: 'Силы: кто толкает поршень', c: '#d0644f' },
   { id: 'glass', t: 'Прозрачные стенки', c: '#8c8880' },
 ]
 const PHASES = {
-  intake: { t: 'Впуск', c: '#8aa37b', text: 'Поршень идёт вниз, впускной клапан открыт. Турбокомпрессор нагнетает в цилиндр свежий воздух под давлением. Топлива в нём нет: дизель набирает чистый воздух.' },
+  intake: { t: 'Впуск', c: '#8aa37b', text: 'Поршень идёт вниз, впускной клапан открыт. Наддува нет: поршень сам засасывает свежий воздух через фильтр и впускной коллектор. Топлива в нём нет: дизель набирает чистый воздух.' },
   compression: { t: 'Сжатие', c: '#6f8fa8', text: `Оба клапана закрыты. Поршень идёт вверх и сжимает воздух примерно в ${EPS} раз. От сжатия воздух сильно нагревается.` },
   injection: { t: 'Впрыск', c: '#c47a45', text: 'Незадолго до ВМТ форсунка распыляет топливо через несколько отверстий распылителя. Капли попадают в раскалённый воздух и воспламеняются сами: свечи зажигания у дизеля нет.' },
   combustion: { t: 'Сгорание', c: '#b0584a', text: 'Топливо горит, давление газов резко растёт и с огромной силой давит на днище поршня. Это единственный такт, когда поршень толкает вал, а не вал поршень.' },
   expansion: { t: 'Рабочий ход', c: '#b0584a', text: 'Газы расширяются и толкают поршень вниз, через шатун он крутит коленвал. Давление и температура падают.' },
-  blowdown: { t: 'Начало выпуска', c: '#d0734f', text: 'Выпускной клапан открылся ещё до НМТ: газы под остаточным давлением вырываются в коллектор и раскручивают турбину.' },
-  exhaust: { t: 'Выпуск', c: '#8c8880', text: 'Поршень идёт вверх и выталкивает отработавшие газы через выпускной клапан в коллектор и дальше на турбину.' },
+  blowdown: { t: 'Начало выпуска', c: '#d0734f', text: 'Выпускной клапан открылся ещё до НМТ: газы под остаточным давлением вырываются в выпускной коллектор.' },
+  exhaust: { t: 'Выпуск', c: '#8c8880', text: 'Поршень идёт вверх и выталкивает отработавшие газы через выпускной клапан в коллектор и дальше в приёмную трубу.' },
 }
 const wPsi = computed(() => mod(theta.value - FIRE_AT[work.follow], 720))
 const wState = computed(() => cylState(wPsi.value))
@@ -390,7 +389,7 @@ const wPiston = computed(() => {
 const powerNow = computed(() => FIRING.filter((c) => cycle.value[c] === 0))
 
 // график давления в цилиндре по углу поворота вала
-const CH = { w: 320, h: 150, l: 30, r: 8, t: 10, b: 22, pMax: 170 }
+const CH = { w: 320, h: 150, l: 30, r: 8, t: 10, b: 22, pMax: 100 }
 const cx = (a) => CH.l + ((a + 360) / 720) * (CH.w - CH.l - CH.r)
 const cy_ = (p) => CH.h - CH.b - (Math.min(p, CH.pMax) / CH.pMax) * (CH.h - CH.t - CH.b)
 const chartPath = (() => {
@@ -561,8 +560,8 @@ const sheetTitle = computed(() => {
       </button>
       <div class="mpanel-scroll">
         <div class="mp-head">
-          <h1>3D-модель V12</h1>
-          <p>Схематичный «типовой» дизель: развал 60°, 12 цилиндров. Нажмите на деталь, чтобы узнать, что это.</p>
+          <h1>3D-модель ЯМЗ-240М2</h1>
+          <p>Схематичная модель по образцу ЯМЗ-240М2: V12, развал 90°, без наддува, шестерни распределения сзади. Формы условные, детали упрощены. Нажмите на деталь, чтобы узнать, что это.</p>
         </div>
 
         <div class="mp-tabs" role="tablist">
@@ -693,7 +692,7 @@ const sheetTitle = computed(() => {
             </div>
             <p v-if="sect.mode !== 'none'" class="mp-note">
               <template v-if="sect.mode === 'x'">Поперечный разрез, как на чертеже: видно, как два шатуна разных рядов сидят на одной шейке вала, гильзы в рубашке и клапаны в головках.</template>
-              <template v-else>Продольный разрез правого ряда по осям цилиндров: видны все шесть поршней, вал и распредвал.</template>
+              <template v-else>Продольный разрез ряда 7–12 по осям цилиндров: видны все шесть поршней, вал и распредвал.</template>
               Внутренние стенки подкрашены красным.
             </p>
           </section>
@@ -823,7 +822,7 @@ const sheetTitle = computed(() => {
               </g>
               <g class="pc-axis">
                 <line :x1="CH.l" :x2="CH.w - CH.r" :y1="CH.h - CH.b" :y2="CH.h - CH.b" />
-                <text v-for="p in [0, 50, 100, 150]" :key="p" :x="CH.l - 4" :y="cy_(p) + 3" text-anchor="end">{{ p }}</text>
+                <text v-for="p in [0, 25, 50, 75, 100]" :key="p" :x="CH.l - 4" :y="cy_(p) + 3" text-anchor="end">{{ p }}</text>
                 <text v-for="a in [-360, -180, 0, 180, 360]" :key="a" :x="cx(a)" :y="CH.h - 7" text-anchor="middle">{{ Math.abs(a) === 180 ? 'НМТ' : 'ВМТ' }}</text>
               </g>
               <rect :x="cx(-14)" :y="CH.t" :width="cx(0) - cx(-14)" :height="CH.h - CH.t - CH.b" fill="#c47a45" opacity="0.25" />
@@ -874,16 +873,16 @@ const sheetTitle = computed(() => {
 
           <section class="part-card">
             <div class="pc-sub">Почему вал крутится без остановки</div>
-            <p class="mp-note">У V12 рабочий ход начинается каждые 60° поворота вала, по порядку работы {{ FIRING.join('–') }}. Поэтому в любой момент 2–3 цилиндра толкают вал, а маховик сглаживает толчки. Поршни остальных цилиндров в это время двигает сам вал: на впуске, сжатии и выпуске.</p>
+            <p class="mp-note">У ЯМЗ-240 рабочие ходы идут по порядку {{ FIRING.join('–') }} неравномерно: поочерёдно через 90° и 30° поворота вала (так получается при развале 90° и двух шатунах на одной шейке). В среднем — каждые 60°. Поэтому в любой момент 2–3 цилиндра толкают вал, а маховик сглаживает толчки. Поршни остальных цилиндров в это время двигает сам вал: на впуске, сжатии и выпуске.</p>
             <p class="mp-note"><b>Сейчас рабочий ход:</b> {{ powerNow.length ? powerNow.join(', ') : '—' }}</p>
           </section>
 
           <section class="part-card">
             <div class="pc-sub">Откуда что берётся</div>
             <ul class="work-src">
-              <li><i style="background: #8aa37b" /><span><b>Воздух</b> — снаружи через воздушный фильтр в колёса компрессоров, затем через охладитель во впускной коллектор, по патрубку и каналу головки к впускному клапану.</span></li>
+              <li><i style="background: #8aa37b" /><span><b>Воздух</b> — снаружи через воздушный фильтр во впускной коллектор в развале (наддува нет, воздух засасывает поршень), по патрубку и каналу головки к впускному клапану.</span></li>
               <li><i style="background: #c47a45" /><span><b>Топливо</b> — из бака через фильтр в ТНВД. Насос по очереди посылает порцию по трубке высокого давления к форсунке нужного цилиндра.</span></li>
-              <li><i style="background: #958e84" /><span><b>Газы</b> — через выпускной клапан и канал головки в коллектор ряда, на турбину и в выпускную трубу. Турбина крутит компрессор: энергия выхлопа идёт на наддув.</span></li>
+              <li><i style="background: #958e84" /><span><b>Газы</b> — через выпускной клапан и канал головки в выпускной коллектор своего ряда и в приёмную трубу, дальше на машине — в глушитель.</span></li>
             </ul>
           </section>
         </template>
@@ -920,7 +919,7 @@ const sheetTitle = computed(() => {
 
           <section class="part-card">
             <div class="pc-sub">Метки ГРМ и ВМТ</div>
-            <p class="mp-note">Перед установкой шестерён вал ставят так, чтобы поршень 1-го цилиндра был в ВМТ такта сжатия. Тогда синие метки шестерён совпадают. Красные совпадают каждый оборот, синие — раз в два оборота.</p>
+            <p class="mp-note">У ЯМЗ-240 шестерни распределения стоят сзади, под картером маховика: метки смотрят назад. Перед установкой шестерён вал ставят так, чтобы поршень 1-го цилиндра был в ВМТ такта сжатия. Тогда синие метки шестерён совпадают. Красные совпадают каждый оборот, синие — раз в два оборота.</p>
             <div class="quiz-btns">
               <button class="btn-primary" type="button" @click="setTdc(1, { marks: true })">ВМТ 1-го цилиндра</button>
               <button class="btn-ghost" type="button" @click="turnCrank(360)">+360° вала</button>

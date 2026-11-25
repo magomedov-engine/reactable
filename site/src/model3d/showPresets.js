@@ -27,9 +27,9 @@ export const SHOW_PRESETS = [
   },
   {
     id: 'air', t: 'Путь воздуха и газов',
-    parts: ['airfilter', 'compressor', 'intercooler', 'manifold_in', 'port_in', 'valve_in', 'piston', 'rings', 'liner', 'valve_ex', 'port_ex', 'manifold_ex', 'turbine', 'exhaustpipe'],
+    parts: ['airfilter', 'manifold_in', 'port_in', 'valve_in', 'piston', 'rings', 'liner', 'valve_ex', 'port_ex', 'manifold_ex', 'exhaustpipe'],
     solo: null, flows: ['air', 'exhaust'],
-    note: 'Воздух: фильтр → компрессор → охладитель → коллектор → патрубок → канал головки → впускной клапан. Газы: выпускной клапан → канал головки → коллектор → турбина → выпускная труба.',
+    note: 'Наддува у ЯМЗ-240М2 нет: поршень на такте впуска сам засасывает воздух. Воздух: фильтр → впускной коллектор в развале → патрубок → канал головки → впускной клапан. Газы: выпускной клапан → канал головки → выпускной коллектор снаружи ряда → приёмная труба.',
   },
   {
     id: 'fuel', t: 'Топливо', parts: ['fuelline', 'fuelfilter', 'fuelel', 'pump', 'hpline', 'injector', 'piston', 'liner'], solo: null, flows: ['fuel'],

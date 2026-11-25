@@ -1,6 +1,11 @@
-// Схематичная 3D-модель V12-дизеля на three.js.
-// Оси: X вдоль коленвала (перед двигателя: −X, маховик: +X), Y вверх, Z вбок.
-// Ряды цилиндров наклонены на ±30° (развал 60°): левый ряд 1–6 (−Z), правый 7–12 (+Z).
+// Схематичная 3D-модель V12-дизеля по образцу ЯМЗ-240М2 на three.js.
+// Что взято от ЯМЗ-240: V12 с развалом 90°, порядок работы 1-12-5-8-3-10-6-7-2-11-4-9,
+// два шатуна рядом на одной шейке (вспышки чередуются через 90° и 30°), один распредвал в развале,
+// штанги и коромысла, 2 клапана на цилиндр, «мокрые» гильзы, шестерни распределения у заднего торца
+// (со стороны маховика), секционный ТНВД в развале, без турбонаддува (у 240М2 его нет).
+// Формы и размеры условные, детали упрощены.
+// Оси: X вдоль коленвала (перёд двигателя: −X, маховик: +X), Y вверх, Z вбок.
+// Ряды наклонены на ±45°: ряд цилиндров 1–6 (−Z), ряд 7–12 (+Z), номера от переднего торца.
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
@@ -17,18 +22,18 @@ const R = 0.54 // радиус кривошипа (ход ≈ 140 мм)
 const ROD = 2.0 // длина шатуна
 const PITCH = 1.7 // шаг цилиндров в ряду
 const OFF = 0.28 // сдвиг рядов вдоль вала (два шатуна на одной шейке)
-const BETA = 30 * DEG // половина развала
+const BETA = 45 * DEG // половина развала (развал 90°)
 const DECK = 3.1 // плоскость блока (по оси цилиндра)
 const SEAT = 3.14 // сёдла клапанов
-const CAM_Y = 2.1 // распредвал в развале
+const CAM_Y = 1.5 // распредвал в развале
 const CAM_R = 0.22 // базовый радиус кулачка
 const LIFT_V = 0.2 // ход клапана
 const ARM_V = 0.45 // плечо коромысла к клапану
 const ARM_P = 0.5 // плечо коромысла к штанге
 const LIFT_P = (LIFT_V * ARM_P) / ARM_V
 const PIVOT = 4.14 // ось коромысел
-const PUSH_W = 1.05 // штанги: расстояние от оси цилиндра в сторону развала
-const GEAR_X = -6.05
+const PUSH_W = CAM_Y * Math.sin(BETA) // штанги: расстояние от оси цилиндра в сторону развала (точно над кулачком)
+const GEAR_X = 6.05 // шестерни распределения у заднего торца блока, перед маховиком
 const TAP_H = 0.28 // высота толкателя
 const SCR = 0.2 // кончик регулировочного винта ниже оси коромысла
 const SPR_SEAT = 3.45 // опора пружины в головке
@@ -43,10 +48,13 @@ const RUN_R = 0.14 // радиус впускного патрубка
 const PORT_R = 0.11 // радиус канала в головке
 
 export const FIRING = [1, 12, 5, 8, 3, 10, 6, 7, 2, 11, 4, 9]
-const FIRE_AT = {} // цилиндр → угол начала рабочего хода (0…720°)
-FIRING.forEach((c, i) => (FIRE_AT[c] = i * 60))
-// углы шатунных шеек выводим из порядка работы: ВМТ левого цилиндра k — при θ ≡ −30° − o_k
-const PIN_OFF = [0, 1, 2, 3, 4, 5].map((k) => (((-30 - FIRE_AT[k + 1]) % 360) + 360) % 360)
+// развал 90° и общие шейки: цилиндр второго ряда приходит в ВМТ через 90° после соседа по шейке,
+// поэтому вспышки идут неравномерно — поочерёдно через 90° и 30° поворота вала
+export const FIRE_ANGLES = [0, 90, 120, 210, 240, 330, 360, 450, 480, 570, 600, 690]
+export const FIRE_AT = {} // цилиндр → угол начала рабочего хода (0…720°)
+FIRING.forEach((c, i) => (FIRE_AT[c] = FIRE_ANGLES[i]))
+// углы шатунных шеек выводим из порядка работы: ВМТ цилиндра k ряда 1–6 — при θ ≡ −45° − o_k
+const PIN_OFF = [0, 1, 2, 3, 4, 5].map((k) => (((-BETA / DEG - FIRE_AT[k + 1]) % 360) + 360) % 360)
 
 const IN_WIN = [340, 590] // впуск: открыт за 20° до ВМТ, закрыт через 50° после НМТ
 const EX_WIN = [130, 380] // выпуск: открыт за 50° до НМТ, закрыт через 20° после ВМТ
@@ -465,9 +473,12 @@ export function createEngine(host, cb = {}, opts = {}) {
   }
   const nose = mk(cylX(0.3, 1.25), 'crank')
   nose.position.x = -5.31 - 0.62
-  const flange = mk(cylX(0.78, 0.8), 'crank')
-  flange.position.x = 5.31 + 0.4
-  crankG.add(nose, flange)
+  // хвостовик: на нём шестерня распределения, за ней фланец маховика
+  const tail = mk(cylX(0.3, 1.3), 'crank')
+  tail.position.x = 5.31 + 0.65
+  const flange = mk(cylX(0.78, 0.3), 'crank')
+  flange.position.x = 6.75
+  crankG.add(nose, tail, flange)
 
   // крышки коренных подшипников: полукольцо снизу шейки + два болта
   const capShape = new THREE.Shape([new THREE.Vector2(0, -0.7), new THREE.Vector2(-0.75, -0.7), new THREE.Vector2(-0.75, 0.7), new THREE.Vector2(0, 0.7)])
@@ -475,6 +486,8 @@ export function createEngine(host, cb = {}, opts = {}) {
   const capGeo = merge([
     profile(capShape, 0.32, 4),
     ...[-0.52, 0.52].flatMap((z) => [at(new THREE.CylinderGeometry(0.05, 0.05, 0.78, 8), 0, -0.41, z), at(new THREE.CylinderGeometry(0.1, 0.1, 0.1, 6), 0, -0.8, z)]),
+    // горизонтальные стяжные болты: через стенки картера в бока крышки
+    ...[-1, 1].flatMap((sd) => [at(cylZ(0.05, 0.95, 8), 0, -0.32, sd * 1.2), at(cylZ(0.1, 0.1, 6), 0, -0.32, sd * 1.72)]),
   ])
   geos.add(capGeo)
   for (let i = 0; i < 7; i++) {
@@ -493,7 +506,7 @@ export function createEngine(host, cb = {}, opts = {}) {
   const sealF = mk(ringX(0.3, 0.44, 0.1), 'seal', { label: 'Передняя манжета' })
   sealF.position.x = -5.64
   root.add(reg(sealF, 'seal', 'world'))
-  const sealR = mk(ringX(0.78, 0.92, 0.1, 48), 'seal', { label: 'Задняя манжета' })
+  const sealR = mk(ringX(0.3, 0.46, 0.1, 40), 'seal', { label: 'Задняя манжета' })
   sealR.position.x = 5.64
   root.add(reg(sealR, 'seal', 'world'))
   sealR.userData.exp.x *= -1
@@ -530,7 +543,7 @@ export function createEngine(host, cb = {}, opts = {}) {
 
   // маховик
   const fly = reg(new THREE.Group(), 'flywheel', 'world')
-  fly.position.x = 6.42
+  fly.position.x = 7.15
   fly.userData.base.copy(fly.position)
   const flyDisc = mk(cylX(1.35, 0.45, 64), 'flywheel')
   // зубчатый венец под шестерню стартера
@@ -541,7 +554,7 @@ export function createEngine(host, cb = {}, opts = {}) {
   fly.add(flyDisc, ring, flyMark)
   root.add(fly)
 
-  // ---------- шестерни ГРМ (плоскость перед блоком)
+  // ---------- шестерни распределения (плоскость за задним торцом блока, перед маховиком)
   const NC = 18, NI = 18, NK = 36
   const rpOf = (n) => n / 36 // модуль 1/18
   const gC = new THREE.Vector2(0, 0) // (y, z)
@@ -575,7 +588,8 @@ export function createEngine(host, cb = {}, opts = {}) {
   function mark(g, localAngle, rp, blue) {
     const m = mk(markGeo, 'gearmark')
     if (blue) m.material = blueMat
-    m.position.set(-0.17, (rp - 0.13) * Math.cos(localAngle), (rp - 0.13) * Math.sin(localAngle))
+    // метки на задней стороне шестерён: их видно со стороны маховика
+    m.position.set(0.17, (rp - 0.13) * Math.cos(localAngle), (rp - 0.13) * Math.sin(localAngle))
     g.add(m)
   }
   mark(gearC, th1, rpOf(NC))
@@ -604,6 +618,8 @@ export function createEngine(host, cb = {}, opts = {}) {
   )
   geos.add(rockerShaftGeo).add(boltGeo)
   const banks = {}
+  // приёмная труба выпуска в координатах ряда: от фланца коллектора вниз и наружу
+  const EXH_PIPE = (o) => [V3(5.4, 3.5, o * 1.35), V3(5.85, 3.5, o * 1.4), V3(6.15, 3.2, o * 1.55), V3(6.3, 2.5, o * 1.7), V3(6.35, 1.8, o * 1.75)]
   for (const side of ['L', 'R']) {
     const g = new THREE.Group()
     g.rotation.x = side === 'R' ? BETA : -BETA
@@ -621,7 +637,7 @@ export function createEngine(host, cb = {}, opts = {}) {
     cv.position.set(shift, 4.2, -out * 0.2)
     cv.userData.base.copy(cv.position)
     g.add(cv)
-    // выпускной коллектор + турбокомпрессор
+    // выпускной коллектор снаружи ряда
     const mex = reg(new THREE.Group(), 'manifold_ex', 'bank', out)
     mex.position.set(shift, 3.5, out * 1.35)
     mex.userData.base.copy(mex.position)
@@ -634,43 +650,12 @@ export function createEngine(host, cb = {}, opts = {}) {
       mex.add(st)
     }
     g.add(mex)
-    const tur = reg(new THREE.Group(), 'turbine', 'bank', out)
-    tur.position.set(shift + 5.75, 3.5, out * 1.35)
-    tur.userData.base.copy(tur.position)
-    const tH = mk(cylX(0.62, 0.62, 40), 'turbine')
-    const core = mk(cylX(0.26, 0.5, 20), 'turbine')
-    core.position.x = 0.55
-    tur.add(tH, core)
-    g.add(tur)
-    const comp = reg(mk(cylX(0.55, 0.55, 40), 'compressor'), 'compressor', 'bank', out)
-    comp.position.set(shift + 6.85, 3.5, out * 1.35)
-    comp.userData.base.copy(comp.position)
-    g.add(comp)
-    banks[side].comp = comp
-    // воздушный фильтр: патрубок в колесо компрессора, корпус с фильтрующим элементом, заборник
-    const af = reg(
-      mk(
-        merge([
-          at(cylX(0.25, 0.55, 20), 7.35, 0, 0),
-          at(cylX(0.48, 1.1, 36), 8.15, 0, 0),
-          at(cylX(0.51, 0.07, 36), 7.63, 0, 0),
-          at(cylX(0.51, 0.07, 36), 8.67, 0, 0),
-          at(new THREE.CylinderGeometry(0.17, 0.17, 0.42, 16), 8.4, 0.62, 0),
-          at(new THREE.CylinderGeometry(0.21, 0.21, 0.06, 16), 8.4, 0.84, 0),
-        ]),
-        'airfilter',
-      ),
-      'airfilter', 'bank', out,
-    )
-    af.position.set(shift, 3.5, out * 1.35)
-    af.userData.base.copy(af.position)
-    g.add(af)
-    // выпускная труба за турбиной: газы уходят вверх, в глушитель
+    // приёмная труба от заднего конца коллектора: газы уходят вниз-назад, дальше на машине к глушителю
     const ep = reg(
       mk(
         merge([
-          new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(5.75, 3.9, out * 1.35), V3(5.82, 4.5, out * 1.45), V3(5.98, 5.2, out * 1.6), V3(6.12, 5.8, out * 1.75)], false, 'centripetal'), 32, 0.2, 14),
-          at(new THREE.CylinderGeometry(0.29, 0.29, 0.07, 20), 5.75, 4.12, out * 1.35),
+          new THREE.TubeGeometry(new THREE.CatmullRomCurve3(EXH_PIPE(out), false, 'centripetal'), 32, 0.2, 14),
+          at(cylX(0.3, 0.07, 20), 5.42, 3.5, out * 1.35),
         ]),
         'exhaustpipe',
       ),
@@ -693,11 +678,11 @@ export function createEngine(host, cb = {}, opts = {}) {
   mIn.add(inPipe)
   // ТНВД, насосы, фильтр
   const pump = reg(mk(new RoundedBoxGeometry(1.2, 0.85, 0.8, 3, 0.1), 'pump'), 'pump', 'world')
-  pump.position.set(5.85, 3.0, 0)
+  pump.position.set(5.85, 3.25, 0)
   pump.userData.base.copy(pump.position)
   root.add(pump)
   const wp = reg(new THREE.Group(), 'waterpump', 'world')
-  wp.position.set(GEAR_X + 0.05, -0.75, -1.35)
+  wp.position.set(-6.0, -0.75, -1.35)
   wp.userData.base.copy(wp.position)
   wp.add(mk(cylX(0.55, 0.45, 40), 'waterpump'))
   const wpPipe = mk(cylZ(0.17, 0.9, 16), 'waterpump')
@@ -731,7 +716,7 @@ export function createEngine(host, cb = {}, opts = {}) {
         at(profile(gearShape(11, 0.13), 0.2, 2), -0.1, 0, 0),
         at(cylX(0.14, 0.6, 14), 0.75, ou.x, ou.y),
       ]),
-      'starter', 6.65, sy, sz,
+      'starter', 7.38, sy, sz,
     )
   }
   // генератор спереди справа, шкив перед блоком
@@ -788,15 +773,17 @@ export function createEngine(host, cb = {}, opts = {}) {
     const el = new THREE.ExtrudeGeometry(star, { depth: 0.6, bevelEnabled: false }).rotateX(-Math.PI / 2).translate(0, -0.32, 0)
     addWorld(merge([el, at(new THREE.CylinderGeometry(0.06, 0.06, 0.8, 10, 1, true), 0, 0.12, 0)]), 'fuelel', 3.0, -0.6, -1.95)
   }
-  // охладитель наддувочного воздуха сверху над ТНВД: сердцевина, рёбра, бачки
-  const ic = addWorld(
+  // воздушный фильтр над развалом: корпус с элементом, заборник спереди, патрубок вниз во впускной коллектор.
+  // На машине фильтр обычно стоит отдельно и соединён с двигателем патрубком
+  addWorld(
     merge([
-      new THREE.BoxGeometry(1.3, 0.5, 1.2),
-      ...Array.from({ length: 11 }, (_, i) => at(new THREE.BoxGeometry(0.025, 0.62, 1.24), -0.6 + i * 0.12, 0, 0)),
-      at(new RoundedBoxGeometry(1.36, 0.6, 0.2, 2, 0.06), 0, 0, 0.7),
-      at(new RoundedBoxGeometry(1.36, 0.6, 0.2, 2, 0.06), 0, 0, -0.7),
+      cylX(0.55, 2.4, 36),
+      at(cylX(0.58, 0.07, 36), -1.2, 0, 0),
+      at(cylX(0.58, 0.07, 36), 1.2, 0, 0),
+      at(cylX(0.22, 0.5, 16), -1.45, 0, 0),
+      at(new THREE.CylinderGeometry(0.2, 0.2, 1.2, 16), 0, -1.1, 0),
     ]),
-    'intercooler', 6.3, 4.45, 0,
+    'airfilter', 0, 5.1, 0,
   )
 
   // ---------- цилиндры
@@ -965,13 +952,13 @@ export function createEngine(host, cb = {}, opts = {}) {
     toGallery: [V3(-2.2, 0.12, 1.95), V3(-2.2, 0.2, 1.62), V3(-2.2, 0.2, 1.35)],
     // сверления в блоке: от магистрали к опорам распредвала. Идут в промежутке между гильзами
     // правого ряда (x = опора + 0.28), под кулачками — вбок к шейке
-    toCam: (m) => [V3(m + 0.28, 0.2, 1.35), V3(m + 0.28, 0.9, 0.95), V3(m + 0.28, 1.55, 0.25), V3(m + 0.28, 1.68, 0), V3(m, 1.68, 0), V3(m, 1.86, 0)],
+    toCam: (m) => [V3(m + 0.28, 0.2, 1.35), V3(m + 0.28, 0.85, 0.85), V3(m + 0.28, 1.1, 0.3), V3(m + 0.28, 1.12, 0), V3(m, 1.12, 0), V3(m, CAM_Y - 0.28, 0)],
   }
   // каналы в координатах ряда: от второй опоры распредвала вверх между головками к оси коромысел
   const ROCK_M = -PITCH * 2
   const rockerFeed = (o) => {
     const gx = ROCK_M + o * OFF
-    return [V3(ROCK_M, 2.0, -o * PUSH_W), V3(ROCK_M, 2.3, -o * PUSH_W), V3(gx, 2.7, -o * 0.98), V3(gx, 3.9, -o * 0.6), V3(gx, PIVOT, -o * 0.55)]
+    return [V3(ROCK_M, CAM_Y * Math.cos(BETA) + 0.3, -o * PUSH_W), V3(ROCK_M, 2.3, -o * PUSH_W), V3(gx, 2.7, -o * 0.98), V3(gx, 3.9, -o * 0.6), V3(gx, PIVOT, -o * 0.55)]
   }
   addWorld(merge([tubeG(OILR.toFilter, 0.06), tubeG(OILR.toGallery, 0.06, 12), ...[0, 1, 2, 3, 4, 5, 6].map((i) => tubeG(OILR.toCam(PITCH * (i - 3)), 0.035, 30, 6))]), 'oilchannel', 0, 0, 0, { label: 'Масляные трубки и сверления блока' })
   for (const side of ['L', 'R']) {
@@ -1027,8 +1014,9 @@ export function createEngine(host, cb = {}, opts = {}) {
   // охлаждение: насос → трубы к рядам → водяные каналы блока → рубашки гильз → головки →
   // сборные каналы → термостат → радиатор (или перепуск обратно в насос, пока не прогрелся)
   const WTR = {
-    feedL: [V3(-5.95, -0.3, -1.4), V3(-5.72, 0.35, -1.45), V3(-5.33, 0.72, -1.45)],
-    feedR: [V3(-5.95, -0.55, -0.95), V3(-5.76, -0.62, -0.3), V3(-5.76, -0.62, 0.45), V3(-5.76, -0.45, 0.95), V3(-5.7, 0.4, 1.45), V3(-4.77, 0.72, 1.45)],
+    // концы: начало водяного канала ряда (y 1.35, z ±0.9 в координатах ряда) при наклоне ряда 45°
+    feedL: [V3(-5.95, -0.3, -1.4), V3(-5.72, 0.05, -1.55), V3(-5.33, 0.32, -1.59)],
+    feedR: [V3(-5.95, -0.55, -0.95), V3(-5.76, -0.62, -0.3), V3(-5.76, -0.62, 0.45), V3(-5.76, -0.45, 0.95), V3(-5.7, 0.1, 1.5), V3(-4.77, 0.32, 1.59)],
     // перепуск (малый круг): из термостата вниз по передней стенке в насос
     bypass: [V3(-5.55, 2.72, 0), V3(-5.74, 2.5, -0.25), V3(-5.74, 2.0, -0.65), V3(-5.74, 1.0, -0.95), V3(-5.74, 0.2, -1.0), V3(-5.95, -0.38, -1.05)],
     // верхний патрубок: термостат → верхний бачок радиатора; нижний: нижний бачок → насос
@@ -1116,19 +1104,6 @@ export function createEngine(host, cb = {}, opts = {}) {
       ]
     }, { cyl: cy.c })
   }
-  // патрубки наддува: компрессоры → охладитель → впускной коллектор
-  for (const side of ['L', 'R']) {
-    const s = side === 'R' ? 1 : -1
-    tube('intercooler', 0.16, 32, () => {
-      const c = banks[side].comp.getWorldPosition(tmpW).clone()
-      const p = ic.position
-      return [c, V3(c.x, c.y + 0.9, c.z - s * 0.25), V3(p.x + 0.35, p.y, s * 1.35), V3(p.x + 0.1, p.y, s * 0.72)]
-    }, { label: 'Патрубок от компрессора к охладителю' })
-  }
-  tube('intercooler', 0.17, 24, () => {
-    const p = ic.position, m = mIn.position
-    return [V3(p.x - 0.4, p.y - 0.2, 0), V3(p.x - 0.85, p.y - 0.35, 0), V3(m.x + 5.05, m.y + 3.6, 0), V3(m.x + 4.95, m.y + 3.2, 0)]
-  }, { label: 'Патрубок от охладителя во впускной коллектор' })
   rebuildTubes()
 
   // ---------- путь воздуха и газов одного цилиндра (координаты root)
@@ -1201,30 +1176,29 @@ export function createEngine(host, cb = {}, opts = {}) {
     }
     flows.define('water', '#86a8c6', water)
     // воздух: фильтры → компрессоры → охладитель → коллектор → патрубки → каналы головок → впускные клапаны
-    const airIn = (side) => {
-      const o = side === 'R' ? 1 : -1
-      return path(W(side, sh(side) + 8.4, 4.4, o * 1.35), W(side, sh(side) + 8.4, 3.75, o * 1.35), W(side, sh(side) + 8.0, 3.5, o * 1.35), W(side, sh(side) + 6.9, 3.5, o * 1.35))
-    }
-    const air = [airIn('L'), airIn('R'), ...tubePts('intercooler'), path(V3(4.95, 3.08, 0), V3(-5.0, 3.08, 0))]
+    // воздух: заборник → фильтр → патрубок вниз → впускной коллектор в обе стороны
+    const airIn = path(V3(-1.75, 5.1, 0), V3(-0.4, 5.1, 0), V3(0, 4.85, 0), V3(0, 3.1, 0))
+    const inGallery = [path(V3(0, 3.08, 0), V3(5.0, 3.08, 0)), path(V3(0, 3.08, 0), V3(-5.0, 3.08, 0))]
+    const air = [airIn, ...inGallery]
     for (const cy of cyls) air.push({ pts: inPath(cy), speed: 0.5 })
     flows.define('air', '#a2c08f', air)
-    // выхлоп: выпускные клапаны → каналы головок → коллектор ряда → турбина → выпускная труба
+    // выхлоп: выпускные клапаны → каналы головок → коллектор ряда → приёмная труба
     const exOut = (side) => {
       const o = side === 'R' ? 1 : -1
-      return [W(side, sh(side) + 5.75, 3.5, o * 1.35), W(side, sh(side) + 5.75, 3.9, o * 1.35), W(side, sh(side) + 5.82, 4.5, o * 1.45), W(side, sh(side) + 5.98, 5.2, o * 1.6), W(side, sh(side) + 6.12, 5.8, o * 1.75)]
+      return EXH_PIPE(o).map((v) => W(side, sh(side) + v.x, v.y, v.z))
     }
     const ex = []
     for (const cy of cyls) ex.push({ pts: exPath(cy), speed: 0.5 })
     for (const side of ['L', 'R']) {
       const o = side === 'R' ? 1 : -1
-      ex.push(path(W(side, sh(side) - 4.9, 3.5, o * 1.35), ...exOut(side)))
+      ex.push(path(W(side, sh(side) - 4.9, 3.5, o * 1.35), W(side, sh(side) + 5.2, 3.5, o * 1.35), ...exOut(side)))
     }
     flows.define('exhaust', '#cc6e5a', ex)
     // топливо: от бака → фильтр → ТНВД → трубки высокого давления → форсунки
     // топливо: подвод → корпус фильтра → вниз по краю банки → сквозь шторку внутрь → вверх по трубке →
     // выход → ТНВД → трубки высокого давления → форсунки
     const fuelIn = path(...FUELR.inlet)
-    const fuel = [fuelIn, path(...FUELR.toPump, V3(5.85, 3.0, 0)), ...tubePts('hpline').map((p) => ({ ...p, speed: 1.6 }))]
+    const fuel = [fuelIn, path(...FUELR.toPump, V3(5.85, 3.25, 0)), ...tubePts('hpline').map((p) => ({ ...p, speed: 1.6 }))]
     for (const a of [90, 180, 270].map((d) => d * DEG)) {
       const c = (r) => [3.0 + r * Math.cos(a), -1.95 + r * Math.sin(a)]
       const [ox, oz] = c(0.25), [ix, iz] = c(0.12)
@@ -1233,15 +1207,14 @@ export function createEngine(host, cb = {}, opts = {}) {
     flows.define('fuel', '#de8d55', fuel)
 
     // режим «Работа»: общие потоки (по цилиндрам частицы рисует operation.js)
-    const opAir = [...tubePts('intercooler'), path(V3(4.95, 3.08, 0), V3(-5.0, 3.08, 0))]
+    // двигатель без наддува: поршень сам засасывает воздух через фильтр
+    const opAir = [{ ...airIn, pts: [V3(-2.6, 5.1, 0), ...airIn.pts] }, ...inGallery]
     const opExh = []
     for (const side of ['L', 'R']) {
       const o = side === 'R' ? 1 : -1
-      // наружный воздух через воздушный фильтр в колесо компрессора
-      opAir.push({ ...airIn(side), pts: [W(side, sh(side) + 8.4, 5.3, o * 1.35), ...airIn(side).pts] })
-      opExh.push(path(W(side, sh(side) - 4.9, 3.5, o * 1.35), W(side, sh(side) + 5.75, 3.5, o * 1.35)))
-      // за турбиной газы уходят вверх по выпускной трубе и дальше, в глушитель
-      opExh.push({ pts: [...exOut(side), W(side, sh(side) + 6.3, 6.6, o * 1.95)], speed: 1.4 })
+      opExh.push(path(W(side, sh(side) - 4.9, 3.5, o * 1.35), W(side, sh(side) + 5.2, 3.5, o * 1.35)))
+      // по приёмной трубе газы уходят вниз и дальше, в глушитель
+      opExh.push({ pts: [...exOut(side), W(side, sh(side) + 6.35, 0.8, o * 1.8)], speed: 1.4 })
     }
     flows.define('op_air', '#a2c08f', opAir, { density: 6, size: 0.24 })
     flows.define('op_exh', '#958e84', opExh, { density: 6, size: 0.3 })
@@ -1321,7 +1294,7 @@ export function createEngine(host, cb = {}, opts = {}) {
   const state = { selected: null, hover: null, layer: 'all', casing: 0.3, cylinder: null, only: null, fresh: null, op: false, glass: true, hidden: new Set(), solo: null, flows: null, xray: null }
   const soloOn = () => (state.only ? null : state.solo)
   // «стеклянный» двигатель в режиме работы: стенки почти прозрачные, внутренности видно
-  const GLASS = { block: 0.1, liner: 0.13, jacket: 0.05, head: 0.16, cover: 0.12, oilpan: 0.15, oil: 0.25, manifold_in: 0.35, manifold_ex: 0.4, intercooler: 0.55, headbolt: 0.5, maincap: 0.4 }
+  const GLASS = { block: 0.1, liner: 0.13, jacket: 0.05, head: 0.16, cover: 0.12, oilpan: 0.15, oil: 0.25, manifold_in: 0.35, manifold_ex: 0.4, airfilter: 0.45, headbolt: 0.5, maincap: 0.4 }
   let flashScale = 1
   // подсветка выбранной / наведённой детали: молочный тёплый белый
   const accent = new THREE.Color(MILK)
@@ -1511,6 +1484,7 @@ export function createEngine(host, cb = {}, opts = {}) {
     side: [new THREE.Vector3(0, 2.5, 23), new THREE.Vector3(0, 1.0, 0)],
     top: [new THREE.Vector3(0.01, 25, 0.5), new THREE.Vector3(0, 1.0, 0)],
     back: [new THREE.Vector3(18, 7, -13), new THREE.Vector3(0, 1.3, 0)],
+    gears: [new THREE.Vector3(19, 2.6, -3.5), new THREE.Vector3(6.0, 1.0, 0)],
   }
 
   // ================================================================

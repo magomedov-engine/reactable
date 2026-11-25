@@ -22,7 +22,7 @@ const rendered = computed(() => {
 })
 const done = computed(() => isDone(lesson.value.id))
 // уроки про двигатель → какую деталь показать в 3D
-const MODEL_PART = { 'engine-01': '', 'engine-02': 'liner', 'engine-03': 'crank', 'engine-04': 'camshaft', 'engine-05': 'injector', 'engine-06': 'turbine', 'assembly-01': '' }
+const MODEL_PART = { 'engine-01': '', 'engine-02': 'liner', 'engine-03': 'crank', 'engine-04': 'camshaft', 'engine-05': 'injector', 'engine-06': 'oilpump', 'assembly-01': '' }
 const modelLink = computed(() => {
   const p = MODEL_PART[lesson.value.id]
   if (p === undefined) return null

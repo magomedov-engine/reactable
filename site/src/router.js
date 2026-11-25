@@ -19,7 +19,7 @@ export const router = createRouter({
     },
     { path: '/glossary/:slug?', name: 'glossary', component: GlossaryView, meta: { title: 'Глоссарий' } },
     // three.js грузится только при открытии этой страницы
-    { path: '/model', name: 'model', component: () => import('./views/ModelView.vue'), meta: { title: '3D-модель V12' } },
+    { path: '/model', name: 'model', component: () => import('./views/ModelView.vue'), meta: { title: '3D-модель ЯМЗ-240М2' } },
     { path: '/:pathMatch(.*)*', name: 'notfound', component: NotFound, meta: { title: 'Не найдено' } },
   ],
   scrollBehavior(to, from, saved) {

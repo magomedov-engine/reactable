@@ -66,7 +66,7 @@ function reset() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z" /><path d="m3 7 9 5 9-5M12 12v10" /></svg>
       </div>
       <div class="promo-text">
-        <strong>3D-модель V12</strong>
+        <strong>3D-модель V12 (ЯМЗ-240М2)</strong>
         <span>Покрутите двигатель, нажмите на любую деталь, разберите его ползунком и посмотрите, как по порядку работают все 12 цилиндров.</span>
       </div>
       <span class="promo-go">Открыть →</span>
