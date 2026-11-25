@@ -269,7 +269,8 @@ export function createOperation(ctx) {
   let enabled = false
   let follow = null
   let focusAll = false
-  let solo = null // показан только один цилиндр: эффекты остальных прячем
+  let solo = null // Set показанных цилиндров: эффекты остальных прячем
+  let turboShown = true // колёса компрессоров видны, только когда виден сам компрессор
   const tmpV = new THREE.Vector3()
   const tmpW = new THREE.Vector3()
   let turbo = 0
@@ -280,7 +281,7 @@ export function createOperation(ctx) {
     turbo += dt * (6 + 18 * Math.min(1, speed)) * (fx.exhaust || fx.air ? 1 : 0)
     for (const w of wheels) {
       w.rotation.x = turbo
-      w.visible = fx.air || fx.exhaust
+      w.visible = turboShown && (fx.air || fx.exhaust)
     }
     let fireBest = 0
     for (let i = 0; i < per.length; i++) {
@@ -289,7 +290,7 @@ export function createOperation(ctx) {
       const psi = mod(theta - FIRE_AT[cy.c], 720)
       const st = cylState(psi)
       p.st = st
-      if (solo && solo !== cy.c) {
+      if (solo && !solo.has(cy.c)) {
         p.gas.visible = p.glow.visible = p.spray.visible = p.arrow.visible = false
         for (let j = 0; j < K; j++) inPool.park(i * K + j), exPool.park(i * K + j)
         for (let j = 0; j < TRAIL; j++) fuelPool.park(i * TRAIL + j)
@@ -406,10 +407,13 @@ export function createOperation(ctx) {
         p.gas.visible = p.glow.visible = p.spray.visible = p.arrow.visible = false
         if (v) p.gas.visible = fx.gas
       }
-      for (const w of wheels) w.visible = v && (fx.air || fx.exhaust)
+      for (const w of wheels) w.visible = v && turboShown && (fx.air || fx.exhaust)
     },
     setFx(key, v) {
       fx[key] = v
+    },
+    setTurboShown(v) {
+      turboShown = v
     },
     setSolo(c) {
       solo = c || null

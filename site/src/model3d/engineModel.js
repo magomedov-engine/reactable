@@ -763,15 +763,31 @@ export function createEngine(host, cb = {}, opts = {}) {
     ]),
     'thermostat', -5.55, 2.85, 0,
   )
-  // топливный фильтр на левом боку блока
+  // топливный фильтр на левом боку блока: корпус с кронштейном, банка (центр y −0.6)
   addWorld(
     merge([
       new THREE.CylinderGeometry(0.28, 0.28, 0.75, 20),
       at(new RoundedBoxGeometry(0.66, 0.2, 0.66, 2, 0.05), 0, 0.47, 0),
       at(new THREE.BoxGeometry(0.3, 0.16, 0.4), 0, 0.47, 0.42),
+      // штуцеры: вход (к баку) и выход (к ТНВД)
+      at(cylX(0.06, 0.16, 10), -0.38, 0.47, 0),
+      at(cylX(0.06, 0.16, 10), 0.38, 0.47, 0),
     ]),
     'fuelfilter', 3.0, -0.6, -1.95,
   )
+  // элемент топливного фильтра: шторка и центральная трубка в корпус
+  {
+    const star = new THREE.Shape()
+    for (let i = 0; i <= 40; i++) {
+      const p = P((i / 40) * Math.PI * 2, i % 2 ? 0.19 : 0.23)
+      i ? star.lineTo(p.x, p.y) : star.moveTo(p.x, p.y)
+    }
+    const hole = new THREE.Path()
+    hole.absarc(0, 0, 0.09, 0, Math.PI * 2, true)
+    star.holes.push(hole)
+    const el = new THREE.ExtrudeGeometry(star, { depth: 0.6, bevelEnabled: false }).rotateX(-Math.PI / 2).translate(0, -0.32, 0)
+    addWorld(merge([el, at(new THREE.CylinderGeometry(0.06, 0.06, 0.8, 10, 1, true), 0, 0.12, 0)]), 'fuelel', 3.0, -0.6, -1.95)
+  }
   // охладитель наддувочного воздуха сверху над ТНВД: сердцевина, рёбра, бачки
   const ic = addWorld(
     merge([
@@ -990,6 +1006,24 @@ export function createEngine(host, cb = {}, opts = {}) {
   }
 
   // ================================================================
+  // топливо низкого давления: подвод (от бака) → фильтр → ТНВД. Дальше — трубки высокого давления
+  const FUELR = {
+    // от бака: конец трубки со штуцером у переднего края фильтра
+    inlet: [V3(0.9, -0.62, -2.75), V3(2.0, -0.45, -2.55), V3(2.45, -0.15, -2.1), V3(2.62, -0.13, -1.95)],
+    // от фильтра назад вдоль блока, за последним цилиндром левого ряда вверх к ТНВД
+    toPump: [V3(3.38, -0.13, -1.95), V3(4.3, -0.05, -2.05), V3(5.4, 0.4, -2.0), V3(5.5, 1.6, -1.55), V3(5.7, 2.5, -0.75), V3(5.85, 2.82, -0.38)],
+  }
+  addWorld(
+    merge([
+      tubeG(FUELR.inlet, 0.05, 24, 8),
+      tubeG(FUELR.toPump, 0.05, 48, 8),
+      // накидная гайка на конце подвода
+      at(cylX(0.08, 0.12, 6), 0.9, -0.62, -2.75),
+    ]),
+    'fuelline', 0, 0, 0, { label: 'Топливопроводы низкого давления' },
+  )
+
+  // ================================================================
   // охлаждение: насос → трубы к рядам → водяные каналы блока → рубашки гильз → головки →
   // сборные каналы → термостат → радиатор (или перепуск обратно в насос, пока не прогрелся)
   const WTR = {
@@ -1143,7 +1177,10 @@ export function createEngine(host, cb = {}, opts = {}) {
       // внутри полой оси коромысел — к каждому коромыслу, оттуда стекает вниз вдоль штанг
       oil.push(path(w(V3(gx, PIVOT, -o * 0.55)), w(V3(sh(side) + 4.85, PIVOT, -o * 0.55))))
       oil.push(path(w(V3(gx, PIVOT, -o * 0.55)), w(V3(sh(side) - 4.85, PIVOT, -o * 0.55))))
-      for (const cy of bankCyls(side)) oil.push({ pts: [w(V3(cy.x, PIVOT - 0.1, -o * 0.75)), w(V3(cy.x, 3.2, -o * 1.0)), w(V3(cy.x, 2.3, -o * 1.05))], speed: 0.35 })
+      for (const cy of bankCyls(side)) {
+        const xt = cy.x + TAP_X[side][0]
+        oil.push({ pts: [w(V3(xt, PIVOT - 0.12, -o * PUSH_W)), w(V3(xt, 3.0, -o * (PUSH_W + 0.06))), w(V3(xt, 2.45, -o * (PUSH_W + 0.06)))], speed: 0.35 })
+      }
     }
     flows.define('oil', '#d8b35c', oil)
     // охлаждающая жидкость: насос → трубы к рядам → каналы рядов → рубашки гильз → головки →
@@ -1184,7 +1221,15 @@ export function createEngine(host, cb = {}, opts = {}) {
     }
     flows.define('exhaust', '#cc6e5a', ex)
     // топливо: от бака → фильтр → ТНВД → трубки высокого давления → форсунки
-    const fuel = [path(V3(1.2, -0.9, -2.6), V3(3.0, -0.7, -2.3), V3(3.0, -0.6, -1.95), V3(3.25, 0.0, -1.95), V3(4.6, 1.6, -1.3), V3(5.6, 2.7, -0.45), V3(5.85, 3.0, 0)), ...tubePts('hpline').map((p) => ({ ...p, speed: 1.6 }))]
+    // топливо: подвод → корпус фильтра → вниз по краю банки → сквозь шторку внутрь → вверх по трубке →
+    // выход → ТНВД → трубки высокого давления → форсунки
+    const fuelIn = path(...FUELR.inlet)
+    const fuel = [fuelIn, path(...FUELR.toPump, V3(5.85, 3.0, 0)), ...tubePts('hpline').map((p) => ({ ...p, speed: 1.6 }))]
+    for (const a of [90, 180, 270].map((d) => d * DEG)) {
+      const c = (r) => [3.0 + r * Math.cos(a), -1.95 + r * Math.sin(a)]
+      const [ox, oz] = c(0.25), [ix, iz] = c(0.12)
+      fuel.push({ pts: [FUELR.inlet.at(-1), V3(ox, -0.2, oz), V3(ox, -0.85, oz), V3(ix, -0.86, iz), V3(3.0, -0.82, -1.95), V3(3.0, -0.15, -1.95), FUELR.toPump[0]], speed: 0.6 })
+    }
     flows.define('fuel', '#de8d55', fuel)
 
     // режим «Работа»: общие потоки (по цилиндрам частицы рисует operation.js)
@@ -1200,7 +1245,7 @@ export function createEngine(host, cb = {}, opts = {}) {
     }
     flows.define('op_air', '#a2c08f', opAir, { density: 6, size: 0.24 })
     flows.define('op_exh', '#958e84', opExh, { density: 6, size: 0.3 })
-    flows.define('op_fuel', '#de8d55', [fuel[0]], { density: 7, size: 0.22, speed: 1.0 })
+    flows.define('op_fuel', '#de8d55', [fuelIn, fuel[1], ...fuel.slice(-3)], { density: 7, size: 0.22, speed: 1.0 })
   }
   // режим «Работа двигателя»
   const hpCurves = {}
@@ -1254,7 +1299,7 @@ export function createEngine(host, cb = {}, opts = {}) {
       // вспышка: начало рабочего хода
       const f = psi < 50 ? 1 - psi / 50 : 0
       cy.fm.opacity = f * 0.85 * flashScale
-      cy.flash.visible = f > 0.01 && flashScale > 0 && (!soloOn() || soloOn() === cy.c)
+      cy.flash.visible = f > 0.01 && flashScale > 0 && (!soloOn() || soloOn().has(cy.c))
       cy.flash.position.set(cy.x, sPin + 0.53 + explodeF * PART.piston.explode.bank[0], 0)
       for (const va of cy.valves) {
         const l = lift(psi, va.type === 'valve_in' ? IN_WIN : EX_WIN)
@@ -1272,7 +1317,7 @@ export function createEngine(host, cb = {}, opts = {}) {
 
   // ================================================================
   // внешний вид: подсветка, слои, прозрачность корпуса
-  // hidden — детали, скрытые пользователем; solo — показывать детали только одного цилиндра
+  // hidden — детали, скрытые пользователем; solo — Set цилиндров, детали остальных не показываем
   const state = { selected: null, hover: null, layer: 'all', casing: 0.3, cylinder: null, only: null, fresh: null, op: false, glass: true, hidden: new Set(), solo: null, flows: null, xray: null }
   const soloOn = () => (state.only ? null : state.solo)
   // «стеклянный» двигатель в режиме работы: стенки почти прозрачные, внутренности видно
@@ -1327,7 +1372,7 @@ export function createEngine(host, cb = {}, opts = {}) {
       m.emissive.set(emis)
       m.emissiveIntensity = emisI
       const solo = soloOn()
-      for (const mesh of meshesByPart[p.id] || []) mesh.visible = op > 0.015 && (!solo || mesh.userData.cyl == null || mesh.userData.cyl === solo)
+      for (const mesh of meshesByPart[p.id] || []) mesh.visible = op > 0.015 && (!solo || mesh.userData.cyl == null || solo.has(mesh.userData.cyl))
     }
     blueMat.opacity = mats.gearmark.opacity
     blueMat.transparent = mats.gearmark.transparent
@@ -1335,11 +1380,13 @@ export function createEngine(host, cb = {}, opts = {}) {
     const solo = soloOn()
     for (const cy of cyls) {
       // выбранный цилиндр — инверсный (сплошной молочный) значок
-      cy.sprite.material.map = state.cylinder === cy.c || solo === cy.c ? cy.sprite.userData.tex.on : cy.sprite.userData.tex.off
-      cy.sprite.visible = numbersOn && (!state.only || state.only.has('liner')) && (!solo || solo === cy.c)
+      cy.sprite.material.map = state.cylinder === cy.c || (solo?.size === 1 && solo.has(cy.c)) ? cy.sprite.userData.tex.on : cy.sprite.userData.tex.off
+      cy.sprite.visible = numbersOn && (!state.only || state.only.has('liner')) && (!solo || solo.has(cy.c))
     }
     work.setSolo(solo)
-    if (state.op) flows.show([work.fx.air && 'op_air', work.fx.exhaust && 'op_exh', work.fx.fuel && 'op_fuel'].filter(Boolean))
+    work.setTurboShown(!!meshesByPart.compressor?.[0]?.visible)
+    // один цилиндр: общие потоки через весь двигатель не показываем, только частицы этого цилиндра
+    if (state.op) flows.show(soloOn() ? null : [work.fx.air && 'op_air', work.fx.exhaust && 'op_exh', work.fx.fuel && 'op_fuel'].filter(Boolean))
     else if (state.layer === 'all' && state.flows) flows.show(!state.only && explodeF < 0.05 ? state.flows : null)
     else flows.show(state.layer !== 'all' && !state.only && explodeF < 0.05 ? state.layer : null)
     dirty = true
@@ -1607,9 +1654,10 @@ export function createEngine(host, cb = {}, opts = {}) {
       applyLook()
       update()
     },
-    // только детали цилиндра c (общие детали — вал, распредвал, блок — остаются); null — все цилиндры
+    // только детали цилиндра c или списка цилиндров (общие детали — вал, распредвал — остаются); null — все
     setSolo(c) {
-      state.solo = c || null
+      const list = [].concat(c ?? []).filter(Boolean)
+      state.solo = list.length ? new Set(list) : null
       applyLook()
       update()
     },

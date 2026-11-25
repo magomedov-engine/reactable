@@ -1,7 +1,7 @@
 // Сцены на полной 3D-модели двигателя (та же, что на странице «3D-модель»).
 // Каждый шаг — «пресет»: какие детали видны, разрез, режим работы, угол вала, камера.
 import { createEngine, FIRING } from '../../model3d/engineModel.js'
-import { PART } from '../../model3d/partsInfo.js'
+import { PART, PARTS } from '../../model3d/partsInfo.js'
 import { ASSEMBLY } from '../../model3d/assemblySteps.js'
 import { ROUTES } from '../../model3d/systemRoutes.js'
 
@@ -13,9 +13,22 @@ const BASE = {
   only: null, fresh: null, section: 'none', pair: 1, op: false, fx: null, follow: 1, allForces: false,
   layer: 'all', casing: 0.3, explode: 0, select: null, numbers: true, cylinder: null,
   playing: true, speed: 1, theta: null, loop: null, fly: null, view: null, focus: null,
+  // show — какие детали видны (остальные скрыты), solo — цилиндр или список цилиндров,
+  // xray — полупрозрачные детали, flows — бегущие потоки систем, focusCyl — камера к цилиндру
+  show: null, solo: null, xray: null, flows: null, focusCyl: null, focusDist: 8,
 }
+const ALL_IDS = PARTS.map((p) => p.id)
+const hiddenFor = (show) => (show ? ALL_IDS.filter((id) => !show.includes(id) && !(id === 'gearmark' && show.includes('gear'))) : [])
+// детали одного цилиндра с клапанным механизмом: поршневая группа, вал, распредвал, клапаны
+const PISTON_GRP = ['piston', 'rings', 'pin', 'rod', 'rodcap', 'rodbearing', 'liner']
+const ONE_CYL = [...PISTON_GRP, 'crank', 'head', 'valve_in', 'valve_ex', 'spring', 'rocker', 'adjscrew', 'pushrod', 'tappet', 'camshaft', 'port_in', 'port_ex', 'manifold_in', 'injector']
+const FUEL = ['fuelline', 'fuelfilter', 'fuelel', 'pump', 'hpline', 'injector']
+// впускной (кулачок 340…590°) и выпускной (130…380°) клапан 1-го цилиндра: состояние для подписи
+const IN_WIN = [340, 590], EX_WIN = [130, 380]
+// эффекты сцены про топливо (шаг задаёт fx целиком, поэтому общая основа)
+const FUEL_FX = { gas: false, air: false, exhaust: false, forces: false, fire: true, fuel: true }
+const isOpen = (psi, [a, b]) => psi > a && psi < b
 
-const CRANK_TRAIN = ['crank', 'bearing', 'maincap', 'thrust', 'rod', 'rodcap', 'rodbearing', 'piston', 'rings', 'pin', 'liner', 'block', 'flywheel', 'damper']
 const VALVE_TRAIN = ['camshaft', 'tappet', 'pushrod', 'rocker', 'adjscrew', 'valve_in', 'valve_ex', 'spring', 'head', 'gear', 'gearmark', 'crank']
 
 function engineScene(def) {
@@ -81,6 +94,10 @@ function engineScene(def) {
         eng.setOperation(false)
         eng.setSection(p.section, p.pair)
         eng.setOnly(p.only ? new Set(p.only) : null, p.fresh ? new Set(p.fresh) : null)
+        eng.setHidden(hiddenFor(p.show))
+        eng.setSolo(p.solo)
+        eng.setXray(p.xray)
+        eng.setFlows(p.flows)
         eng.setLayer(p.layer)
         eng.setCasing(p.casing)
         eng.setExplode(p.explode)
@@ -98,6 +115,7 @@ function engineScene(def) {
         if (p.theta != null) eng.setTheta(p.theta)
         eng.setPlaying(!p.loop && playing && p.playing)
         if (p.fly) eng.fly(p.fly[0], p.fly[1], instant ? 0 : 900)
+        else if (p.focusCyl) eng.focusCylinder(p.focusCyl, p.focusDist)
         else if (p.view) eng.view(p.view)
         else if (p.focus) eng.focusPart(p.focus)
         p.enter?.(eng, h)
@@ -137,6 +155,7 @@ function engineScene(def) {
         resetView() {
           if (!cur) return
           if (cur.fly) eng.fly(cur.fly[0], cur.fly[1], 700)
+          else if (cur.focusCyl) eng.focusCylinder(cur.focusCyl, cur.focusDist)
           else if (cur.view) eng.view(cur.view)
           else if (cur.focus) eng.focusPart(cur.focus)
           else eng.view('iso')
@@ -152,6 +171,8 @@ function engineScene(def) {
   }
 }
 
+// 1-й цилиндр крупно спереди-сбоку: вал уходит в глубину, видно поршень, шатун, клапаны и их привод
+const CYL1 = [[-9.8, 4.1, -5.9], [-4.5, 2.0, -0.9]]
 const FRONT_GEARS = [[-14, 2.5, 4], [-6.0, 1.0, 0]]
 const VALVE1 = [[-9.5, 6.5, -7.5], [-4.4, 2.8, -1.2]]
 
@@ -196,25 +217,28 @@ export const SCENES = {
   }),
   'four-stroke': engineScene({
     title: 'Четыре такта дизеля',
-    base: { op: true, follow: 1, numbers: false, section: 'x', pair: 1 },
+    // один цилиндр крупно: поршень с шатуном на валу, клапаны с приводом от распредвала, форсунка
+    base: { op: true, follow: 1, numbers: false, solo: 1, show: ONE_CYL, fly: CYL1, onCycle: valveNote },
     steps: [
       { title: 'Впуск', text: 'Поршень идёт вниз, впускной клапан открыт: турбина нагнетает в цилиндр чистый воздух.', p: { loop: [360, 540, 45] } },
       { title: 'Сжатие', text: 'Клапаны закрыты, поршень идёт вверх и сжимает воздух. Воздух сильно нагревается.', p: { loop: [540, 714, 45] } },
       { title: 'Впрыск и рабочий ход', text: 'В конце сжатия форсунка впрыскивает топливо, оно само воспламеняется. Газы давят на поршень — это единственный такт, когда поршень толкает вал.', p: { loop: [700, 900, 40] } },
       { title: 'Выпуск', text: 'Выпускной клапан открыт, поршень идёт вверх и выталкивает газы в коллектор, к турбине.', p: { loop: [180, 360, 45] } },
-      { title: 'Весь цикл: два оборота', text: 'Четыре такта занимают два оборота коленвала (720°). Пока этот цилиндр проходит цикл, остальные одиннадцать работают в своём порядке.', p: { speed: 0.25 } },
+      { title: 'Весь цикл: два оборота', text: 'Четыре такта занимают два оборота коленвала (720°), а распредвал за это время делает один оборот: каждый клапан открывается один раз за цикл. Остальные одиннадцать цилиндров работают так же, по очереди.', p: { speed: 0.25 } },
     ],
   }),
   // ---------------------------------------------------------------- engine-03
   'crank-train': engineScene({
     title: 'Кривошипно-шатунный механизм',
-    base: { only: CRANK_TRAIN, casing: 0.12, numbers: false, section: 'x', pair: 1 },
+    // один цилиндр на валу: гильза полупрозрачная, вид наискосок спереди — видно, как кривошип ведёт шатун
+    base: { show: [...PISTON_GRP, 'crank', 'bearing', 'maincap', 'flywheel'], solo: 1, xray: ['liner'], numbers: false, fly: [[-9.3, 3.7, -5.5], [-4.3, 1.2, -0.7]] },
     steps: [
-      { title: 'Как ход поршня становится вращением', text: 'Поршень, поршневой палец, шатун и коленвал — это КШМ. Разрез через первую пару цилиндров.', p: { speed: 0.5 } },
+      { title: 'Как ход поршня становится вращением', text: 'Поршень, поршневой палец, шатун и коленвал — это КШМ. Здесь один цилиндр: поршень ходит вверх-вниз в гильзе, шатун передаёт это движение на шатунную шейку, и вал крутится.', p: { speed: 0.5 } },
       { title: 'ВМТ', text: 'Верхняя мёртвая точка: поршень в самом верху, шатун стоит вертикально, кривошип смотрит вверх.', p: { playing: false, theta: 0, select: 'piston' } },
       { title: 'Середина хода', text: 'Вал повернулся примерно на 90°: шатун наклонён сильнее всего, поршень посередине.', p: { playing: false, theta: 90, select: 'rod' } },
       { title: 'НМТ', text: 'Нижняя мёртвая точка: поршень в самом низу. За один оборот вала поршень проходит вниз и вверх.', p: { playing: false, theta: 180, select: 'crank' } },
-      { title: 'Шатун и крышка', text: 'Нижняя головка шатуна разъёмная: крышка с двумя болтами. Метки шатуна и крышки должны совпадать.', p: { speed: 0.3, select: 'rodcap' } },
+      { title: 'Шатун и крышка', text: 'Нижняя головка шатуна разъёмная: крышка с двумя болтами, внутри вкладыши. Метки шатуна и крышки должны совпадать.', p: { speed: 0.3, select: 'rodcap' } },
+      { title: 'Два шатуна на одной шейке', text: 'У V12 на каждой шатунной шейке сидят два шатуна: цилиндр левого ряда и цилиндр правого. Здесь это 1-й и 7-й.', p: { speed: 0.3, solo: [1, 7], show: [...PISTON_GRP, 'crank'], fly: [[-9.6, 6.6, 1.4], [-4.2, 1.0, 0]] } },
     ],
   }),
   // ---------------------------------------------------------------- engine-04
@@ -241,7 +265,8 @@ export const SCENES = {
   }),
   'valve-timing': engineScene({
     title: 'Фазы газораспределения',
-    base: { op: true, follow: 1, numbers: false, section: 'x', pair: 1, fx: { forces: false } },
+    // один цилиндр: видно, где поршень, когда кулачок открывает каждый клапан; подпись — состояние клапанов
+    base: { op: true, follow: 1, numbers: false, solo: 1, show: ONE_CYL, fly: CYL1, fx: { forces: false, fuel: false, fire: false }, onCycle: valveNote },
     steps: [
       { title: 'Впуск открывается до ВМТ', text: 'Впускной клапан начинает открываться ещё до того, как поршень дошёл до верха (до ВМТ). Так цилиндр лучше наполняется.', p: { loop: [300, 380, 18] } },
       { title: 'Перекрытие клапанов', text: 'Около ВМТ открыты оба клапана: свежий воздух продувает цилиндр и выталкивает остатки газов.', p: { loop: [330, 400, 14] } },
@@ -253,12 +278,14 @@ export const SCENES = {
   // ---------------------------------------------------------------- engine-05
   'fuel-path': engineScene({
     title: 'Путь топлива',
-    base: { op: true, numbers: false, fx: { gas: false, air: false, exhaust: false, forces: false, fire: true, fuel: true } },
+    // только топливная аппаратура; поршни и гильзы — там, где нужен цилиндр
+    base: { op: true, numbers: false, show: FUEL, fx: FUEL_FX },
     steps: [
-      { title: 'Фильтр и ТНВД', text: 'Топливо из бака проходит фильтр и попадает в ТНВД — насос высокого давления.', p: { speed: 0.3, fly: [[8, 3, -9], [4.5, 1.6, -0.6]], select: 'pump' } },
-      { title: 'Трубки высокого давления', text: 'ТНВД по очереди посылает порцию топлива по трубке к форсунке нужного цилиндра — по порядку работы.', p: { speed: 0.25, view: 'iso', select: 'hpline' } },
-      { title: 'Впрыск в цилиндр', text: 'Форсунка распыляет топливо в раскалённый сжатый воздух в конце такта сжатия — и оно вспыхивает.', p: { loop: [690, 730, 8], follow: 1, section: 'x', pair: 1 } },
-      { title: 'Все цилиндры', text: 'Порции идут одна за другой каждые 60° поворота вала. Трубки ставят строго по номерам цилиндров.', p: { speed: 0.3, view: 'iso' } },
+      { title: 'Фильтр', text: 'Топливо от бака приходит по тонкой трубке в корпус фильтра, проходит бумажную шторку снаружи внутрь — грязь и вода остаются в банке — и по центральной трубке выходит к насосу.', p: { op: false, flows: ['fuel'], show: ['fuelline', 'fuelfilter', 'fuelel'], fly: [[0.6, 1.4, -6.6], [3.0, -0.35, -1.95]] } },
+      { title: 'Линия к ТНВД', text: 'От фильтра топливо под небольшим давлением идёт по трубке назад вдоль блока и поднимается к ТНВД — насосу высокого давления в развале.', p: { op: false, flows: ['fuel'], show: ['fuelline', 'fuelfilter', 'fuelel', 'pump'], select: 'fuelline', fly: [[3.5, 4.5, -10], [4.6, 1.2, -1.0]] } },
+      { title: 'ТНВД и трубки высокого давления', text: 'ТНВД по очереди посылает порцию топлива по трубке к форсунке нужного цилиндра — по порядку работы. Давление здесь в сотни раз выше, чем до насоса.', p: { speed: 0.25, select: 'hpline', fly: [[8, 9, -8], [2.0, 3.4, 0]], fx: { ...FUEL_FX, fire: false } } },
+      { title: 'Впрыск в цилиндр', text: 'Форсунка распыляет топливо в раскалённый сжатый воздух в конце такта сжатия — и оно вспыхивает.', p: { loop: [690, 730, 8], follow: 1, solo: 1, show: [...FUEL, 'piston', 'rings', 'liner'], fx: { ...FUEL_FX, gas: true }, fly: [[-9.2, 4.6, -5.4], [-4.5, 2.4, -1.4]] } },
+      { title: 'Все цилиндры', text: 'Порции идут одна за другой каждые 60° поворота вала. Трубки ставят строго по номерам цилиндров.', p: { speed: 0.3, show: [...FUEL, 'piston', 'liner'], view: 'iso' } },
     ],
   }),
   // ---------------------------------------------------------------- engine-06
@@ -286,6 +313,14 @@ export const SCENES = {
       }
     }),
   }),
+}
+
+// подпись: угол вала и состояние клапанов 1-го цилиндра (сцены про такты и фазы)
+function valveNote(eng, cycle, theta, h) {
+  const psi = ((theta % 720) + 720) % 720
+  const dead = Math.round(psi / 180) * 180 // ближайшая мёртвая точка: 0, 360, 720 — ВМТ, 180, 540 — НМТ
+  const at = Math.abs(psi - dead) < 6 ? ` · поршень в ${dead % 360 ? 'НМТ' : 'ВМТ'}` : ''
+  h.note(`Вал ${Math.round(psi)}° · впускной ${isOpen(psi, IN_WIN) ? 'открыт' : 'закрыт'} · выпускной ${isOpen(psi, EX_WIN) ? 'открыт' : 'закрыт'}${at}`)
 }
 
 // подсветить цилиндры по очереди (шаги про нумерацию)
