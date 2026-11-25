@@ -2,6 +2,7 @@
 // parts — что остаётся видимым (всё остальное скрыто), null — весь двигатель.
 // solo — сразу показать только один цилиндр (на общих деталях вроде вала это не влияет).
 // flows — бегущие потоки систем, которые включаются вместе с набором.
+// xray — детали, которые в наборе полупрозрачные (чтобы видеть каналы внутри них).
 const PISTON = ['piston', 'rings', 'pin', 'rod', 'rodcap', 'rodbearing']
 const CRANK = ['crank', 'bearing', 'maincap', 'thrust', 'flywheel', 'damper']
 const VALVES = ['camshaft', 'tappet', 'pushrod', 'rocker', 'adjscrew', 'valve_in', 'valve_ex', 'spring', 'gear', 'gearmark']
@@ -35,7 +36,15 @@ export const SHOW_PRESETS = [
     note: 'Фильтр → ТНВД → трубки высокого давления → форсунки. Каждая трубка ведёт к своему цилиндру.',
   },
   {
-    id: 'oil', t: 'Смазка', parts: ['oil', 'oilpickup', 'oilpump', 'oilfilter', 'oilgallery', 'bearing', 'rodbearing', 'crank', 'maincap'], solo: null, flows: ['oil'],
-    note: 'Маслоприёмник → насос → фильтр → главная магистраль → коренные вкладыши → по каналам вала к шатунным вкладышам → стекает в поддон.',
+    id: 'oil', t: 'Смазка',
+    parts: ['oil', 'oilpickup', 'oilpump', 'oilfilter', 'filterel', 'oilgallery', 'oilchannel', 'bearing', 'rodbearing', 'crank', 'maincap', 'rod', 'rodcap', 'camshaft', 'rocker'],
+    solo: null, flows: ['oil'], xray: ['crank', 'camshaft', 'rod', 'rodcap', 'maincap'],
+    note: 'Маслоприёмник → насос → фильтр: масло проходит бумажную шторку снаружи внутрь и по центральной трубке уходит в главную магистраль. Из неё — к коренным вкладышам, а по наклонным сверлениям вала (вал полупрозрачный) к шатунным. Вверх по сверлениям блока масло идёт к опорам распредвала и к осям коромысел, а оттуда стекает в поддон.',
+  },
+  {
+    id: 'water', t: 'Охлаждение',
+    parts: ['waterpump', 'impeller', 'waterpipe', 'jacket', 'liner', 'head', 'thermostat', 'radiator'],
+    solo: null, flows: ['water'],
+    note: 'Насос (внутри крутится крыльчатка) гонит жидкость по трубам к обоим рядам. Вдоль ряда идёт канал, из него — в рубашку каждой гильзы, вверх в головку и в сборный канал головок. Дальше термостат: холодный двигатель — по перепуску сразу обратно в насос (малый круг), прогретый — через радиатор (большой круг).',
   },
 ]

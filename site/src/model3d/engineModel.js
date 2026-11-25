@@ -937,6 +937,105 @@ export function createEngine(host, cb = {}, opts = {}) {
     mIn.add(m)
   }
 
+  // ================================================================
+  // смазка: насос → фильтр → магистраль → коренные опоры → по сверлениям вала к шатунным;
+  // от магистрали вверх к опорам распредвала и к осям коромысел. Все точки — координаты root,
+  // они же служат маршрутами бегущих точек (см. «потоки»).
+  const tubeG = (pts, r, seg = 40, rs = 8) => new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'centripetal'), seg, r, rs)
+  const OILR = {
+    // от насоса вверх по борту блока к корпусу фильтра
+    toFilter: [V3(-5.6, -1.0, 1.3), V3(-4.6, -0.85, 2.0), V3(-3.2, -0.2, 2.05), V3(-2.52, 0.11, 1.98)],
+    // из центральной трубки фильтра в главную магистраль
+    toGallery: [V3(-2.2, 0.12, 1.95), V3(-2.2, 0.2, 1.62), V3(-2.2, 0.2, 1.35)],
+    // сверления в блоке: от магистрали к опорам распредвала. Идут в промежутке между гильзами
+    // правого ряда (x = опора + 0.28), под кулачками — вбок к шейке
+    toCam: (m) => [V3(m + 0.28, 0.2, 1.35), V3(m + 0.28, 0.9, 0.95), V3(m + 0.28, 1.55, 0.25), V3(m + 0.28, 1.68, 0), V3(m, 1.68, 0), V3(m, 1.86, 0)],
+  }
+  // каналы в координатах ряда: от второй опоры распредвала вверх между головками к оси коромысел
+  const ROCK_M = -PITCH * 2
+  const rockerFeed = (o) => {
+    const gx = ROCK_M + o * OFF
+    return [V3(ROCK_M, 2.0, -o * PUSH_W), V3(ROCK_M, 2.3, -o * PUSH_W), V3(gx, 2.7, -o * 0.98), V3(gx, 3.9, -o * 0.6), V3(gx, PIVOT, -o * 0.55)]
+  }
+  addWorld(merge([tubeG(OILR.toFilter, 0.06), tubeG(OILR.toGallery, 0.06, 12), ...[0, 1, 2, 3, 4, 5, 6].map((i) => tubeG(OILR.toCam(PITCH * (i - 3)), 0.035, 30, 6))]), 'oilchannel', 0, 0, 0, { label: 'Масляные трубки и сверления блока' })
+  for (const side of ['L', 'R']) {
+    const o = side === 'R' ? 1 : -1
+    banks[side].add(reg(mk(tubeG(rockerFeed(o), 0.035, 30, 6), 'oilchannel', { label: 'Подвод масла к оси коромысел' }), 'oilchannel', 'bank', o))
+  }
+  // сверления коленвала: от коренной шейки через щёку в шатунную, к каждому из двух шатунов
+  for (let k = 0; k < 6; k++) {
+    const xk = PITCH * (k - 2.5), o = PIN_OFF[k] * DEG
+    const parts = []
+    for (const sx of [-1, 1]) {
+      const a = V3(xk + sx * 0.78, -0.24 * Math.cos(o), -0.24 * Math.sin(o))
+      const b = V3(xk + sx * 0.2, (R + 0.18) * Math.cos(o), (R + 0.18) * Math.sin(o))
+      parts.push(cylBetween(a, b, 0.035, 8), at(new THREE.SphereGeometry(0.05, 8, 6), a.x, a.y, a.z))
+    }
+    crankG.add(mk(merge(parts), 'oilchannel', { label: 'Масляные каналы коленвала' }))
+  }
+  // масляный фильтр изнутри: корпус над банкой, гофрированная бумажная шторка, центральная трубка
+  addWorld(new RoundedBoxGeometry(0.9, 0.22, 0.85, 2, 0.05), 'oilfilter', -2.2, 0.11, 1.95, { label: 'Корпус масляного фильтра' })
+  {
+    const star = new THREE.Shape()
+    for (let i = 0; i <= 48; i++) {
+      const p = P((i / 48) * Math.PI * 2, i % 2 ? 0.26 : 0.31)
+      i ? star.lineTo(p.x, p.y) : star.moveTo(p.x, p.y)
+    }
+    const hole = new THREE.Path()
+    hole.absarc(0, 0, 0.13, 0, Math.PI * 2, true)
+    star.holes.push(hole)
+    const el = new THREE.ExtrudeGeometry(star, { depth: 0.8, bevelEnabled: false }).rotateX(-Math.PI / 2).translate(0, -0.42, 0)
+    // банка фильтра: y −1…0, центр −0.5; трубка выходит вверх в корпус
+    addWorld(merge([el, at(new THREE.CylinderGeometry(0.085, 0.085, 1.0, 12, 1, true), 0, 0.08, 0)]), 'filterel', -2.2, -0.5, 1.95)
+  }
+
+  // ================================================================
+  // охлаждение: насос → трубы к рядам → водяные каналы блока → рубашки гильз → головки →
+  // сборные каналы → термостат → радиатор (или перепуск обратно в насос, пока не прогрелся)
+  const WTR = {
+    feedL: [V3(-5.95, -0.3, -1.4), V3(-5.72, 0.35, -1.45), V3(-5.33, 0.72, -1.45)],
+    feedR: [V3(-5.95, -0.55, -0.95), V3(-5.76, -0.62, -0.3), V3(-5.76, -0.62, 0.45), V3(-5.76, -0.45, 0.95), V3(-5.7, 0.4, 1.45), V3(-4.77, 0.72, 1.45)],
+    // перепуск (малый круг): из термостата вниз по передней стенке в насос
+    bypass: [V3(-5.55, 2.72, 0), V3(-5.74, 2.5, -0.25), V3(-5.74, 2.0, -0.65), V3(-5.74, 1.0, -0.95), V3(-5.74, 0.2, -1.0), V3(-5.95, -0.38, -1.05)],
+    // верхний патрубок: термостат → верхний бачок радиатора; нижний: нижний бачок → насос
+    upper: [V3(-6.4, 3.47, 0), V3(-6.9, 3.45, 0), V3(-7.3, 3.25, 0), V3(-7.48, 3.08, 0)],
+    lower: [V3(-7.48, -0.5, -1.1), V3(-7.2, -0.75, -1.9), V3(-6.6, -0.78, -2.35), V3(-6.0, -0.75, -2.3)],
+  }
+  const WGAL = 0.9 // водяной канал ряда: (y 1.35, z = o·0.9) в координатах ряда
+  const WRAIL = 0.66 // сборный канал головок: (y 3.2, z = o·0.66)
+  const wFront = (o) => (o > 0 ? OFF : -OFF) - 5.05
+  // от сборного канала ряда к термостату (в координатах root)
+  const toThermo = (side) => {
+    const o = side === 'R' ? 1 : -1
+    return [banks[side].localToWorld(V3(wFront(o), 3.2, o * WRAIL)), banks[side].localToWorld(V3(wFront(o) - 0.3, 3.25, o * 0.3)), V3(-5.5, 2.85, o * 0.45), V3(-5.55, 2.85, o * 0.18)]
+  }
+  addWorld(merge([tubeG(WTR.feedL, 0.09, 16, 10), tubeG(WTR.feedR, 0.09, 40, 10), tubeG(WTR.bypass, 0.06, 40, 8), tubeG(WTR.upper, 0.12, 20, 12), tubeG(WTR.lower, 0.12, 24, 12), tubeG(toThermo('L'), 0.07, 20, 8), tubeG(toThermo('R'), 0.07, 20, 8)]), 'waterpipe', 0, 0, 0, { label: 'Водяные трубы и патрубки' })
+  for (const side of ['L', 'R']) {
+    const o = side === 'R' ? 1 : -1, sh = o * OFF
+    const list = [
+      at(cylX(0.08, 10.1, 12), sh - 0.1, 1.35, o * WGAL), // канал вдоль ряда у рубашек
+      at(cylX(0.06, 10.15, 10), sh - 0.1, 3.2, o * WRAIL), // сборный канал в головках
+    ]
+    for (const cy of cyls.filter((c) => c.side === side)) {
+      list.push(cylBetween(V3(cy.x, 1.35, o * WGAL), V3(cy.x, 1.35, o * 0.68), 0.05, 8)) // вход в рубашку гильзы
+      list.push(cylBetween(V3(cy.x, 2.8, o * 0.68), V3(cy.x, 3.2, o * 0.68), 0.04, 8)) // переход из рубашки в головку
+    }
+    banks[side].add(reg(mk(merge(list), 'waterpipe', { label: 'Водяные каналы блока и головок' }), 'waterpipe', 'bank', o))
+  }
+  // радиатор перед двигателем: сердцевина из трубок, верхний и нижний бачки
+  addWorld(
+    merge([
+      new THREE.BoxGeometry(0.22, 3.2, 3.0),
+      ...Array.from({ length: 17 }, (_, i) => at(new THREE.BoxGeometry(0.3, 3.2, 0.025), 0, 0, -1.44 + i * 0.18)),
+      at(new RoundedBoxGeometry(0.38, 0.3, 3.15, 2, 0.06), 0, 1.75, 0),
+      at(new RoundedBoxGeometry(0.38, 0.3, 3.15, 2, 0.06), 0, -1.75, 0),
+    ]),
+    'radiator', -7.5, 1.3, 0,
+  )
+  // крыльчатка внутри корпуса водяного насоса
+  const impeller = mk(merge([cylX(0.12, 0.3, 12), ...Array.from({ length: 6 }, (_, i) => at(new THREE.BoxGeometry(0.22, 0.4, 0.05), 0, 0.22, 0).rotateX((i * Math.PI) / 3))]), 'impeller')
+  wp.add(impeller)
+
   // ---------- гибкие трубки: строятся в координатах root по текущему положению концов
   // (перестраиваются при «разборке», чтобы не отрываться от ТНВД, форсунок, компрессоров)
   const tmpW = new THREE.Vector3()
@@ -1017,26 +1116,51 @@ export function createEngine(host, cb = {}, opts = {}) {
     const sh = (side) => (side === 'R' ? OFF : -OFF)
     const tubePts = (id) => tubes.filter((t) => t.mesh.userData.part === id).map((t) => ({ pts: t.pointsFn().map((v) => v.clone()) }))
     const bankCyls = (side) => cyls.filter((c) => c.side === side)
-    // масло: поддон → насос → фильтр → магистраль → коренные опоры → обратно в поддон
+    // масло: маслоприёмник → насос → фильтр (снаружи внутрь через шторку, вверх по центральной трубке) →
+    // главная магистраль → коренные опоры, опоры распредвала, оси коромысел → стекает в поддон
+    const Wb = (side) => (v) => banks[side].localToWorld(v.clone())
     const oil = [
-      path(V3(1.6, -2.86, 0), V3(1.5, -2.45, 0.2), V3(0.2, -2.18, 0.5), V3(-4.4, -2.05, 0.85), V3(-5.5, -1.75, 1.0), V3(-5.85, -1.15, 1.0), V3(-4.6, -0.95, 1.7), V3(-2.2, -1.05, 1.95), V3(-2.2, -0.5, 1.95), V3(-2.2, 0.0, 1.6), V3(-2.2, 0.2, 1.35)),
+      path(V3(1.6, -2.86, 0), V3(1.5, -2.45, 0.2), V3(0.2, -2.18, 0.5), V3(-4.4, -2.05, 0.85), V3(-5.5, -1.75, 1.0), V3(-5.85, -1.15, 1.0)),
+      path(V3(-5.85, -1.15, 1.0), ...OILR.toFilter),
       path(V3(-2.2, 0.2, 1.35), V3(5.4, 0.2, 1.35)),
       path(V3(-2.2, 0.2, 1.35), V3(-5.4, 0.2, 1.35)),
     ]
+    for (const a of [100, 180, 260].map((d) => d * DEG)) {
+      const c = (r) => [-2.2 + r * Math.cos(a), 1.95 + r * Math.sin(a)]
+      const [ox, oz] = c(0.34), [ix, iz] = c(0.18)
+      oil.push({ pts: [OILR.toFilter.at(-1), V3(ox, 0.04, oz), V3(ox, -0.7, oz), V3(ix, -0.72, iz), V3(-2.2, -0.68, 1.95), V3(-2.2, 0.06, 1.95), ...OILR.toGallery], speed: 0.6 })
+    }
     const dir = new THREE.Vector3(0, 0.2, 1.35).normalize()
     for (let i = 0; i < 7; i++) {
       const x = PITCH * (i - 3)
       oil.push({ pts: [V3(x, 0.2, 1.35), V3(x, 0, 0).addScaledVector(dir, 0.38)], speed: 0.6 })
       oil.push({ pts: [V3(x, -0.35, 0.1), V3(x + 0.2, -1.2, 0.2), V3(x + 0.3, -2.05, 0.1)], speed: 0.45 })
+      oil.push({ pts: OILR.toCam(x), speed: 0.6 })
+    }
+    for (const side of ['L', 'R']) {
+      const o = side === 'R' ? 1 : -1, w = Wb(side), gx = ROCK_M + o * OFF
+      oil.push({ pts: rockerFeed(o).map(w), speed: 0.6 })
+      // внутри полой оси коромысел — к каждому коромыслу, оттуда стекает вниз вдоль штанг
+      oil.push(path(w(V3(gx, PIVOT, -o * 0.55)), w(V3(sh(side) + 4.85, PIVOT, -o * 0.55))))
+      oil.push(path(w(V3(gx, PIVOT, -o * 0.55)), w(V3(sh(side) - 4.85, PIVOT, -o * 0.55))))
+      for (const cy of bankCyls(side)) oil.push({ pts: [w(V3(cy.x, PIVOT - 0.1, -o * 0.75)), w(V3(cy.x, 3.2, -o * 1.0)), w(V3(cy.x, 2.3, -o * 1.05))], speed: 0.35 })
     }
     flows.define('oil', '#d8b35c', oil)
-    // охлаждающая жидкость: насос → рубашки рядов → головки → термостат → к радиатору
-    const water = []
+    // охлаждающая жидкость: насос → трубы к рядам → каналы рядов → рубашки гильз → головки →
+    // сборные каналы → термостат → радиатор → насос; пока холодно — перепуск сразу в насос
+    const water = [
+      path(V3(-6.0, -0.75, -1.35), ...WTR.feedL),
+      path(V3(-6.0, -0.75, -1.35), ...WTR.feedR),
+      path(V3(-5.55, 2.85, 0), V3(-5.55, 3.47, 0), ...WTR.upper),
+      path(...WTR.lower),
+      { pts: WTR.bypass, speed: 0.5 },
+    ]
+    for (const z of [-1.2, -0.6, 0, 0.6, 1.2]) water.push({ pts: [V3(-7.5, 3.05, 0), V3(-7.5, 3.05, z), V3(-7.5, -0.45, z), V3(-7.48, -0.5, -1.1)], speed: 0.7 })
     for (const side of ['L', 'R']) {
-      const o = side === 'R' ? 1 : -1
-      water.push(path(V3(-6.0, -0.75, -1.35), V3(-5.6, -0.2, o * 1.1), W(side, -5.0, 1.35, o * 0.85), W(side, 5.1, 1.35, o * 0.85)))
-      for (const cy of bankCyls(side)) water.push({ pts: [W(side, cy.x, 1.4, o * 0.8), W(side, cy.x, 2.4, o * 0.78), W(side, cy.x + 0.25, 3.3, o * 0.55)], speed: 0.6 })
-      water.push(path(W(side, 5.0, 3.3, o * 0.55), W(side, -4.9, 3.3, o * 0.55), W(side, -5.3, 3.3, 0), V3(-5.55, 2.95, 0), V3(-5.55, 3.47, 0), V3(-6.45, 3.47, 0)))
+      const o = side === 'R' ? 1 : -1, w = Wb(side), f = wFront(o)
+      water.push(path(w(V3(f, 1.35, o * WGAL)), w(V3(sh(side) + 4.95, 1.35, o * WGAL))))
+      for (const cy of bankCyls(side)) water.push({ pts: [V3(cy.x, 1.35, o * WGAL), V3(cy.x, 1.35, o * 0.7), V3(cy.x, 1.9, o * 0.7), V3(cy.x, 2.8, o * 0.68), V3(cy.x, 3.2, o * 0.68)].map(w), speed: 0.6 })
+      water.push(path(w(V3(sh(side) + 4.95, 3.2, o * WRAIL)), w(V3(f, 3.2, o * WRAIL)), ...toThermo(side).slice(1)))
     }
     flows.define('water', '#86a8c6', water)
     // воздух: фильтры → компрессоры → охладитель → коллектор → патрубки → каналы головок → впускные клапаны
@@ -1109,6 +1233,7 @@ export function createEngine(host, cb = {}, opts = {}) {
     fly.rotation.x = th
     gearC.rotation.x = th
     damper.rotation.x = th
+    impeller.rotation.x = th * 1.6
     gearI.rotation.x = rotI0 - th * (NC / NI)
     gearK.rotation.x = rotK0 + th * (NC / NK)
     for (const cy of cyls) {
@@ -1148,7 +1273,7 @@ export function createEngine(host, cb = {}, opts = {}) {
   // ================================================================
   // внешний вид: подсветка, слои, прозрачность корпуса
   // hidden — детали, скрытые пользователем; solo — показывать детали только одного цилиндра
-  const state = { selected: null, hover: null, layer: 'all', casing: 0.3, cylinder: null, only: null, fresh: null, op: false, glass: true, hidden: new Set(), solo: null, flows: null }
+  const state = { selected: null, hover: null, layer: 'all', casing: 0.3, cylinder: null, only: null, fresh: null, op: false, glass: true, hidden: new Set(), solo: null, flows: null, xray: null }
   const soloOn = () => (state.only ? null : state.solo)
   // «стеклянный» двигатель в режиме работы: стенки почти прозрачные, внутренности видно
   const GLASS = { block: 0.1, liner: 0.13, jacket: 0.05, head: 0.16, cover: 0.12, oilpan: 0.15, oil: 0.25, manifold_in: 0.35, manifold_ex: 0.4, intercooler: 0.55, headbolt: 0.5, maincap: 0.4 }
@@ -1190,6 +1315,9 @@ export function createEngine(host, cb = {}, opts = {}) {
           emisI = 0.22
         }
       }
+      if (!state.only && state.xray?.includes(p.id) && !state.selected) op = Math.min(op, 0.28)
+      // рубашки охлаждения заметнее, когда бежит поток воды
+      if (p.id === 'jacket' && state.flows?.includes('water')) op = Math.max(op, 0.4)
       if (!state.only && state.hidden.has(p.id)) op = 0
       const tr = op < 0.99
       if (m.transparent !== tr) m.needsUpdate = true
@@ -1286,7 +1414,7 @@ export function createEngine(host, cb = {}, opts = {}) {
   function fitScale() {
     const vf = (camera.fov * Math.PI) / 180
     const hf = 2 * Math.atan(Math.tan(vf / 2) * camera.aspect)
-    const d = 7 / Math.sin(Math.min(vf, hf) / 2)
+    const d = 7.6 / Math.sin(Math.min(vf, hf) / 2)
     return Math.min(3, Math.max(0.85, d / 22.6))
   }
   function viewPos(name) {
@@ -1489,6 +1617,11 @@ export function createEngine(host, cb = {}, opts = {}) {
     // потоки систем без подсветки слоя (для наборов «Что показывать»): ['air', 'exhaust'] | null
     setFlows(ids) {
       state.flows = ids
+      applyLook()
+    },
+    // полупрозрачные детали (видно каналы внутри): ['crank', …] | null
+    setXray(ids) {
+      state.xray = ids
       applyLook()
     },
     setNumbers(v) {

@@ -161,6 +161,7 @@ function applyPreset(p) {
   vis.hidden = p.parts ? allIds.filter((id) => !p.parts.includes(id) && !(id === 'gearmark' && p.parts.includes('gear'))) : []
   if (p.flows) s.layer = 'all'
   eng?.setFlows(p.flows || null)
+  eng?.setXray(p.xray || null)
   if (s.selected && vis.hidden.includes(s.selected)) select(null)
   eng?.setHidden(vis.hidden)
   setSolo(p.solo, false)
@@ -192,6 +193,7 @@ function toggleGroup(g) {
 const groupHidden = (g) => g.parts.every((p) => vis.hidden.includes(p.id))
 function resetVisibility(fly = true) {
   eng?.setFlows(null)
+  eng?.setXray(null)
   vis.preset = 'all'
   vis.hidden = []
   eng?.setHidden([])
