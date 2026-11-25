@@ -7,6 +7,8 @@ import { DETAILS, QUIZ } from '../model3d/partsDetails.js'
 import { ASSEMBLY, TIGHTEN } from '../model3d/assemblySteps.js'
 import { ROUTES } from '../model3d/systemRoutes.js'
 import { cylState, EPS } from '../model3d/operation.js'
+import { SHOW_PRESETS } from '../model3d/showPresets.js'
+import ModelVisibility from '../components/ModelVisibility.vue'
 import { getLesson, getTerm } from '../lib/content.js'
 import { ui } from '../lib/store.js'
 
@@ -62,6 +64,8 @@ const tabs = [
 ]
 
 function select(id, focus = false) {
+  // выбрали скрытую деталь — показываем её снова
+  if (id && vis.hidden.includes(id)) toggleHidden(id)
   s.selected = id
   if (!id) s.pickCyl = null
   eng?.select(id, { focus, keepMesh: !focus })
@@ -149,6 +153,52 @@ const crankAngle = computed(() => Math.round(theta.value % 360))
 const cycleAngle = computed(() => Math.round(theta.value))
 
 // ================================================================
+// что показывать: наборы деталей, один цилиндр, скрытие отдельных деталей
+const vis = reactive({ preset: 'all', hidden: [], solo: null })
+const allIds = PARTS.map((p) => p.id)
+function applyPreset(p) {
+  vis.preset = p.id
+  vis.hidden = p.parts ? allIds.filter((id) => !p.parts.includes(id) && !(id === 'gearmark' && p.parts.includes('gear'))) : []
+  if (p.flows) s.layer = 'all'
+  eng?.setFlows(p.flows || null)
+  if (s.selected && vis.hidden.includes(s.selected)) select(null)
+  eng?.setHidden(vis.hidden)
+  setSolo(p.solo, false)
+  if (p.solo) eng?.focusCylinder(p.solo)
+  else eng?.view('iso')
+}
+function setSolo(c, fly = true) {
+  vis.solo = c
+  eng?.setSolo(c)
+  if (tab.value === 'work' && c) workFollow(c)
+  else if (fly) c ? eng?.focusCylinder(c) : eng?.view('iso')
+}
+function toggleHidden(id) {
+  const i = vis.hidden.indexOf(id)
+  if (i >= 0) vis.hidden.splice(i, 1)
+  else vis.hidden.push(id)
+  if (id === 'gear') toggleHidden('gearmark')
+  vis.preset = vis.hidden.length ? 'custom' : 'all'
+  eng?.setHidden(vis.hidden)
+}
+function toggleGroup(g) {
+  const ids = g.parts.map((p) => p.id)
+  const anyShown = ids.some((id) => !vis.hidden.includes(id))
+  vis.hidden = anyShown ? [...new Set([...vis.hidden, ...ids])] : vis.hidden.filter((id) => !ids.includes(id))
+  vis.preset = vis.hidden.length ? 'custom' : 'all'
+  if (s.selected && vis.hidden.includes(s.selected)) select(null)
+  eng?.setHidden(vis.hidden)
+}
+const groupHidden = (g) => g.parts.every((p) => vis.hidden.includes(p.id))
+function resetVisibility(fly = true) {
+  eng?.setFlows(null)
+  vis.preset = 'all'
+  vis.hidden = []
+  eng?.setHidden([])
+  setSolo(null, fly)
+}
+
+// ================================================================
 // разрез
 const sect = reactive({ mode: 'none', pair: 1 })
 const sectModes = [
@@ -215,6 +265,7 @@ function shuffle(n) {
   return a
 }
 function startQuiz() {
+  resetVisibility(false)
   Object.assign(quiz, { running: true, order: shuffle(QUIZ.length).slice(0, 10), i: 0, score: 0, tries: 0, state: null, wrong: '', hint: false, done: false })
   select(null)
   s.explode = 0.35
@@ -376,6 +427,7 @@ function enterWork() {
   setSection('none')
   work.cut = false
   select(null)
+  if (vis.solo) work.follow = vis.solo
   s.speed = 0.25
   s.playing = true
   eng?.setOperation(true)
@@ -584,6 +636,15 @@ const sheetTitle = computed(() => {
             </section>
           </Transition>
 
+          <ModelVisibility
+            :preset="vis.preset"
+            :solo="vis.solo"
+            :hidden-count="vis.hidden.length"
+            @preset="applyPreset"
+            @solo="setSolo"
+            @reset="resetVisibility()"
+          />
+
           <section class="mp-block">
             <div class="mp-title">Корпус</div>
             <div class="seg wide">
@@ -648,20 +709,29 @@ const sheetTitle = computed(() => {
           </section>
 
           <section v-for="g in groups" :key="g.id" class="mp-block">
-            <div class="mp-title">{{ g.title }}</div>
+            <div class="mp-title group-title">
+              <span>{{ g.title }}</span>
+              <button type="button" class="group-eye" @click="toggleGroup(g)">{{ groupHidden(g) ? 'Показать все' : 'Скрыть все' }}</button>
+            </div>
             <div class="part-list">
-              <button
-                v-for="p in g.parts"
-                :key="p.id"
-                type="button"
-                class="part-row"
-                :class="{ on: s.selected === p.id }"
-                @click="pickFromList(p.id)"
-              >
-                <i :style="{ background: p.color }" />
-                <span>{{ p.name }}</span>
-                <small v-if="p.count > 1">×{{ p.count }}</small>
-              </button>
+              <div v-for="p in g.parts" :key="p.id" class="part-line" :class="{ off: vis.hidden.includes(p.id) }">
+                <button type="button" class="part-row" :class="{ on: s.selected === p.id }" @click="pickFromList(p.id)">
+                  <i :style="{ background: p.color }" />
+                  <span>{{ p.name }}</span>
+                  <small v-if="p.count > 1">×{{ p.count }}</small>
+                </button>
+                <button
+                  type="button"
+                  class="eye"
+                  :aria-pressed="!vis.hidden.includes(p.id)"
+                  :title="vis.hidden.includes(p.id) ? 'Показать на модели' : 'Скрыть на модели'"
+                  :aria-label="(vis.hidden.includes(p.id) ? 'Показать: ' : 'Скрыть: ') + p.name"
+                  @click="toggleHidden(p.id)"
+                >
+                  <svg v-if="!vis.hidden.includes(p.id)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>
+                  <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18" /><path d="M10.6 5.1A10.6 10.6 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6A17.4 17.4 0 0 0 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /></svg>
+                </button>
+              </div>
             </div>
           </section>
         </template>
@@ -770,8 +840,19 @@ const sheetTitle = computed(() => {
             <div class="quiz-btns">
               <button class="btn-ghost" :class="{ active: work.cut }" type="button" @click="workCut">{{ work.cut ? 'Убрать разрез' : 'Разрез через цилиндр' }}</button>
               <button class="btn-ghost" type="button" @click="workFollow(work.follow)">Камера к цилиндру</button>
+              <button class="btn-ghost" :class="{ active: vis.solo === work.follow }" type="button" @click="setSolo(vis.solo === work.follow ? null : work.follow)">{{ vis.solo === work.follow ? 'Все цилиндры' : 'Только этот цилиндр' }}</button>
             </div>
           </section>
+
+          <ModelVisibility
+            :preset="vis.preset"
+            :solo="vis.solo"
+            :hidden-count="vis.hidden.length"
+            compact
+            @preset="applyPreset"
+            @solo="setSolo"
+            @reset="resetVisibility()"
+          />
 
           <section class="mp-block">
             <div class="mp-title">Эффекты</div>
@@ -798,9 +879,9 @@ const sheetTitle = computed(() => {
           <section class="part-card">
             <div class="pc-sub">Откуда что берётся</div>
             <ul class="work-src">
-              <li><i style="background: #8aa37b" /><span><b>Воздух</b> — снаружи через воздушный фильтр (на модели нет) в колёса компрессоров, затем через охладитель во впускной коллектор и к впускным клапанам.</span></li>
+              <li><i style="background: #8aa37b" /><span><b>Воздух</b> — снаружи через воздушный фильтр в колёса компрессоров, затем через охладитель во впускной коллектор, по патрубку и каналу головки к впускному клапану.</span></li>
               <li><i style="background: #c47a45" /><span><b>Топливо</b> — из бака через фильтр в ТНВД. Насос по очереди посылает порцию по трубке высокого давления к форсунке нужного цилиндра.</span></li>
-              <li><i style="background: #958e84" /><span><b>Газы</b> — через выпускные клапаны в коллектор ряда, на турбину и в выпускную трубу. Турбина крутит компрессор: энергия выхлопа идёт на наддув.</span></li>
+              <li><i style="background: #958e84" /><span><b>Газы</b> — через выпускной клапан и канал головки в коллектор ряда, на турбину и в выпускную трубу. Турбина крутит компрессор: энергия выхлопа идёт на наддув.</span></li>
             </ul>
           </section>
         </template>
@@ -997,6 +1078,16 @@ const sheetTitle = computed(() => {
 .switch input:checked + .track .thumb { transform: translateX(16px); background: var(--bg); box-shadow: none; }
 .switch input:focus-visible + .track { outline: 2px solid var(--accent); outline-offset: 2px; }
 .part-list { display: flex; flex-direction: column; gap: 2px; }
+.group-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.group-eye { border: 0; background: none; padding: 0; font: inherit; font-size: 11px; letter-spacing: 0.04em; color: var(--text-3); cursor: pointer; text-transform: uppercase; }
+.group-eye:hover { color: var(--text); }
+.part-line { display: flex; align-items: center; gap: 2px; }
+.part-line .part-row { flex: 1; min-width: 0; }
+.part-line .eye { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border: 0; background: none; border-radius: var(--radius); color: var(--text-3); transition: background 0.15s, color 0.15s; }
+.part-line .eye:hover { background: var(--surface-2); color: var(--text); }
+.part-line .eye svg { width: 17px; height: 17px; }
+.part-line.off .part-row { opacity: 0.45; }
+.part-line.off .eye { color: var(--accent); }
 .part-row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border: 0; background: none; border-radius: var(--radius); text-align: left; font-size: 13.5px; color: var(--text-2); transition: background 0.15s, color 0.15s; }
 .part-row i { width: 12px; height: 12px; border-radius: 1px; flex: none; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15); }
 .part-row small { margin-left: auto; color: var(--text-3); font-size: 12px; }

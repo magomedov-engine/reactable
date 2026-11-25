@@ -150,7 +150,7 @@ function particlePool(parent, n, size, tex) {
 
 // ================================================================
 export function createOperation(ctx) {
-  const { root, banks, cyls, hpCurve, DECK, IN_WIN, EX_WIN, FIRE_AT, lift } = ctx
+  const { root, banks, cyls, hpCurve, DECK, IN_WIN, EX_WIN, FIRE_AT, lift, inPath, exPath } = ctx
   const group = new THREE.Group()
   group.visible = false
   root.add(group)
@@ -221,10 +221,10 @@ export function createOperation(ctx) {
   root.updateMatrixWorld(true)
   const lanes = per.map((p) => {
     const cy = p.cy
-    const o = cy.out
     const xi = cy.x - 0.3, xe = cy.x + 0.3
-    const inCurve = new THREE.CatmullRomCurve3([new THREE.Vector3(xi, 3.08, 0), W(cy, xi, 3.45, -o * 0.12), W(cy, xi, 3.22, 0), W(cy, xi, DECK - 0.02, 0)])
-    const exCurve = new THREE.CatmullRomCurve3([W(cy, xe, DECK - 0.02, 0), W(cy, xe, 3.25, 0), W(cy, xe, 3.45, o * 0.3), W(cy, cy.x + 0.1, 3.5, o * 1.3)])
+    // по впускному патрубку и каналу головки к клапану; от клапана по выпускному каналу в коллектор
+    const inCurve = new THREE.CatmullRomCurve3([...inPath(cy).slice(0, -2), W(cy, xi, DECK - 0.02, 0)], false, 'centripetal')
+    const exCurve = new THREE.CatmullRomCurve3([W(cy, xe, DECK - 0.02, 0), ...exPath(cy).slice(2)], false, 'centripetal')
     const seeds = (n) => Array.from({ length: n }, (_, i) => ({ u: i / n, rx: (Math.random() - 0.5) * 0.7, rz: (Math.random() - 0.5) * 0.7, k: Math.random() }))
     return { cy, inCurve, exCurve, inP: seeds(K), exP: seeds(K) }
   })
@@ -269,6 +269,7 @@ export function createOperation(ctx) {
   let enabled = false
   let follow = null
   let focusAll = false
+  let solo = null // показан только один цилиндр: эффекты остальных прячем
   const tmpV = new THREE.Vector3()
   const tmpW = new THREE.Vector3()
   let turbo = 0
@@ -288,6 +289,12 @@ export function createOperation(ctx) {
       const psi = mod(theta - FIRE_AT[cy.c], 720)
       const st = cylState(psi)
       p.st = st
+      if (solo && solo !== cy.c) {
+        p.gas.visible = p.glow.visible = p.spray.visible = p.arrow.visible = false
+        for (let j = 0; j < K; j++) inPool.park(i * K + j), exPool.park(i * K + j)
+        for (let j = 0; j < TRAIL; j++) fuelPool.park(i * TRAIL + j)
+        continue
+      }
       const crown = cy.sPin + 0.5
       // газ
       p.gas.visible = fx.gas
@@ -403,6 +410,9 @@ export function createOperation(ctx) {
     },
     setFx(key, v) {
       fx[key] = v
+    },
+    setSolo(c) {
+      solo = c || null
     },
     setFollow(c, all = false) {
       follow = c

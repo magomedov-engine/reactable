@@ -134,7 +134,7 @@ export function createFlows(parent) {
     for (let i = 0; i < s.parts.length; i++) {
       const p = s.parts[i]
       const c = s.curves[p.ci]
-      p.u = (p.u + (dt * s.speed * c.speed) / c.len) % 1
+      p.u = ((((p.u + (dt * s.speed * c.speed) / c.len) % 1) + 1) % 1) || 0
       c.curve.getPointAt(p.u, tmp)
       a[i * 3] = tmp.x
       a[i * 3 + 1] = tmp.y

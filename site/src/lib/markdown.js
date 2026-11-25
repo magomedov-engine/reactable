@@ -1,5 +1,6 @@
 import MarkdownIt from 'markdown-it'
 import { resolveWikilink, scheme } from './content.js'
+import { REPLACE, INSERTS } from '../lessons3d/registry.js'
 
 // --- иконки врезок (простые линейные, 24×24)
 const ICONS = {
@@ -57,6 +58,8 @@ function figureHtml(target, env) {
   if (!s) {
     return `<div class="figure-missing">${icon('example')}<span>Здесь будет ваше фото: <code>${esc(name)}</code></span></div>`
   }
+  // схема, для которой есть 3D-сцена: показываем 3D-блок (схема остаётся во вкладке «Схема»)
+  if (REPLACE[name]) return l3dHtml(REPLACE[name], s.url, s.caption)
   env.figures = env.figures || []
   const idx = env.figures.length
   env.figures.push({ type: 'img', src: s.url, caption: s.caption })
@@ -67,6 +70,35 @@ function figureHtml(target, env) {
 </button>
 <figcaption>${esc(s.caption)}</figcaption>
 </figure>`
+}
+
+// место для 3D-блока: компонент монтирует LessonView
+function l3dHtml(id, poster = '', caption = '') {
+  return `<div class="l3d-mount" data-scene="${esc(id)}" data-poster="${esc(poster)}" data-caption="${esc(caption)}"></div>
+`
+}
+
+// дополнительные 3D-блоки по урокам: после первого абзаца раздела, заголовок которого содержит подстроку
+function insertsPlugin(md) {
+  md.core.ruler.push('l3d_inserts', (state) => {
+    const list = INSERTS[state.env?.lesson]
+    if (!list?.length) return
+    const t = state.tokens
+    for (const ins of list) {
+      const needle = ins.heading.toLowerCase()
+      const h = t.findIndex((tok, i) => tok.type === 'heading_open' && t[i + 1]?.content.toLowerCase().includes(needle))
+      if (h < 0) continue
+      let at = h + 3 // сразу после заголовка
+      // если раздел начинается с абзаца — ставим после него, чтобы сначала шёл текст
+      if (t[at]?.type === 'paragraph_open' && t[at].level === 0) {
+        const close = t.findIndex((tok, i) => i > at && tok.type === 'paragraph_close' && tok.level === 0)
+        if (close > 0) at = close + 1
+      }
+      const tok = new state.Token('html_block', '', 0)
+      tok.content = l3dHtml(ins.scene)
+      t.splice(at, 0, tok)
+    }
+  })
 }
 
 // Абзац, состоящий только из ![[...]], превращаем в блок (без обёртки <p>)
@@ -184,10 +216,10 @@ function miscPlugin(md) {
 }
 
 const md = new MarkdownIt({ html: false, linkify: true, typographer: false, breaks: false })
-md.use(wikilinkPlugin).use(blockEmbedPlugin).use(calloutPlugin).use(headingPlugin).use(miscPlugin)
+md.use(wikilinkPlugin).use(blockEmbedPlugin).use(calloutPlugin).use(headingPlugin).use(miscPlugin).use(insertsPlugin)
 
-export function renderMarkdown(src) {
-  const env = { toc: [], figures: [] }
+export function renderMarkdown(src, lesson = '') {
+  const env = { toc: [], figures: [], lesson }
   const html = md.render(src, env)
   return { html, toc: env.toc.filter((h) => h.level === 2), figures: env.figures }
 }

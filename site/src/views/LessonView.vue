@@ -1,5 +1,6 @@
 <script setup>
-import { computed, ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, nextTick, watch, createApp } from 'vue'
+import Scene3D from '../components/Scene3D.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getLesson, lessonSource, lessonNeighbours, lessonLabel, sectionTitle, lessons } from '../lib/content.js'
 import { renderMarkdown } from '../lib/markdown.js'
@@ -17,7 +18,7 @@ const nav = computed(() => lessonNeighbours(lesson.value.id))
 const rendered = computed(() => {
   // раздел «Дальше» заменён собственной навигацией внизу страницы
   const src = lessonSource(lesson.value.id).replace(/\n##\s*➡[^\n]*\n[\s\S]*$/, '\n')
-  return renderMarkdown(src)
+  return renderMarkdown(src, lesson.value.id)
 })
 const done = computed(() => isDone(lesson.value.id))
 // уроки про двигатель → какую деталь показать в 3D
@@ -85,7 +86,22 @@ onMounted(async () => {
   else if (route.query.resume && progress.last?.y) window.scrollTo({ top: progress.last.y })
   window.addEventListener('scroll', onScroll, { passive: true })
   renderMermaid(body.value, isDark.value)
+  mount3d()
 })
+
+// 3D-блоки внутри текста урока (текст вставлен через v-html, поэтому монтируем вручную)
+const apps3d = []
+function mount3d() {
+  if (!body.value) return
+  for (const el of body.value.querySelectorAll('.l3d-mount')) {
+    const app = createApp(Scene3D, { id: el.dataset.scene, poster: el.dataset.poster || '', caption: el.dataset.caption || '' })
+    app.mount(el)
+    apps3d.push(app)
+  }
+}
+function unmount3d() {
+  apps3d.splice(0).forEach((a) => a.unmount())
+}
 watch(isDark, async (d) => {
   if (!body.value) return
   body.value.querySelectorAll('.mermaid-wrap').forEach((b) => b.classList.remove('ready'))
@@ -99,6 +115,7 @@ watch(isDark, async (d) => {
   renderMermaid(body.value, d)
 })
 onBeforeUnmount(() => {
+  unmount3d()
   observer?.disconnect()
   window.removeEventListener('scroll', onScroll)
 })
