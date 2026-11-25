@@ -9,6 +9,7 @@ import { ROUTES } from '../model3d/systemRoutes.js'
 import { cylState, EPS } from '../model3d/operation.js'
 import { SHOW_PRESETS } from '../model3d/showPresets.js'
 import ModelVisibility from '../components/ModelVisibility.vue'
+import TightenCard from '../components/TightenCard.vue'
 import { getLesson, getTerm } from '../lib/content.js'
 import { ui } from '../lib/store.js'
 
@@ -220,7 +221,7 @@ const asm = reactive({ i: 0 })
 const step = computed(() => ASSEMBLY[asm.i])
 const stepParts = computed(() => (step.value?.show || []).filter((id) => PART[id]))
 const stepLesson = computed(() => (step.value?.lesson ? getLesson(step.value.lesson) : null))
-const stepTighten = computed(() => stepParts.value.map((id) => TIGHTEN?.[id]).filter(Boolean))
+const stepTighten = computed(() => stepParts.value.filter((id) => TIGHTEN?.[id]))
 function shownUpTo(i) {
   const set = new Set()
   for (const st of ASSEMBLY.slice(0, i + 1)) st.show.forEach((id) => set.add(id))
@@ -588,6 +589,8 @@ const sheetTitle = computed(() => {
                 </ul>
               </div>
 
+              <TightenCard v-if="TIGHTEN[info.id]" :kind="info.id" :eng="eng" :cyl="s.pickCyl" />
+
               <template v-if="det">
                 <details v-if="det.how" class="pc-more" open>
                   <summary>Как работает</summary>
@@ -764,10 +767,7 @@ const sheetTitle = computed(() => {
                   <li v-for="x in step.check" :key="x">{{ x }}</li>
                 </ul>
               </div>
-              <div v-for="t in stepTighten" :key="t.title" class="asm-sec tighten">
-                <div class="pc-sub">{{ t.title }}</div>
-                <p>{{ t.note }}</p>
-              </div>
+              <TightenCard v-for="id in stepTighten" :key="id" :kind="id" :eng="eng" />
               <div v-if="step.doc" class="asm-doc"><b>В карту сборки:</b> {{ step.doc }}</div>
               <div v-if="step.warn" class="asm-warn">{{ step.warn }}</div>
               <RouterLink v-if="stepLesson" :to="`/lesson/${stepLesson.id}`" class="pc-lesson">
