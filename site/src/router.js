@@ -20,13 +20,15 @@ export const router = createRouter({
     { path: '/glossary/:slug?', name: 'glossary', component: GlossaryView, meta: { title: 'Глоссарий' } },
     { path: '/exam', name: 'exam', component: () => import('./views/ExamView.vue'), meta: { title: 'Итоговый экзамен' } },
     { path: '/cards', name: 'cards', component: () => import('./views/CardsView.vue'), meta: { title: 'Карточки' } },
+    { path: '/trainers', name: 'trainers', component: () => import('./views/TrainersView.vue'), meta: { title: 'Тренажёры' } },
+    { path: '/mentor', name: 'mentor', component: () => import('./views/MentorView.vue'), meta: { title: 'Первая смена и наставник' } },
     // three.js грузится только при открытии этой страницы
     { path: '/model', name: 'model', component: () => import('./views/ModelView.vue'), meta: { title: '3D-модель ЯМЗ-240М2' } },
     { path: '/:pathMatch(.*)*', name: 'notfound', component: NotFound, meta: { title: 'Не найдено' } },
   ],
   scrollBehavior(to, from, saved) {
     if (saved) return saved
-    if (to.name === from.name && (to.name === 'glossary' || to.name === 'model')) return false
+    if (to.name === from.name && (to.name === 'glossary' || to.name === 'model' || to.name === 'trainers')) return false
     return { top: 0 }
   },
 })

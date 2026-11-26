@@ -139,8 +139,35 @@ if (fs.existsSync(cardsFile)) {
   }
 }
 fs.writeFileSync(path.join(out, 'cards.json'), JSON.stringify(cards, null, 1))
+
+// --- наставник: вопросы из разделов «… вопроса наставнику» всех уроков и чек-лист первой смены
+const mentorQuestions = []
+for (const l of lessons) {
+  const src = fs.readFileSync(path.join(out, 'lessons', `${l.id}.md`), 'utf8').split(/\r?\n/)
+  const start = src.findIndex((x) => /^##\s.*наставнику/i.test(x))
+  if (start < 0) continue
+  for (let i = start + 1; i < src.length && !/^##\s/.test(src[i]); i++) {
+    const m = src[i].match(/^\s*(?:\d+[.)]|[-*])\s+(.+)$/)
+    if (m) mentorQuestions.push({ id: `${l.id}#${mentorQuestions.filter((q) => q.lessonId === l.id).length}`, lessonId: l.id, text: m[1].trim() })
+  }
+}
+const checklist = []
+const checkFile = path.join(vault, '04_Практика', 'Чек-лист_первой_смены.md')
+if (fs.existsSync(checkFile)) {
+  for (const line of parseFrontmatter(fs.readFileSync(checkFile, 'utf8')).body.split(/\r?\n/)) {
+    const h = line.match(/^##\s+(.+)$/)
+    if (h) checklist.push({ title: h[1].trim(), items: [] })
+    const m = line.match(/^- \[[ xX]\]\s+(.+)$/)
+    if (m && checklist.length) {
+      const text = m[1].trim()
+      // id по тексту пункта: отметки не сбиваются, если пункты переставить
+      checklist.at(-1).items.push({ id: 'c-' + translit(text.replace(/\*\*/g, '')).slice(0, 60), text })
+    }
+  }
+}
+fs.writeFileSync(path.join(out, 'mentor.json'), JSON.stringify({ questions: mentorQuestions, checklist }, null, 1))
 fs.writeFileSync(
   path.join(out, 'manifest.json'),
   JSON.stringify({ sections: SECTIONS.map(({ id, title }) => ({ id, title })), lessons, schemes }, null, 1),
 )
-console.log(`[sync] уроков: ${lessons.length}, терминов: ${glossary.length}, схем: ${Object.keys(schemes).length}, карточек: ${cards.length}`)
+console.log(`[sync] уроков: ${lessons.length}, терминов: ${glossary.length}, схем: ${Object.keys(schemes).length}, карточек: ${cards.length}, вопросов наставнику: ${mentorQuestions.length}`)

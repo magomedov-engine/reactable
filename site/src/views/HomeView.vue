@@ -90,6 +90,7 @@ function reset() {
             <template v-if="p.day === REVIEW_DAY">
               <RouterLink to="/exam" class="plan-link" :class="{ done: exam.passed }">Итоговый экзамен</RouterLink>
               <RouterLink to="/cards" class="plan-link">Карточки: термины, числа, правила</RouterLink>
+              <RouterLink to="/mentor" class="plan-link">Чек-лист первой смены и вопросы наставнику</RouterLink>
             </template>
             <div v-if="p.note" class="plan-note">{{ p.note }}</div>
           </div>

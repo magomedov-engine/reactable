@@ -584,6 +584,18 @@ details.callout-question { border-width: 1px; }
   .quiz-actions .btn { flex: 1; justify-content: center; align-items: center; }
 }
 
+/* тренажёры */
+.tr-top { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin-top: 12px; }
+.tr-task { margin: 0; flex: 1 1 320px; color: var(--text-2); }
+.tr-task b { color: var(--text); }
+.seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--radius); overflow: hidden; }
+.seg.wrap { flex-wrap: wrap; border: 0; gap: 6px; }
+.seg button { padding: 6px 12px; font-size: 13.5px; background: var(--surface); border: 0; color: var(--text-2); }
+.seg.wrap button { border: 1px solid var(--border); border-radius: var(--radius); }
+.seg button + button { border-left: 1px solid var(--border-strong); }
+.seg.wrap button + button { border-left: 1px solid var(--border); }
+.seg button.on { background: var(--accent); color: var(--accent-ink); }
+
 /* ============ Анимации ============ */
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
@@ -686,6 +698,13 @@ details.callout-question { border-width: 1px; }
   .card:hover, .btn:hover, .pager-card:hover { transform: none; }
 }
 @media print {
+  /* на бумаге — светлая палитра: тёмный фон не печатается, а светлый текст на белом не виден */
+  :root {
+    --bg: #fff; --surface: #fff; --surface-2: #f4f4f4; --surface-3: #e6e6e6; --border: #bbb; --border-strong: #888;
+    --text: #000; --text-2: #222; --text-3: #555; --accent: #000; --accent-strong: #000; --accent-soft: transparent; --link: #000;
+    --ok: #2e6b2e; color-scheme: light;
+  }
+  body { background: #fff; color: #000; }
   .topbar, .sidenav, .toc, .toc-mobile, .lesson-end { display: none !important; }
   .main { margin: 0; padding: 0; }
   details.callout > .callout-body { display: block; }

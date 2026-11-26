@@ -43,7 +43,26 @@ export function resetProgress() {
   Object.assign(exam, { best: 0, total: 0, passed: false, attempts: [], wrong: [] })
   for (const k of Object.keys(cardState)) delete cardState[k]
   Object.assign(cardsDay, { date: '', fresh: 0 })
+  for (const k of Object.keys(trainerStats)) delete trainerStats[k]
 }
+
+// ---------- тренажёры: { [id]: { ok, n, streak, best } } — верных ответов, всего, серия подряд, лучшая серия
+export const trainerStats = reactive(load('trainers', {}))
+watch(trainerStats, (v) => save('trainers', v), { deep: true })
+export function recordTrainer(id, ok) {
+  const t = (trainerStats[id] ||= { ok: 0, n: 0, streak: 0, best: 0 })
+  t.n++
+  if (ok) {
+    t.ok++
+    t.streak++
+    t.best = Math.max(t.best, t.streak)
+  } else t.streak = 0
+}
+
+// ---------- первая смена и наставник: отметки чек-листа, «спросил», записанные ответы, свои вопросы
+// (не сбрасывается вместе с прогрессом курса: это личные записи)
+export const mentor = reactive(Object.assign({ checked: {}, asked: {}, answers: {}, own: [] }, load('mentor', {})))
+watch(mentor, (v) => save('mentor', v), { deep: true })
 
 // ---------- карточки: { [id]: { box, due: 'ГГГГ-ММ-ДД', reps, lapses } }; расписание — lib/cards.js
 export const cardState = reactive(load('cards', {}))

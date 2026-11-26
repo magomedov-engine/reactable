@@ -47,9 +47,17 @@ const total = lessons.length
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="14" rx="1.5" /><path d="M7 3h13a1 1 0 0 1 1 1v13" /></svg>
         Карточки <span v-if="cardsToday" class="count new" title="Карточек на сегодня">{{ cardsToday }}</span>
       </RouterLink>
+      <RouterLink to="/trainers" class="nav-top" :class="{ active: route.name === 'trainers' }">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h13v8H3z" /><path d="M6 8v3M9 8v4M12 8v3" /><path d="M16 10h3a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-3" /></svg>
+        Тренажёры
+      </RouterLink>
       <RouterLink to="/exam" class="nav-top" :class="{ active: route.name === 'exam' }">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6v3H9z" /><path d="M15 5h3v16H6V5h3" /><path d="m9 13 2 2 4-4" /></svg>
         Итоговый экзамен <span v-if="exam.passed" class="count">сдан</span>
+      </RouterLink>
+      <RouterLink to="/mentor" class="nav-top" :class="{ active: route.name === 'mentor' }">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20" /></svg>
+        Первая смена и наставник
       </RouterLink>
 
       <div v-for="s in sections" :key="s.id" class="nav-section">

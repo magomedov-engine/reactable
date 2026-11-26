@@ -29,6 +29,14 @@ const modelLink = computed(() => {
   if (p === undefined) return null
   return p ? { path: '/model', query: { part: p } } : { path: '/model' }
 })
+// уроки, к которым есть тренажёр
+const TRAINER = {
+  'basics-05': { t: 'caliper', title: 'Тренажёр: прочитайте штангенциркуль и микрометр', text: 'Случайные показания на шкалах и разбор: где целые, где доли, где половинка.' },
+  'basics-07': { t: 'torque', title: 'Тренажёр: порядок затяжки', text: 'Нажимайте болты крышки, фланца, головки и коренных крышек по порядку — от центра, крест-накрест, по проходам.' },
+  'extra-04': { t: 'units', title: 'Тренажёр: перевод единиц', text: 'Сотки, микроны, Н·м и кгс·м, бары и МПа, градусы доворота — случайные задания с разбором.' },
+  'engine-02': { t: 'torque', title: 'Тренажёр: порядок затяжки головки и коренных крышек', text: 'От центра к краям, крест-накрест, в несколько проходов.' },
+}
+const trainer = computed(() => TRAINER[lesson.value.id] || null)
 const figCount = computed(() => rendered.value.figures.length)
 const questionCount = computed(() => (lessonSource(lesson.value.id).match(/\[!question\]-/g) || []).length)
 const quizCount = computed(() => rendered.value.quiz.length)
@@ -201,6 +209,17 @@ const position = computed(() => `${nav.value.index + 1} из ${lessons.length}`)
           <div class="promo-text">
             <strong>Посмотреть в 3D</strong>
             <span>Найдите детали из этого урока на модели двигателя и посмотрите, как они двигаются.</span>
+          </div>
+          <span class="promo-go">Открыть →</span>
+        </RouterLink>
+
+        <RouterLink v-if="trainer" :to="{ path: '/trainers', query: { t: trainer.t } }" class="promo-3d in-lesson">
+          <div class="promo-cube" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h13v8H3z" /><path d="M6 8v3M9 8v4M12 8v3" /><path d="M16 10h3a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-3" /></svg>
+          </div>
+          <div class="promo-text">
+            <strong>{{ trainer.title }}</strong>
+            <span>{{ trainer.text }}</span>
           </div>
           <span class="promo-go">Открыть →</span>
         </RouterLink>

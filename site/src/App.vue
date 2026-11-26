@@ -35,7 +35,7 @@ watch(
     <main id="main" class="main">
       <RouterView v-slot="{ Component, route }">
         <Transition name="page" mode="out-in">
-          <component :is="Component" :key="route.name === 'glossary' || route.name === 'model' ? route.name : route.fullPath.split('?')[0]" />
+          <component :is="Component" :key="['glossary', 'model', 'trainers'].includes(route.name) ? route.name : route.fullPath.split('?')[0]" />
         </Transition>
       </RouterView>
     </main>
