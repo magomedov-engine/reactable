@@ -46,6 +46,7 @@ function wikilinkPlugin(md) {
     if (!r) return `<span class="wl-missing">${label}</span>`
     if (r.type === 'term') return `<a class="gl" href="#/glossary/${r.term.slug}" data-term="${r.term.slug}">${label}</a>`
     if (r.type === 'home') return `<a class="wl" href="#/" data-route="/">${alias ? label : 'План курса'}</a>`
+    if (r.type === 'guide') return `<a class="wl" href="#/guide/${r.guide.id}" data-route="/guide/${r.guide.id}">${alias ? label : esc(r.guide.title)}</a>`
     return `<a class="wl" href="#/lesson/${r.lesson.id}" data-route="/lesson/${r.lesson.id}">${alias ? label : esc(r.lesson.title)}</a>`
   }
 
@@ -189,6 +190,9 @@ function miscPlugin(md) {
   const defaultFence = md.renderer.rules.fence
   md.renderer.rules.fence = (tokens, i, opts, env, self) => {
     const tok = tokens[i]
+    // ```3d <id сцены>``` (или id в теле блока) — интерактивный 3D-блок из lessons3d
+    const info = tok.info.trim().split(/\s+/)
+    if (info[0] === '3d') return l3dHtml(info[1] || tok.content.trim())
     if (tok.info.trim() === 'mermaid') {
       return `<div class="mermaid-wrap" data-mermaid="${encodeURIComponent(tok.content)}"><div class="mermaid-skeleton"></div></div>`
     }

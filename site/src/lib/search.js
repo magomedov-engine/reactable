@@ -1,5 +1,5 @@
 import MiniSearch from 'minisearch'
-import { lessons, lessonSource, glossary } from './content.js'
+import { lessons, lessonSource, glossary, guides, guideSource } from './content.js'
 import { plainText } from './markdown.js'
 
 let index = null
@@ -10,7 +10,7 @@ const norm = (s) => s.toLowerCase().replace(/ё/g, 'е')
 function build() {
   index = new MiniSearch({
     fields: ['title', 'heading', 'text'],
-    storeFields: ['kind', 'lessonId', 'title', 'heading', 'sec', 'slug'],
+    storeFields: ['kind', 'lessonId', 'guideId', 'title', 'heading', 'sec', 'slug'],
     processTerm: (t) => (t.length < 2 ? null : norm(t)),
     searchOptions: { boost: { title: 3, heading: 2 }, prefix: true, fuzzy: 0.2, combineWith: 'AND' },
   })
@@ -22,6 +22,15 @@ function build() {
       const heading = n === 0 ? '' : p.slice(0, nl).replace(/^[^\p{L}\p{N}]+/u, '').trim()
       const body = n === 0 ? p : p.slice(nl + 1)
       const doc = { id: `${l.id}#${n}`, kind: 'lesson', lessonId: l.id, title: l.title, heading, sec: n, text: plainText(body) }
+      all.push(doc)
+      docs.set(doc.id, doc)
+    })
+  }
+  for (const g of guides) {
+    guideSource(g.id).split(/^##\s+/m).forEach((p, n) => {
+      const nl = p.indexOf('\n')
+      const heading = n === 0 ? '' : p.slice(0, nl).replace(/^[^\p{L}\p{N}]+/u, '').trim()
+      const doc = { id: `guide:${g.id}#${n}`, kind: 'guide', guideId: g.id, title: g.title, heading, sec: n, text: plainText(n === 0 ? p : p.slice(nl + 1)) }
       all.push(doc)
       docs.set(doc.id, doc)
     })

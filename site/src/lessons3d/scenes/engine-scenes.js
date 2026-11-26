@@ -15,6 +15,8 @@ const BASE = {
   // show — какие детали видны (остальные скрыты), solo — цилиндр или список цилиндров,
   // xray — полупрозрачные детали, flows — бегущие потоки систем, focusCyl — камера к цилиндру
   show: null, solo: null, xray: null, flows: null, focusCyl: null, focusDist: 8,
+  // arrive — детали, которые на этом шаге «подлетают» на своё место (анимация сборки, повторяется)
+  arrive: null, tighten: null,
 }
 const ALL_IDS = PARTS.map((p) => p.id)
 const hiddenFor = (show) => (show ? ALL_IDS.filter((id) => !show.includes(id) && !(id === 'gearmark' && show.includes('gear'))) : [])
@@ -27,6 +29,7 @@ const IN_WIN = [340, 590], EX_WIN = [130, 380]
 // эффекты сцены про топливо (шаг задаёт fx целиком, поэтому общая основа)
 const FUEL_FX = { gas: false, air: false, exhaust: false, forces: false, fire: true, fuel: true }
 const isOpen = (psi, [a, b]) => psi > a && psi < b
+const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 
 const VALVE_TRAIN = ['camshaft', 'tappet', 'pushrod', 'rocker', 'adjscrew', 'valve_in', 'valve_ex', 'spring', 'head', 'gear', 'gearmark', 'crank']
 
@@ -83,6 +86,7 @@ function engineScene(def) {
       let raf = 0
       let last = 0
       let loopT = 0
+      let arriveT = 0 // время анимации подлёта деталей шага
 
       function apply(i, instant) {
         const p = { ...BASE, ...(def.base || {}), ...def.steps[i].p }
@@ -100,6 +104,11 @@ function engineScene(def) {
         eng.setLayer(p.layer)
         eng.setCasing(p.casing)
         eng.setExplode(p.explode)
+        arriveT = 0
+        // порядок затяжки: номера над болтами (tighten: { kind: 'maincap' | 'headbolt', order, cyl })
+        eng.setTighten(p.tighten?.kind || null, p.tighten ? { order: p.tighten.order, cyl: p.tighten.cyl || 1, at: -1 } : {})
+        // сначала детали на месте — камера наводится на них, потом разносим детали шага
+        eng.setPartExplode(null, { tubes: false })
         eng.setNumbers(p.numbers)
         eng.setSpeed(p.speed)
         if (p.op) {
@@ -118,6 +127,9 @@ function engineScene(def) {
         else if (p.view) eng.view(p.view)
         else if (p.focus) eng.focusPart(p.focus)
         p.enter?.(eng, h)
+        if (p.arrive) eng.setPartExplode(Object.fromEntries(p.arrive.map((id) => [id, 1])), { tubes: false })
+        else eng.setPartExplode(null)
+        p._k = undefined
       }
 
       // свой цикл: прокрутка вала в заданном диапазоне углов (шаги про отдельный такт, фазы, метки)
@@ -129,6 +141,17 @@ function engineScene(def) {
           const [a, b, speed = 40] = cur.loop
           loopT += dt * speed
           eng.setTheta(a + (loopT % (b - a)))
+        }
+        // подлёт: 0,6 с пауза → 1,6 с движение → 2 с стоит на месте → снова (пока не нажата пауза — тогда стоит на месте)
+        if (cur?.arrive) {
+          const T = 4.2
+          if (playing) arriveT += dt
+          const t = arriveT % T
+          const k = !playing ? 0 : t < 0.6 ? 1 : t < 2.2 ? 1 - easeInOut((t - 0.6) / 1.6) : 0
+          if (k !== cur._k) {
+            cur._k = k
+            eng.setPartExplode(Object.fromEntries(cur.arrive.map((id) => [id, k])), { tubes: k === 0 })
+          }
         }
       }
 
@@ -175,6 +198,8 @@ const CYL1 = [[-9.8, 4.1, -5.9], [-4.5, 2.0, -0.9]]
 // шестерни распределения у ЯМЗ-240 сзади: смотрим со стороны маховика
 const REAR_GEARS = [[14, 2.6, -4], [6.0, 1.0, 0]]
 const VALVE1 = [[-9.5, 6.5, -7.5], [-4.4, 2.8, -1.2]]
+
+export { engineScene, PISTON_GRP, FUEL, VALVE_TRAIN, CYL1, REAR_GEARS, VALVE1, valveNote }
 
 export const SCENES = {
   // ---------------------------------------------------------------- engine-01

@@ -64,6 +64,17 @@ function reset() {
       <span class="promo-go">Открыть →</span>
     </RouterLink>
 
+    <RouterLink to="/guides" class="promo-3d">
+      <div class="promo-cube" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="17" r="4" /><path d="M12 17 9 6h6l-3 11" /><rect x="8" y="2" width="8" height="5" rx="1" /></svg>
+      </div>
+      <div class="promo-text">
+        <strong>Разбор узлов: КШМ, ГРМ, системы, инструменты</strong>
+        <span>Подробно с нуля: что это, зачем, как работает, где стоит и как собирается — с 3D-анимацией сборки по шагам.</span>
+      </div>
+      <span class="promo-go">Открыть →</span>
+    </RouterLink>
+
     <div class="note-card">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20z" /><path d="M12 10v4M12 17v.5" /></svg>
       <p>

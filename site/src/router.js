@@ -3,7 +3,7 @@ import HomeView from './views/HomeView.vue'
 import LessonView from './views/LessonView.vue'
 import GlossaryView from './views/GlossaryView.vue'
 import NotFound from './views/NotFound.vue'
-import { getLesson } from './lib/content.js'
+import { getLesson, getGuide } from './lib/content.js'
 import { ui } from './lib/store.js'
 
 export const router = createRouter({
@@ -18,6 +18,13 @@ export const router = createRouter({
       beforeEnter: (to) => (getLesson(to.params.id) ? true : { name: 'notfound' }),
     },
     { path: '/glossary/:slug?', name: 'glossary', component: GlossaryView, meta: { title: 'Глоссарий' } },
+    { path: '/guides', name: 'guides', component: () => import('./views/GuidesView.vue'), meta: { title: 'Разбор узлов' } },
+    {
+      path: '/guide/:id',
+      name: 'guide',
+      component: () => import('./views/GuideView.vue'),
+      beforeEnter: (to) => (getGuide(to.params.id) ? true : { name: 'notfound' }),
+    },
     { path: '/exam', name: 'exam', component: () => import('./views/ExamView.vue'), meta: { title: 'Итоговый экзамен' } },
     { path: '/cards', name: 'cards', component: () => import('./views/CardsView.vue'), meta: { title: 'Карточки' } },
     { path: '/trainers', name: 'trainers', component: () => import('./views/TrainersView.vue'), meta: { title: 'Тренажёры' } },
@@ -36,6 +43,6 @@ export const router = createRouter({
 router.afterEach((to) => {
   ui.sidebarOpen = false
   ui.term = null
-  const l = to.name === 'lesson' ? getLesson(to.params.id) : null
+  const l = to.name === 'lesson' ? getLesson(to.params.id) : to.name === 'guide' ? getGuide(to.params.id) : null
   document.title = `${l ? l.title : to.meta.title || 'Курс'} · reactable`
 })

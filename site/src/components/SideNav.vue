@@ -1,6 +1,6 @@
 <script setup>
 import { useRoute } from 'vue-router'
-import { sections, lessonLabel, glossary } from '../lib/content.js'
+import { sections, lessonLabel, glossary, guides } from '../lib/content.js'
 import { ui, isDone, doneCount, donePercent, exam } from '../lib/store.js'
 import { lessons } from '../lib/content.js'
 
@@ -59,6 +59,20 @@ const total = lessons.length
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20" /></svg>
         Первая смена и наставник
       </RouterLink>
+
+      <div v-if="guides.length" class="nav-section">
+        <RouterLink to="/guides" class="nav-section-title nav-section-link">Разбор узлов</RouterLink>
+        <RouterLink
+          v-for="g in guides"
+          :key="g.id"
+          :to="`/guide/${g.id}`"
+          class="nav-lesson nav-guide"
+          :class="{ active: route.name === 'guide' && route.params.id === g.id }"
+        >
+          <span class="nav-dot guide-dot" />
+          <span class="nav-lesson-text"><span class="nav-title">{{ g.short }}</span></span>
+        </RouterLink>
+      </div>
 
       <div v-for="s in sections" :key="s.id" class="nav-section">
         <div class="nav-section-title">{{ s.title }}</div>

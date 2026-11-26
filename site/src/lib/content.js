@@ -16,6 +16,14 @@ const bySource = new Map(lessons.map((l) => [l.source, l]))
 export const getLesson = (id) => byId.get(id)
 export const lessonSource = (id) => lessonRaw[`../content/lessons/${id}.md`] || ''
 
+// --- разбор узлов: отдельный раздел подробных разборов (не входит в план по дням)
+const guideRaw = import.meta.glob('../content/guides/*.md', { query: '?raw', import: 'default', eager: true })
+export const guides = manifest.guides || []
+const guideById = new Map(guides.map((g) => [g.id, g]))
+const guideBySource = new Map(guides.map((g) => [g.source, g]))
+export const getGuide = (id) => guideById.get(id)
+export const guideSource = (id) => guideRaw[`../content/guides/${id}.md`] || ''
+
 export function lessonNeighbours(id) {
   const i = lessons.findIndex((l) => l.id === id)
   return { prev: lessons[i - 1] || null, next: lessons[i + 1] || null, index: i }
@@ -58,6 +66,7 @@ export function resolveWikilink(target) {
     return g ? { type: 'term', term: g } : null
   }
   if (base === '00_План_курса') return { type: 'home' }
+  if (guideBySource.has(base)) return { type: 'guide', guide: guideBySource.get(base) }
   const l = bySource.get(base)
   return l ? { type: 'lesson', lesson: l } : null
 }

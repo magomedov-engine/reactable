@@ -101,6 +101,22 @@ for (const sec of SECTIONS) {
   })
 }
 
+// --- разбор узлов: отдельный раздел (не входит в план по дням), id — из поля «id» в заметке
+const guides = []
+const guideDir = path.join(vault, '05_Разбор_узлов')
+fs.mkdirSync(path.join(out, 'guides'), { recursive: true })
+if (fs.existsSync(guideDir)) {
+  for (const f of fs.readdirSync(guideDir).filter((f) => f.endsWith('.md')).sort()) {
+    const { data, body } = parseFrontmatter(fs.readFileSync(path.join(guideDir, f), 'utf8'))
+    const id = data['id'] || translit(f.replace(/\.md$/, ''))
+    const title = (body.match(/^#\s+(.+)$/m) || [])[1]?.trim() || f
+    const abstract = (body.match(/>\s*\[!abstract\][^\n]*\n((?:>.*\n?)+)/) || [])[1] || ''
+    const summary = abstract.replace(/^>\s?/gm, '').replace(/\*\*/g, '').replace(/\s+/g, ' ').trim()
+    fs.writeFileSync(path.join(out, 'guides', `${id}.md`), body.replace(/^#\s+.+\r?\n/m, ''))
+    guides.push({ id, source: f.replace(/\.md$/, ''), title, short: data['коротко'] || title, time: data['время'] || '', summary: summary.length > 220 ? summary.slice(0, 217).replace(/\s+\S*$/, '') + '…' : summary })
+  }
+}
+
 // порядок курса = порядок плана: по дню, внутри дня — как в папках
 const folderOrder = new Map(lessons.map((l, i) => [l.id, i]))
 lessons.sort((a, b) => (a.day ?? 99) - (b.day ?? 99) || folderOrder.get(a.id) - folderOrder.get(b.id))
@@ -168,6 +184,6 @@ if (fs.existsSync(checkFile)) {
 fs.writeFileSync(path.join(out, 'mentor.json'), JSON.stringify({ questions: mentorQuestions, checklist }, null, 1))
 fs.writeFileSync(
   path.join(out, 'manifest.json'),
-  JSON.stringify({ sections: SECTIONS.map(({ id, title }) => ({ id, title })), lessons, schemes }, null, 1),
+  JSON.stringify({ sections: SECTIONS.map(({ id, title }) => ({ id, title })), lessons, guides, schemes }, null, 1),
 )
-console.log(`[sync] уроков: ${lessons.length}, терминов: ${glossary.length}, схем: ${Object.keys(schemes).length}, карточек: ${cards.length}, вопросов наставнику: ${mentorQuestions.length}`)
+console.log(`[sync] уроков: ${lessons.length}, разборов: ${guides.length}, терминов: ${glossary.length}, схем: ${Object.keys(schemes).length}, карточек: ${cards.length}, вопросов наставнику: ${mentorQuestions.length}`)

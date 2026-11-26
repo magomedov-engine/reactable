@@ -379,6 +379,9 @@ export function createEngine(host, cb = {}, opts = {}) {
   const geos = new Set()
 
   let explodeF = 0
+  // разнос отдельных деталей поверх общего: { id детали: доля 0…1 } — для анимации «деталь встаёт на место»
+  const partExp = {}
+  const expOf = (obj) => partExp[obj.userData.expPart] ?? explodeF
   function reg(obj, partId, space, out = 1) {
     const e = PART[partId]?.explode
     const v = new THREE.Vector3()
@@ -386,12 +389,13 @@ export function createEngine(host, cb = {}, opts = {}) {
     if (e?.world) v.set(...e.world)
     obj.userData.base = obj.position.clone()
     obj.userData.exp = v
+    obj.userData.expPart = partId
     placed.push(obj)
     return obj
   }
   function setPos(obj, x, y, z) {
     obj.userData.base.set(x, y, z)
-    obj.position.copy(obj.userData.base).addScaledVector(obj.userData.exp, explodeF)
+    obj.position.copy(obj.userData.base).addScaledVector(obj.userData.exp, expOf(obj))
   }
   function mk(geo, partId, extra) {
     geos.add(geo)
@@ -1821,9 +1825,18 @@ export function createEngine(host, cb = {}, opts = {}) {
       state.casing = v
       applyLook()
     },
+    // разнести отдельные детали: map { id: 0…1 } (0 — на месте); null — сбросить. tubes — перестроить трубки (в конце анимации)
+    setPartExplode(map, { tubes = true } = {}) {
+      for (const k of Object.keys(partExp)) if (!map || !(k in map)) delete partExp[k]
+      if (map) Object.assign(partExp, map)
+      for (const o of placed) o.position.copy(o.userData.base).addScaledVector(o.userData.exp, expOf(o))
+      update()
+      if (tubes) rebuildTubes()
+      dirty = true
+    },
     setExplode(f) {
       explodeF = f
-      for (const o of placed) o.position.copy(o.userData.base).addScaledVector(o.userData.exp, explodeF)
+      for (const o of placed) o.position.copy(o.userData.base).addScaledVector(o.userData.exp, expOf(o))
       update()
       rebuildTubes()
       applyLook()

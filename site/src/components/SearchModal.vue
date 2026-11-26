@@ -27,6 +27,7 @@ watch(
 function go(r) {
   ui.searchOpen = false
   if (r.kind === 'term') router.push(`/glossary/${r.slug}`)
+  else if (r.kind === 'guide') router.push({ path: `/guide/${r.guideId}`, query: r.sec ? { s: r.sec } : {} })
   else router.push({ path: `/lesson/${r.lessonId}`, query: r.sec ? { s: r.sec } : {} })
 }
 function onKey(e) {
@@ -74,11 +75,11 @@ const SUGGEST = ['момент затяжки', 'микрометр', 'выст�
             @mouseenter="active = i"
             @click="go(r)"
           >
-            <span class="res-kind" :class="r.kind">{{ r.kind === 'term' ? 'Термин' : lessonLabel(getLesson(r.lessonId)) || 'Урок' }}</span>
+            <span class="res-kind" :class="r.kind">{{ r.kind === 'term' ? 'Термин' : r.kind === 'guide' ? 'Разбор' : lessonLabel(getLesson(r.lessonId)) || 'Урок' }}</span>
             <span class="res-main">
               <span class="res-title">
                 <span v-html="highlight(r.title, r.terms)" />
-                <span v-if="r.heading && r.kind === 'lesson'" class="res-heading"> › <span v-html="highlight(r.heading, r.terms)" /></span>
+                <span v-if="r.heading && r.kind !== 'term'" class="res-heading"> › <span v-html="highlight(r.heading, r.terms)" /></span>
               </span>
               <span class="res-snippet" v-html="highlight(r.snippet, r.terms)" />
             </span>
