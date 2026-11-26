@@ -31,12 +31,17 @@ export const translit = (s) =>
   s.toLowerCase().split('').map((c) => (c in TR ? TR[c] : c)).join('')
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
 
+// id урока (basics-01, extra-04…) задаётся папкой и номером файла и не меняется:
+// по нему в браузере хранятся прогресс и результаты тестов.
+// Раздел на сайте и порядок уроков задаёт поле «день» в заметке: план курса строится из него.
 const SECTIONS = [
   { id: 'basics', title: 'Неделя 1 · Основы', dir: '01_Основы', filter: (n) => /^0[1-7]_/.test(n) },
-  { id: 'extra', title: 'Дополнительные уроки', dir: '01_Основы', filter: (n) => /^(0[89]|1\d)_/.test(n) },
+  { id: 'extra', title: 'Неделя 2 · Слесарная база', dir: '01_Основы', filter: (n) => /^(0[89]|1\d)_/.test(n) },
   { id: 'engine', title: 'Неделя 2 · Двигатель V12', dir: '02_Двигатель', filter: () => true },
-  { id: 'assembly', title: 'Сборка', dir: '03_Сборка', filter: () => true },
+  { id: 'assembly', title: 'Неделя 2 · Сборка', dir: '03_Сборка', filter: () => true },
 ]
+// уроки из «Основ», поставленные в первую неделю (например, единицы измерения), показываем в разделе недели 1
+const sectionFor = (sec, day) => (sec.dir === '01_Основы' && day <= 7 ? 'basics' : sec.id)
 
 function parseFrontmatter(text) {
   const m = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/)
@@ -81,18 +86,24 @@ for (const sec of SECTIONS) {
     const abstract = (body.match(/>\s*\[!abstract\][^\n]*\n((?:>.*\n?)+)/) || [])[1] || ''
     const summary = abstract.replace(/^>\s?/gm, '').replace(/\*\*/g, '').replace(/\s+/g, ' ').trim()
     fs.writeFileSync(path.join(out, 'lessons', `${id}.md`), body.replace(/^#\s+.+\r?\n/m, ''))
+    const day = parseInt(data['день'], 10)
+    if (!Number.isFinite(day)) console.warn(`[sync] у урока ${sec.dir}/${f} нет числового поля «день»: в плане его не будет`)
     lessons.push({
       id,
-      section: sec.id,
+      section: sectionFor(sec, day),
       source: f.replace(/\.md$/, ''),
       title,
       fullTitle,
-      day: data['день'] || '',
+      day: Number.isFinite(day) ? day : null,
       time: data['время'] || '',
       summary: summary.length > 220 ? summary.slice(0, 217).replace(/\s+\S*$/, '') + '…' : summary,
     })
   })
 }
+
+// порядок курса = порядок плана: по дню, внутри дня — как в папках
+const folderOrder = new Map(lessons.map((l, i) => [l.id, i]))
+lessons.sort((a, b) => (a.day ?? 99) - (b.day ?? 99) || folderOrder.get(a.id) - folderOrder.get(b.id))
 
 // --- глоссарий
 const glossary = []
@@ -107,8 +118,29 @@ for (const f of fs.readdirSync(gDir).filter((f) => f.endsWith('.md')).sort((a, b
 }
 
 fs.writeFileSync(path.join(out, 'glossary.json'), JSON.stringify(glossary, null, 1))
+
+// --- карточки: строки «вопрос::ответ» из 04_Практика/Карточки.md, колода — ближайший заголовок ##
+const cards = []
+const cardsFile = path.join(vault, '04_Практика', 'Карточки.md')
+if (fs.existsSync(cardsFile)) {
+  let deck = 'Курс'
+  let fence = false
+  for (const line of parseFrontmatter(fs.readFileSync(cardsFile, 'utf8')).body.split(/\r?\n/)) {
+    if (/^```/.test(line)) fence = !fence
+    if (fence) continue
+    const h = line.match(/^##\s+(.+)$/)
+    if (h) deck = h[1].trim()
+    const m = line.match(/^(?!>)(.+?)::(.+)$/)
+    if (m && !line.includes('`')) {
+      const front = m[1].trim()
+      // id по тексту вопроса: поправка ответа не сбрасывает историю повторений
+      cards.push({ id: 'f-' + translit(front).slice(0, 80), deck, front, back: m[2].trim() })
+    }
+  }
+}
+fs.writeFileSync(path.join(out, 'cards.json'), JSON.stringify(cards, null, 1))
 fs.writeFileSync(
   path.join(out, 'manifest.json'),
   JSON.stringify({ sections: SECTIONS.map(({ id, title }) => ({ id, title })), lessons, schemes }, null, 1),
 )
-console.log(`[sync] уроков: ${lessons.length}, терминов: ${glossary.length}, схем: ${Object.keys(schemes).length}`)
+console.log(`[sync] уроков: ${lessons.length}, терминов: ${glossary.length}, схем: ${Object.keys(schemes).length}, карточек: ${cards.length}`)

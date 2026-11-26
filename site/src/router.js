@@ -18,6 +18,8 @@ export const router = createRouter({
       beforeEnter: (to) => (getLesson(to.params.id) ? true : { name: 'notfound' }),
     },
     { path: '/glossary/:slug?', name: 'glossary', component: GlossaryView, meta: { title: 'Глоссарий' } },
+    { path: '/exam', name: 'exam', component: () => import('./views/ExamView.vue'), meta: { title: 'Итоговый экзамен' } },
+    { path: '/cards', name: 'cards', component: () => import('./views/CardsView.vue'), meta: { title: 'Карточки' } },
     // three.js грузится только при открытии этой страницы
     { path: '/model', name: 'model', component: () => import('./views/ModelView.vue'), meta: { title: '3D-модель ЯМЗ-240М2' } },
     { path: '/:pathMatch(.*)*', name: 'notfound', component: NotFound, meta: { title: 'Не найдено' } },

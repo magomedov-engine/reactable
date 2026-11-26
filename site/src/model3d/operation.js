@@ -1,6 +1,6 @@
 // Режим «Работа двигателя»: что происходит внутри цилиндров.
 // Газ в цилиндре (цвет = температура), впуск и выпуск синхронно с клапанами,
-// впрыск топлива, вспышка, импульсы топлива по трубкам ВД, стрелки сил, вращение турбокомпрессора.
+// впрыск топлива, вспышка, импульсы топлива по трубкам ВД, стрелки сил. Турбокомпрессора нет: у ЯМЗ-240М2 наддува нет.
 import * as THREE from 'three'
 
 const DEG = Math.PI / 180
@@ -241,48 +241,15 @@ export function createOperation(ctx) {
   keep(fuelPool.geo), keep(fuelPool.mat)
   const C_FUEL = new THREE.Color('#e39a5e')
 
-  // ---------- крыльчатки компрессоров: видно, как раскручивается турбокомпрессор
-  const wheelMat = keep(new THREE.MeshStandardMaterial({ color: '#c9c5bc', metalness: 0.8, roughness: 0.3 }))
-  const bladeGeo = keep(new THREE.BoxGeometry(0.03, 0.38, 0.08).translate(0, 0.21, 0))
-  const hubGeo = keep(new THREE.ConeGeometry(0.1, 0.18, 16).rotateZ(-Math.PI / 2))
-  const wheels = []
-  for (const side of ['L', 'R']) {
-    const comp = banks[side].comp
-    if (!comp) continue
-    const w = new THREE.Group()
-    for (let i = 0; i < 9; i++) {
-      const b = new THREE.Mesh(bladeGeo, wheelMat)
-      b.rotation.x = (i * 40 * Math.PI) / 180
-      b.rotation.y = 0.35
-      w.add(b)
-    }
-    const hub = new THREE.Mesh(hubGeo, wheelMat)
-    hub.position.x = 0.06
-    w.add(hub)
-    w.position.copy(comp.position).add(new THREE.Vector3(0.3, 0, 0))
-    w.traverse((m) => (m.userData.noPick = true))
-    w.visible = false
-    banks[side].add(w)
-    wheels.push(w)
-  }
-
   let enabled = false
   let follow = null
   let focusAll = false
   let solo = null // Set показанных цилиндров: эффекты остальных прячем
-  let turboShown = true // колёса компрессоров видны, только когда виден сам компрессор
   const tmpV = new THREE.Vector3()
   const tmpW = new THREE.Vector3()
-  let turbo = 0
 
   function update(theta, dt, speed) {
     if (!enabled) return
-    // поток выхлопа и наддув держат турбину раскрученной
-    turbo += dt * (6 + 18 * Math.min(1, speed)) * (fx.exhaust || fx.air ? 1 : 0)
-    for (const w of wheels) {
-      w.rotation.x = turbo
-      w.visible = turboShown && (fx.air || fx.exhaust)
-    }
     let fireBest = 0
     for (let i = 0; i < per.length; i++) {
       const p = per[i]
@@ -407,13 +374,9 @@ export function createOperation(ctx) {
         p.gas.visible = p.glow.visible = p.spray.visible = p.arrow.visible = false
         if (v) p.gas.visible = fx.gas
       }
-      for (const w of wheels) w.visible = v && turboShown && (fx.air || fx.exhaust)
     },
     setFx(key, v) {
       fx[key] = v
-    },
-    setTurboShown(v) {
-      turboShown = v
     },
     setSolo(c) {
       solo = c || null

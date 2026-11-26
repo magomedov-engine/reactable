@@ -1,11 +1,12 @@
 <script setup>
 import { computed, ref, onMounted, onBeforeUnmount, nextTick, watch, createApp } from 'vue'
 import Scene3D from '../components/Scene3D.vue'
+import LessonQuiz from '../components/LessonQuiz.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getLesson, lessonSource, lessonNeighbours, lessonLabel, sectionTitle, lessons } from '../lib/content.js'
 import { renderMarkdown } from '../lib/markdown.js'
 import { contentClick, renderMermaid } from '../lib/interactive.js'
-import { progress, isDone, toggleDone, isDark } from '../lib/store.js'
+import { progress, isDone, toggleDone, isDark, quizResults } from '../lib/store.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -30,6 +31,8 @@ const modelLink = computed(() => {
 })
 const figCount = computed(() => rendered.value.figures.length)
 const questionCount = computed(() => (lessonSource(lesson.value.id).match(/\[!question\]-/g) || []).length)
+const quizCount = computed(() => rendered.value.quiz.length)
+const quizResult = computed(() => quizResults[lesson.value.id] || null)
 
 function onClick(e) {
   contentClick(e, router, rendered.value.figures)
@@ -57,6 +60,12 @@ function scrollToId(id, smooth = true) {
   window.scrollTo({ top: y, behavior: smooth ? 'smooth' : 'auto' })
   activeId.value = id
   tocOpen.value = false
+}
+
+function scrollToQuiz() {
+  const el = body.value?.querySelector('.quiz')
+  if (!el) return
+  window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' })
 }
 
 function scrollToQuerySection() {
@@ -96,6 +105,12 @@ function mount3d() {
   for (const el of body.value.querySelectorAll('.l3d-mount')) {
     const app = createApp(Scene3D, { id: el.dataset.scene, poster: el.dataset.poster || '', caption: el.dataset.caption || '' })
     app.mount(el)
+    apps3d.push(app)
+  }
+  const q = body.value.querySelector('.quiz-mount')
+  if (q && rendered.value.quiz.length) {
+    const app = createApp(LessonQuiz, { lessonId: lesson.value.id, questions: rendered.value.quiz })
+    app.mount(q)
     apps3d.push(app)
   }
 }
@@ -151,7 +166,12 @@ const position = computed(() => `${nav.value.index + 1} из ${lessons.length}`)
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="m3 16 5-5 4 4 3-3 6 6" /></svg>
               {{ figCount }} {{ figCount === 1 ? 'схема' : figCount < 5 ? 'схемы' : 'схем' }}
             </span>
-            <span v-if="questionCount" class="meta-item">
+            <a v-if="quizCount" class="meta-item meta-link" href="#" @click.prevent="scrollToQuiz">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7v.5M12 17v.5" /></svg>
+              <template v-if="quizResult">Тест: {{ quizResult.best }} из {{ quizResult.total }}{{ quizResult.passed ? ' · сдан' : '' }}</template>
+              <template v-else>Тест: {{ quizCount }} вопросов</template>
+            </a>
+            <span v-else-if="questionCount" class="meta-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7v.5M12 17v.5" /></svg>
               {{ questionCount }} вопросов для самопроверки
             </span>

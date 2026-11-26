@@ -215,13 +215,84 @@ function miscPlugin(md) {
   }
 }
 
+// ---------- тест: место, куда LessonView монтирует компонент теста
+const QUIZ_MARK = '%%quiz%%'
+function quizMountPlugin(md) {
+  md.core.ruler.after('inline', 'quiz_mount', (state) => {
+    const t = state.tokens
+    for (let i = 0; i < t.length - 2; i++) {
+      if (t[i].type === 'paragraph_open' && t[i + 1].type === 'inline' && t[i + 1].content.trim() === QUIZ_MARK) {
+        const tok = new state.Token('html_block', '', 0)
+        tok.content = '<div class="quiz-mount"></div>\n'
+        t.splice(i, 3, tok)
+      }
+    }
+  })
+}
+
 const md = new MarkdownIt({ html: false, linkify: true, typographer: false, breaks: false })
-md.use(wikilinkPlugin).use(blockEmbedPlugin).use(calloutPlugin).use(headingPlugin).use(miscPlugin).use(insertsPlugin)
+md.use(wikilinkPlugin).use(blockEmbedPlugin).use(calloutPlugin).use(headingPlugin).use(miscPlugin).use(insertsPlugin).use(quizMountPlugin)
+
+// Вопросы самопроверки с вариантами превращаются в тест. Формат в Obsidian:
+//   > [!question]- 1. Вопрос
+//   > - [x] правильный вариант
+//   > - [ ] неверный вариант
+//   >
+//   > Пояснение
+// Вопросы без вариантов остаются обычными раскрывающимися врезками.
+const OPTION = /^-\s+\[([ xX])\]\s+(.+)$/
+export function extractQuiz(src) {
+  const lines = src.replace(/\r\n?/g, '\n').split('\n')
+  const start = lines.findIndex((l) => /^##\s.*Самопроверка/i.test(l))
+  if (start < 0) return { src, quiz: [] }
+  let end = lines.findIndex((l, i) => i > start && /^##\s/.test(l))
+  if (end < 0) end = lines.length
+  const quiz = []
+  const keep = []
+  let placed = false
+  for (let i = start + 1; i < end; ) {
+    const head = lines[i].match(/^>\s*\[!question\][-+]?\s*(.*)$/i)
+    if (!head) {
+      keep.push(lines[i++])
+      continue
+    }
+    let j = i + 1
+    while (j < end && lines[j].startsWith('>')) j++
+    const body = lines.slice(i + 1, j).map((l) => l.replace(/^>\s?/, ''))
+    const options = []
+    const explain = []
+    for (const l of body) {
+      const m = l.match(OPTION)
+      if (m) options.push({ html: md.renderInline(m[2].trim()), text: m[2].trim(), correct: m[1] !== ' ' })
+      else explain.push(l)
+    }
+    if (options.length >= 2 && options.filter((o) => o.correct).length === 1) {
+      const correct = options.find((o) => o.correct).text
+      const ex = explain.join('\n').trim()
+      // пояснение, которое просто повторяет правильный вариант, не показываем
+      const same = ex.replace(/[.\s]+$/, '').toLowerCase() === correct.replace(/[.\s]+$/, '').toLowerCase()
+      quiz.push({
+        q: md.renderInline(head[1].replace(/^\d+[а-я]?\.\s*/i, '').trim()),
+        options,
+        explain: ex && !same ? md.render(ex) : '',
+      })
+      if (!placed) {
+        keep.push(QUIZ_MARK)
+        placed = true
+      }
+    } else {
+      keep.push(...lines.slice(i, j))
+    }
+    i = j
+  }
+  return { src: [...lines.slice(0, start + 1), ...keep, ...lines.slice(end)].join('\n'), quiz }
+}
 
 export function renderMarkdown(src, lesson = '') {
   const env = { toc: [], figures: [], lesson }
-  const html = md.render(src, env)
-  return { html, toc: env.toc.filter((h) => h.level === 2), figures: env.figures }
+  const ex = extractQuiz(src)
+  const html = md.render(ex.src, env)
+  return { html, toc: env.toc.filter((h) => h.level === 2), figures: env.figures, quiz: ex.quiz }
 }
 
 // Плоский текст для поиска
@@ -231,6 +302,7 @@ export function plainText(src) {
     .replace(/!\[\[[^\]]*\]\]/g, ' ')
     .replace(/\[\[([^\]|]*\/)?([^\]|\\]*)(\\?\|([^\]]*))?\]\]/g, (_, _p, t, _a, alias) => alias || t)
     .replace(/\[!\w+\][-+]?/g, ' ')
+    .replace(/^>?\s*-\s+\[[ xX]\]/gm, ' ')
     .replace(/[#>*`|~_-]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()

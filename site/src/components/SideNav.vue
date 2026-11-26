@@ -1,10 +1,14 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { sections, lessonLabel, glossary } from '../lib/content.js'
-import { ui, isDone, doneCount, donePercent } from '../lib/store.js'
+import { ui, isDone, doneCount, donePercent, exam } from '../lib/store.js'
 import { lessons } from '../lib/content.js'
 
+import { deckStats } from '../lib/cards.js'
+import { computed } from 'vue'
+
 const route = useRoute()
+const cardsToday = computed(() => { const st = deckStats(''); return st.due + st.fresh })
 const total = lessons.length
 </script>
 
@@ -38,6 +42,14 @@ const total = lessons.length
       <RouterLink to="/glossary" class="nav-top" :class="{ active: route.name === 'glossary' }">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" /><path d="M4 19V5" /><path d="M9 7h6" /></svg>
         Глоссарий <span class="count">{{ glossary.length }}</span>
+      </RouterLink>
+      <RouterLink to="/cards" class="nav-top" :class="{ active: route.name === 'cards' }">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="14" rx="1.5" /><path d="M7 3h13a1 1 0 0 1 1 1v13" /></svg>
+        Карточки <span v-if="cardsToday" class="count new" title="Карточек на сегодня">{{ cardsToday }}</span>
+      </RouterLink>
+      <RouterLink to="/exam" class="nav-top" :class="{ active: route.name === 'exam' }">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6v3H9z" /><path d="M15 5h3v16H6V5h3" /><path d="m9 13 2 2 4-4" /></svg>
+        Итоговый экзамен <span v-if="exam.passed" class="count">сдан</span>
       </RouterLink>
 
       <div v-for="s in sections" :key="s.id" class="nav-section">

@@ -1512,7 +1512,6 @@ export function createEngine(host, cb = {}, opts = {}) {
       cy.sprite.visible = numbersOn && !tight.kind && (!state.only || state.only.has('liner')) && (!solo || solo.has(cy.c))
     }
     work.setSolo(solo)
-    work.setTurboShown(!!meshesByPart.compressor?.[0]?.visible)
     // один цилиндр: общие потоки через весь двигатель не показываем, только частицы этого цилиндра
     if (state.op) flows.show(soloOn() ? null : [work.fx.air && 'op_air', work.fx.exhaust && 'op_exh', work.fx.fuel && 'op_fuel'].filter(Boolean))
     else if (state.layer === 'all' && state.flows) flows.show(!state.only && explodeF < 0.05 ? state.flows : null)

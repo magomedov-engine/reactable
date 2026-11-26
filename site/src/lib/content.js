@@ -21,11 +21,16 @@ export function lessonNeighbours(id) {
   return { prev: lessons[i - 1] || null, next: lessons[i + 1] || null, index: i }
 }
 
-export function lessonLabel(l) {
-  if (l.section === 'extra') return 'Доп.'
-  const d = parseInt(l.day, 10)
-  return Number.isFinite(d) ? `День ${d}` : ''
-}
+export const lessonLabel = (l) => (l?.day ? `День ${l.day}` : '')
+
+// план курса по дням: строится из поля «день» в заметках
+export const REVIEW_DAY = 14
+export const planDays = (() => {
+  const days = new Map()
+  for (const l of lessons) if (l.day) (days.get(l.day) || days.set(l.day, []).get(l.day)).push(l)
+  if (!days.has(REVIEW_DAY)) days.set(REVIEW_DAY, [])
+  return [...days.entries()].sort((a, b) => a[0] - b[0]).map(([day, list]) => ({ day, lessons: list }))
+})()
 
 export const sectionTitle = (id) => manifest.sections.find((s) => s.id === id)?.title || ''
 

@@ -1,26 +1,18 @@
 <script setup>
 import { computed } from 'vue'
-import { sections, lessons, getLesson, lessonLabel, glossary, schemeCount } from '../lib/content.js'
-import { isDone, doneCount, donePercent, nextLesson, progress, resetProgress } from '../lib/store.js'
+import { sections, lessons, lessonLabel, glossary, schemeCount, planDays, REVIEW_DAY } from '../lib/content.js'
+import { isDone, doneCount, donePercent, nextLesson, progress, resetProgress, quizResults, exam } from '../lib/store.js'
 
-const PLAN = [
-  { day: 1, ids: ['basics-01', 'extra-04'], note: 'Профессия и единицы измерения' },
-  { day: 2, ids: ['basics-02'], note: 'Самый важный урок: читать внимательно' },
-  { day: 3, ids: ['basics-03'] },
-  { day: 4, ids: ['basics-04'] },
-  { day: 5, ids: ['basics-05'], note: 'Если есть штангенциркуль, потренируйтесь мерить' },
-  { day: 6, ids: ['basics-06'] },
-  { day: 7, ids: ['basics-07'] },
-  { day: 8, ids: ['extra-01'] },
-  { day: 9, ids: ['extra-02', 'extra-03'] },
-  { day: 10, ids: ['engine-01', 'engine-02'] },
-  { day: 11, ids: ['engine-03'] },
-  { day: 12, ids: ['engine-04', 'engine-05'] },
-  { day: 13, ids: ['engine-06', 'assembly-01'] },
-  { day: 14, ids: [], note: 'Повторение: пройдите самопроверки всех уроков, выпишите вопросы наставнику' },
-]
-const plan = PLAN.map((p) => ({ ...p, lessons: p.ids.map(getLesson) }))
-const dayDone = (p) => p.lessons.length > 0 && p.lessons.every((l) => isDone(l.id))
+// дни и уроки берутся из поля «день» в заметках; здесь только подсказки к дням
+const DAY_NOTES = {
+  1: 'Профессия и единицы измерения',
+  2: 'Самый важный урок: читать внимательно',
+  5: 'Если есть штангенциркуль, потренируйтесь мерить',
+  10: 'Слесарная база заканчивается, начинается двигатель',
+  [REVIEW_DAY]: 'Сдайте экзамен (от 80 %), повторите карточки, выпишите вопросы наставнику. Карточки — по 5–10 минут каждый день с первого дня',
+}
+const plan = planDays.map((p) => ({ ...p, note: DAY_NOTES[p.day] }))
+const dayDone = (p) => (p.day === REVIEW_DAY ? exam.passed : p.lessons.length > 0 && p.lessons.every((l) => isDone(l.id)))
 const started = computed(() => doneCount.value > 0 || !!progress.last)
 const resumeTo = computed(() => {
   const l = nextLesson.value
@@ -29,7 +21,7 @@ const resumeTo = computed(() => {
   return { path: `/lesson/${l.id}`, query: resume ? { resume: 1 } : {} }
 })
 function reset() {
-  if (confirm('Сбросить отметки о пройденных уроках?')) resetProgress()
+  if (confirm('Сбросить отметки о пройденных уроках, результаты тестов и экзамена, историю карточек?')) resetProgress()
 }
 </script>
 
@@ -95,7 +87,10 @@ function reset() {
             <RouterLink v-for="l in p.lessons" :key="l.id" :to="`/lesson/${l.id}`" class="plan-link" :class="{ done: isDone(l.id) }">
               {{ l.title }}
             </RouterLink>
-            <RouterLink v-if="!p.lessons.length" to="/glossary" class="plan-link">Повторение и глоссарий</RouterLink>
+            <template v-if="p.day === REVIEW_DAY">
+              <RouterLink to="/exam" class="plan-link" :class="{ done: exam.passed }">Итоговый экзамен</RouterLink>
+              <RouterLink to="/cards" class="plan-link">Карточки: термины, числа, правила</RouterLink>
+            </template>
             <div v-if="p.note" class="plan-note">{{ p.note }}</div>
           </div>
         </li>
@@ -117,6 +112,9 @@ function reset() {
           </div>
           <h3 class="card-title">{{ l.title }}</h3>
           <p class="card-text">{{ l.summary }}</p>
+          <span v-if="quizResults[l.id]" class="card-quiz" :class="{ ok: quizResults[l.id].passed }">
+            Тест {{ quizResults[l.id].best }}/{{ quizResults[l.id].total }}
+          </span>
         </RouterLink>
       </div>
     </section>

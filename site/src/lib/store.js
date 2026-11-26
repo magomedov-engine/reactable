@@ -39,6 +39,56 @@ export const nextLesson = computed(() => {
 export function resetProgress() {
   progress.done.splice(0)
   progress.last = null
+  for (const k of Object.keys(quizResults)) delete quizResults[k]
+  Object.assign(exam, { best: 0, total: 0, passed: false, attempts: [], wrong: [] })
+  for (const k of Object.keys(cardState)) delete cardState[k]
+  Object.assign(cardsDay, { date: '', fresh: 0 })
+}
+
+// ---------- карточки: { [id]: { box, due: 'ГГГГ-ММ-ДД', reps, lapses } }; расписание — lib/cards.js
+export const cardState = reactive(load('cards', {}))
+watch(cardState, (v) => save('cards', v), { deep: true })
+// сколько новых карточек взято сегодня (дневной лимит новых)
+export const cardsDay = reactive(load('cardsDay', { date: '', fresh: 0 }))
+watch(cardsDay, (v) => save('cardsDay', v), { deep: true })
+
+// ---------- тесты по урокам: { [id урока]: { best, last, total, passed, at } }
+export const QUIZ_PASS = 0.8
+export const quizResults = reactive(load('quiz', {}))
+watch(quizResults, (v) => save('quiz', v), { deep: true })
+
+// записать попытку; при результате от 80 % урок отмечается пройденным
+export function recordQuiz(id, score, total) {
+  const prev = quizResults[id]
+  const passed = score / total >= QUIZ_PASS
+  quizResults[id] = {
+    best: Math.max(score, prev?.best ?? 0),
+    last: score,
+    total,
+    passed: passed || !!prev?.passed,
+    at: Date.now(),
+  }
+  if (passed && !isDone(id)) progress.done.push(id)
+  return passed
+}
+
+// ---------- итоговый экзамен: { best, total, passed, attempts: [{ at, score, total }], wrong: [ключи вопросов] }
+export const exam = reactive(load('exam', { best: 0, total: 0, passed: false, attempts: [], wrong: [] }))
+watch(exam, (v) => save('exam', v), { deep: true })
+
+export function recordExam(answers) {
+  const score = answers.filter((a) => a.ok).length
+  const total = answers.length
+  const passed = score / total >= QUIZ_PASS
+  exam.best = Math.max(exam.best, score)
+  exam.total = total
+  exam.passed = exam.passed || passed
+  exam.attempts = [...exam.attempts, { at: Date.now(), score, total }].slice(-10)
+  // ошибки копятся, пока на вопрос не ответят верно: такие вопросы попадут в следующий билет первыми
+  const wrong = new Set(exam.wrong)
+  for (const a of answers) a.ok ? wrong.delete(a.key) : wrong.add(a.key)
+  exam.wrong = [...wrong]
+  return passed
 }
 
 // ---------- оформление
